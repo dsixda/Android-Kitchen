@@ -1,3 +1,9 @@
+#
+# This file has two optional arguments: 
+# $1 = "no_info"
+# $2 = "kernel_only"
+#
+
 
 echo
 echo "Ensure the ROM is under the original_update folder.  The format"
@@ -35,7 +41,7 @@ then
 
 else
 
-  scripts/choose_rom
+  scripts/choose_rom $2
   res=$?
 
   if [ `ls | grep -m 1 WORKING_` ] && [ "$res" != "1" ] && [ "$1" == "" ]

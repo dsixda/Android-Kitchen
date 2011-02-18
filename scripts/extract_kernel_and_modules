@@ -1,3 +1,8 @@
+#
+# This file has one optional argument: 
+# $1 = "for_porting"
+#
+
 clear
 
 if [ -d MY_DEVICE_WORKING ]
@@ -24,7 +29,7 @@ clear
 echo
 echo "--> Obtain a ROM meant for YOUR DEVICE <--"
 
-scripts/check_rom no_info
+scripts/check_rom no_info kernel_only
 
 # If working folder is open and cannot move it, handle the error properly
 if [ "$?" != "1" ]

@@ -1,3 +1,9 @@
+#
+# This file has two arguments:
+# $1 = file name (mandatory)
+# $2 = "kernel_only" (optional)
+#
+
 
 update_file=$1
  
@@ -175,62 +181,67 @@ else
 
   cd ..
   echo
-  scripts/check_no_update_script
-  error_code=$?
-  cd WORKING_*
 
-  cd META-INF/com/google/android
-
-
-  #
-  # Check for extra files / folders; e.g in OTA update
-  #
-
-  if [ -e updater-script ] && [ -e update-script ]
+  if [ "$2" != "kernel_only" ]
   then
-    echo
-    echo "Warning: Both updater-script and update-script are found."
-    echo -n "Remove updater-script (y/n)? (default: y) "
-    read enterRemove
-    if [ "$enterRemove" != "n" ]
-    then
-      echo "Removing updater-script"
-      rm -f updater-script
-    else
-      echo "Not removing updater-script"
-    fi
-  fi
-  if [ -e update-binary ] && [ -e update-script ]
-  then
-    echo
-    echo "Warning: Both update-binary and update-script are found."
-    echo -n "Remove update-binary (y/n)? (default: y) "
-    read enterRemove
-    if [ "$enterRemove" != "n" ]
-    then
-      echo "Removing update-binary"
-      rm -f update-binary
-    else
-      echo "Not removing update-binary"
-    fi
-  fi
+
+    scripts/check_no_update_script
+    error_code=$?
+    cd WORKING_*
+
+    cd META-INF/com/google/android
 
 
-  if [ -e update-script ]
-  then
     #
-    # Remove some comments to prevent common issues with kitchen
+    # Check for extra files / folders; e.g in OTA update
     #
-    sed -i \
-      -e 's/#set_perm[^\n]*[\n]*//g' \
-      -e 's/#write[^\n]*[\n]*//g' \
-      update-script
+
+    if [ -e updater-script ] && [ -e update-script ]
+    then
+      echo
+      echo "Warning: Both updater-script and update-script are found."
+      echo -n "Remove updater-script (y/n)? (default: y) "
+      read enterRemove
+      if [ "$enterRemove" != "n" ]
+      then
+        echo "Removing updater-script"
+        rm -f updater-script
+      else
+        echo "Not removing updater-script"
+      fi
+    fi
+    if [ -e update-binary ] && [ -e update-script ]
+    then
+      echo
+      echo "Warning: Both update-binary and update-script are found."
+      echo -n "Remove update-binary (y/n)? (default: y) "
+      read enterRemove
+      if [ "$enterRemove" != "n" ]
+      then
+        echo "Removing update-binary"
+        rm -f update-binary
+      else
+        echo "Not removing update-binary"
+      fi
+    fi
+
+
+    if [ -e update-script ]
+    then
+      #
+      # Remove some comments to prevent common issues with kitchen
+      #
+      sed -i \
+        -e 's/#set_perm[^\n]*[\n]*//g' \
+        -e 's/#write[^\n]*[\n]*//g' \
+        update-script
+    fi
+
+    rm -rf update-script.bak
+    cd ../../../../..
+
+    scripts/remove_recovery
   fi
-
-  rm -rf update-script.bak
-  cd ../../../../..
-
-  scripts/remove_recovery
 
   echo
   echo "Listing of META-INF/com/google/android:"

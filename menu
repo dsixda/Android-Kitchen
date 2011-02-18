@@ -1,6 +1,6 @@
 #!/bin/bash
  
-version=0.125
+version=0.126
 
 chmod 755 scripts/*
 scripts/init_kitchen

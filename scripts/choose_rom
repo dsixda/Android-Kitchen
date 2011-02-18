@@ -1,3 +1,8 @@
+#
+# This file has two optional arguments:
+# $1 = "kernel_only"
+#
+
 
 #
 # Check for any ZIP files in original_update
@@ -105,7 +110,7 @@ then
 
   elif [ "`echo $file_chosen | grep -i \\.zip$`" != "" ]
   then
-    scripts/zip_file_to_working_folder "$file_chosen"
+    scripts/zip_file_to_working_folder "$file_chosen" $1
     exit $?
 
   elif [ "`echo $file_chosen | grep -i \\.app$`" != "" ]

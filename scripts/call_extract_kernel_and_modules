@@ -75,6 +75,7 @@ fi
 
 if [ -d MY_DEVICE_WORKING ]
 then
+  echo "Removing this ROM's working folder ..."
   rm -rf MY_DEVICE_WORKING
 fi
 
