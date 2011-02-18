@@ -1,0 +1,76 @@
+
+if [ "$1" == "" ]
+then
+  clear
+fi
+
+scripts/prompt_remove_boot_extracted
+
+if [ ! -d BOOT-EXTRACTED ]
+then
+
+  if [ -d WORKING_* ]
+  then
+    echo
+    echo "Working folder found"
+  else
+    echo
+    echo "Working folder not found, you will need to create one!"
+    exit 0
+  fi
+
+  cd WORKING_*
+
+  if [ -d system ]
+  then
+
+    if [ -d boot ]
+    then
+
+      if [ ! -e boot/initrd.gz ]
+      then
+        echo
+        echo "boot/initrd.gz not found in working folder!"
+        cd ..
+        exit 0
+      fi
+
+      if [ ! -e boot/zImage ]
+      then  
+        echo
+        echo "boot/zImage not found in working folder!"
+        cd ..
+        exit 0
+      fi
+
+      echo "Making folder 'BOOT-EXTRACTED' ..."
+      mkdir ../BOOT-EXTRACTED
+
+      echo "Copying initrd.gz and zImage to BOOT-EXTRACTED"
+      cp boot/zImage ../BOOT-EXTRACTED/
+      cp boot/initrd.gz ../BOOT-EXTRACTED
+
+      echo "Extracting ramdisk contents ..."
+      cd ../BOOT-EXTRACTED
+      mkdir boot.img-ramdisk
+      cd boot.img-ramdisk
+      gzip -d -c ../initrd.gz | cpio -i
+      cd ..
+      rm -f initrd.gz
+
+      cd ..
+
+    else
+      echo "Error: boot folder not found!"
+      echo
+      cd ..
+      exit 0
+    fi      
+  
+  else
+    echo "Error: system folder not found under working folder!"
+    cd ..
+    exit 0
+  fi
+fi
+

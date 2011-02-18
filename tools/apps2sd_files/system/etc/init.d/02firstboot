@@ -1,0 +1,9 @@
+#!/system/bin/sh
+# execute any postinstall script then kill it
+if [ -e /data/firstboot.sh ];
+then
+   /system/bin/busybox.a2sd "[ ] Executing firstboot.sh";
+   logwrapper /system/bin/bash /data/firstboot.sh;
+   /system/bin/busybox.a2sd rm -f /data/firstboot.sh;
+fi;
+

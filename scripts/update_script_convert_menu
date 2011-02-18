@@ -1,0 +1,48 @@
+
+clear
+if [ ! -d WORKING_* ]
+then
+  echo No working folder found!
+  scripts/press_enter
+  exit 0
+fi
+
+
+while :
+do
+
+  clear
+
+  echo
+  echo "Convert update-script/updater-script"
+  echo "--------------------------------------"
+  echo
+  echo "Enter a choice:"
+  echo 
+
+  echo "  1 = Convert updater-script to update-script"
+  echo "  2 = Convert update-script to updater-script"
+  echo "  0 = Exit"
+  echo
+  echo -n "? "
+
+  read enterNumber
+
+  if [ "$enterNumber" == "1" ]
+  then
+    scripts/convert_updater_script
+  elif [ "$enterNumber" == "2" ] 
+  then
+    scripts/convert_update_script
+  elif [ "$enterNumber" == "0" ]
+  then
+    exit 0
+  else 
+    echo "Invalid option"
+    continue
+  fi
+
+  scripts/press_enter
+  exit 0
+
+done

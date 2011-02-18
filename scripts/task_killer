@@ -1,0 +1,223 @@
+scripts/ensure_boot_extracted
+
+if [ -d BOOT-EXTRACTED ]
+then
+  if [ -d WORKING_* ]
+  then
+
+    if [ -d BOOT-EXTRACTED/boot.img-ramdisk ]
+    then
+      cd BOOT-EXTRACTED/boot.img-ramdisk
+    else
+      echo "Error: BOOT-EXTRACTED/boot.img-ramdisk folder not found!"
+      exit 0
+    fi
+
+  else
+    exit 0
+  fi
+else
+  exit 0
+fi
+
+
+clear
+
+init_params=(FOREGROUND_APP_MEM VISIBLE_APP_MEM SECONDARY_SERVER_MEM HOME_APP_MEM HIDDEN_APP_MEM CONTENT_PROVIDER_MEM EMPTY_APP_MEM)   
+
+echo
+echo Currently:
+echo
+
+for i in 0 1 2 3 4 5 6
+do
+
+  init_param=${init_params[${i}]} 
+
+  init_val=`grep $init_param init.rc | grep -v [#] | sed 's/[ ]*setprop ro.'$init_param'[ ]*//'`
+  if [ "$init_val" == "" ]
+  then
+    init_val="?"
+    str="NOT FOUND"
+  else
+    str=$init_val
+  fi
+
+  init_vals=( ${init_vals[@]} $init_val )
+
+  echo " $init_param = $str"
+
+  if [ "$str" == "NOT FOUND" ]
+  then
+    echo 
+    echo "Error: Could not obtain required parameters"
+    cd ../..
+    rm -rf BOOT-EXTRACTED
+    exit 0
+  fi
+
+done
+
+
+echo
+echo "You will now be asked to change each of the values above.  If you "
+echo "want to enable the task killer tweak but are unsure of what values"
+echo "to use, then simply press Enter at the prompts and the script" 
+echo "will do it for you."
+echo
+echo "Type x at any time if you want to cancel and exit.  None of the"
+echo "values will be saved if you cancel."
+echo
+
+default_vals=(1536 2048 4096 4096 5120 15360 25600)
+
+for i in 0 1 2 3 4 5 6
+do
+
+  if [ "${init_vals[${i}]}" == "?" ]
+  then
+    read_val="?"
+  else
+
+    echo -n "${init_params[${i}]} (default for tweak: ${default_vals[${i}]}): "
+    read read_val
+
+    if [ "$read_val" == "x" ] 
+    then
+      exit 0
+    elif [ "$read_val" == "" ]
+    then
+      read_val=${default_vals[${i}]}
+    fi
+  fi
+
+  read_vals=( ${read_vals[@]} $read_val )
+
+done
+
+
+clear
+
+
+echo
+echo "You wanted the following:"
+echo
+
+changes_made=0
+
+for i in 0 1 2 3 4 5 6
+do
+
+  if [ "${init_vals[${i}]}" == "?" ]
+  then
+    continue
+  fi
+
+  init_param=${init_params[${i}]} 
+  init_val=${init_vals[${i}]}
+  read_val=${read_vals[${i}]}
+
+  if [ "$init_val" == "$read_val" ]
+  then
+    echo " $init_param = $init_val"
+  else
+    changes_made=1
+    echo " $init_param = $init_val --> $read_val"
+  fi    
+  echo
+
+done
+
+
+
+echo
+
+if [ $changes_made == 0 ]
+then
+  echo "Nothing was changed."
+  cd ../..
+  rm -rf BOOT-EXTRACTED
+  exit 0
+fi
+
+
+echo -n "Are these values OK (y/n)? (default: y): "
+
+read promptOk
+
+if [ "$promptOk" == "n" ]
+then
+  echo "Cancelled"
+  cd ../..
+  rm -rf BOOT-EXTRACTED
+  exit 0
+fi
+
+
+#
+# Write to file
+#
+
+for i in 0 1 2 3 4 5 6
+do
+
+  if [ "${init_vals[${i}]}" == "?" ]
+  then
+    continue
+  fi
+
+  export NEW_INIT_VAL=${read_vals[${i}]}
+  export INIT_PARAM=${init_params[${i}]} 
+  export INIT_VAL=${init_vals[${i}]} 
+
+
+  perl -pi -e 's/ro.$ENV{"INIT_PARAM"} $ENV{"INIT_VAL"}/ro.$ENV{"INIT_PARAM"} $ENV{"NEW_INIT_VAL"}/g' init.rc
+
+done
+
+export VAL0=${read_vals[0]}
+export VAL1=${read_vals[1]}
+export VAL2=${read_vals[2]}
+export VAL3=${read_vals[3]}
+export VAL4=${read_vals[4]}
+export VAL5=${read_vals[5]}
+export VAL6=${read_vals[6]}
+
+perl -pi -e 's/parameters\/minfree[^\n]*/parameters\/minfree $ENV{"VAL0"},$ENV{"VAL1"},$ENV{"VAL2"},$ENV{"VAL3"},$ENV{"VAL4"},$ENV{"VAL5"},$ENV{"VAL6"}/' init.rc
+
+if [ -e init.rc.bak ]
+then
+  rm init.rc.bak
+fi
+
+
+
+echo
+echo Saved to file:
+echo
+
+for i in 0 1 2 3 4 5 6
+do
+
+  if [ "${init_vals[${i}]}" == "?" ]
+  then
+    continue
+  fi
+
+  init_param=${init_params[${i}]} 
+  init_val=`grep $init_param init.rc | grep -v [#] | sed 's/[ ]*setprop ro.'$init_param'[ ]*//'`
+  init_vals=( ${init_vals[@]} $init_val )
+
+  echo " $init_param = $init_val"
+
+done
+
+echo
+cat init.rc | grep minfree | sed 's/   //'
+
+cd ../..
+scripts/build_boot_img
+
+
+
+

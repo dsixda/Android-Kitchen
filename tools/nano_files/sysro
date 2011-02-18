@@ -1,0 +1,1 @@
+mount -o ro,remount /dev/block/mtdblock3 /system

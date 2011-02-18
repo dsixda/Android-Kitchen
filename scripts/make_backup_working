@@ -1,0 +1,30 @@
+
+if [ `ls | grep -m 1 WORKING_` ]
+then
+  echo "Any existing working folders under the main folder will be automatically"
+  echo "backed up to folder OLD_WORKING."
+fi
+
+scripts/press_enter
+
+#
+# Make backup folder
+#
+
+if [ `ls | grep -m 1 WORKING_` ]
+then
+  if [ -d OLD_WORKING ]
+  then
+    echo
+    echo "Found OLD_WORKING" 
+  else
+    echo
+    echo "Making folder OLD_WORKING ..."
+    mkdir OLD_WORKING
+  fi
+
+  echo "Moving old working folders to OLD_WORKING ..."
+  mv WORKING_* OLD_WORKING 2>/dev/null
+
+fi
+

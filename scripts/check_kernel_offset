@@ -1,0 +1,46 @@
+if [ ! -d WORKING_* ]
+then
+  echo Working folder not found!
+  exit 0
+fi
+
+cd WORKING_*
+
+echo
+
+if [ -e boot.img ] 
+then
+
+  hex_offset=`od -x -A x boot.img | grep -m 1 "0000 e1a0" | sed -e 's/ .*//'`
+
+  if [ "$hex_offset" != "" ]
+  then
+    dec_offset=`printf "%d" 0x$hex_offset`
+    echo "Kernel found at offset $dec_offset in boot.img"
+
+    echo "Setting mkbootimg.c line 74"
+    sed -i -e '74s/.*/static unsigned char padding\['$dec_offset'\] = { 0, };/' ../tools/mkboot/mkbootimg.c
+    echo "Setting mkbootimg.c line 107"
+    sed -i -e '107s/.*/    unsigned pagesize = '$dec_offset';/' ../tools/mkboot/mkbootimg.c
+
+    echo "Setting extract-kernel.pl line 23"
+    sed -i -e '23s/.*/$pageSize = '$dec_offset';/' ../tools/extract_boot_files/extract-kernel.pl
+
+    echo "Setting extract-ramdisk.pl line 23"
+    sed -i -e '23s/.*/$pageSize = '$dec_offset';/' ../tools/extract_boot_files/extract-ramdisk.pl
+
+    cd ..
+    exit 0
+
+  else
+    echo "Error kernel offset not found in boot.img!"
+    cd ..
+    exit 1
+  fi
+
+else
+  echo "boot.img not found under working folder!"
+  cd ..
+  exit 1
+fi
+

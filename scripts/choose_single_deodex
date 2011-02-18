@@ -1,0 +1,69 @@
+
+clear
+
+
+echo
+cd WORKING_*
+
+grep_cmd=`find . | grep \\.odex$ | sort -f`
+count=0
+
+rm -f ../temp.list
+
+echo >> ../temp.list
+echo "All ODEX files:" >> ../temp.list
+echo >> ../temp.list
+
+for filename in $grep_cmd 
+do
+  count=$(($count+1))
+
+  # Store file names in an array
+  file_array[$count]=$filename
+  echo "  ($count) $filename" >> ../temp.list
+done
+
+more ../temp.list
+rm -f ../temp.list
+
+echo
+echo -n "Enter file number (0 = cancel): "
+
+read enterNumber
+
+if [ "$enterNumber" == "0" ]
+then
+  cd ..
+  exit 0
+
+# Verify input is a number
+elif [ "`echo $enterNumber | sed 's/[0-9]*//'`" == "" ]
+then
+
+  file_chosen=${file_array[$enterNumber]}
+
+  if [ "$file_chosen" == "" ]
+  then
+    cd ..
+    exit 0
+  fi
+
+  echo
+  echo "Enter any JAR file dependencies separated by colon (Enter=none):"
+  echo -n "$file_chosen > "
+  read classfiles
+  echo
+
+  cp ../tools/deodex_files/baksmali*.jar baksmali.jar
+  cp ../tools/deodex_files/smali*.jar smali.jar
+
+  ../scripts/do_deodex_file $file_chosen system/framework $classfiles 
+
+  rm -f *smali.jar
+
+fi
+
+
+cd ..
+scripts/press_enter
+

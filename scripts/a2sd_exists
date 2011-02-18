@@ -1,0 +1,11 @@
+cd WORKING_*
+
+if [ "`find . -name a2sd`" != "" ] || [ "`find . -type d -name sd`" != "" ]
+then
+  cd ..
+  exit 1
+else
+  cd ..
+  exit 0
+fi
+

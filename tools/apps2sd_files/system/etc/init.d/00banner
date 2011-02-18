@@ -1,0 +1,14 @@
+#!/system/bin/sh
+#
+# Print startup info
+#
+/system/bin/busybox.a2sd echo "Welcome to Android `getprop ro.build.version.release` / `getprop ro.modversion`";
+/system/bin/busybox.a2sd echo "";
+/system/bin/busybox.a2sd echo " Powered by _____    _______";
+/system/bin/busybox.a2sd echo "            |    \      |   ";
+/system/bin/busybox.a2sd echo "            |     |     |   ";
+/system/bin/busybox.a2sd echo "            |     |     |   ";
+/system/bin/busybox.a2sd echo "            |     |     |   ";
+/system/bin/busybox.a2sd echo "            |____/      |   ";
+/system/bin/busybox.a2sd echo "           Darktremor Apps2SD";
+exit;

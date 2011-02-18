@@ -1,0 +1,44 @@
+clear
+
+echo
+echo "----------------------------------------------------------------"
+echo  
+echo "The Bash command shell is handy for command line completion when "
+echo "using a terminal emulator (e.g. ConnectBot) on your Android"
+echo "device.  To start it from a shell, type: bash"
+echo
+echo "----------------------------------------------------------------"
+echo 
+
+echo -n "Proceed with install (y/n)? (default: y): "
+read do_install
+
+if [ "$do_install" == "n" ]
+then
+  exit 0
+fi
+
+echo 
+
+if [ -d WORKING_* ]
+then
+  echo Found working folder
+else
+  echo No working folder found!
+  exit 0
+fi
+
+cd WORKING_*
+
+bash_path=`find . -name bash`
+if [ "$bash_path" == "" ] 
+then
+  echo "Adding /system/bin/bash"
+  cp ../tools/bash system/bin/
+else
+  echo "Found $bash_path"
+fi
+
+cd ..
+scripts/add_bash_to_update_script
+

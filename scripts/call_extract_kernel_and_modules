@@ -1,0 +1,88 @@
+clear
+
+echo
+echo "This procedure will extract the kernel and modules from a donor ROM."
+echo 
+echo "NOTE1: Any existing MY_KERNEL folder will be removed before we start."
+echo 
+echo "NOTE2: If a working folder already exists, it will be backed up and"
+echo "       then restored after the kernel extraction."
+echo
+echo "Get the new ROM, and be ready to copy it to the folder 'original_update'."
+
+scripts/press_enter
+
+if [ -d WORKINGTEMP ]
+then
+  rm -rf WORKINGTEMP
+fi
+
+if [ -d WORKING_* ]
+then
+  mkdir WORKINGTEMP
+  mv WORKING_* WORKINGTEMP 2>/dev/null
+
+  if [ "$?" == "1" ]
+  then
+    echo "Error: Working folder is in use. Ensure its files or folders are not open."
+    rm -rf WORKINGTEMP
+    exit 0
+  fi
+
+fi
+
+scripts/extract_kernel_and_modules
+
+if [ -d MY_KERNEL ]
+then
+
+  if [ -d MY_DEVICE_WORKING/system ]
+  then
+
+    if [ `ls MY_DEVICE_WORKING/system | grep -m 1 prop` ]
+    then
+
+      echo
+      echo "Copying *.prop ..."
+  
+      if [ ! -d MY_KERNEL/system ]
+      then
+        mkdir MY_KERNEL/system
+      fi
+
+      cp -v MY_DEVICE_WORKING/system/*.prop MY_KERNEL/system/
+    fi
+
+  fi
+
+
+  rm MY_KERNEL/boot.img
+
+  echo
+  echo "----------------------------------------------------------------------"
+  echo
+  echo "The following files/folders have been copied to the MY_KERNEL folder:"
+  echo
+  ls -R MY_KERNEL
+  echo
+  echo "You can add zImage to the BOOT-EXTRACTED folder, which is created"
+  echo "when unpacking the working folder's boot.img in the kitchen."
+  echo
+
+else
+  echo "Error: Kernel not extracted"
+fi
+
+if [ -d MY_DEVICE_WORKING ]
+then
+  rm -rf MY_DEVICE_WORKING
+fi
+
+if [ -d WORKINGTEMP ]
+then
+  working_folder=`ls WORKINGTEMP`
+  echo "Restoring previous working folder $working_folder ..."
+  mv WORKINGTEMP/* .
+  rmdir WORKINGTEMP
+fi
+

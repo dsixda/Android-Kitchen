@@ -1,0 +1,62 @@
+
+cd WORKING_*
+echo
+
+if [ -e META-INF/com/google/android/update-script ]
+then
+  
+  #
+  # Deleting any existing lines with 'bin/bash' to prevent conflicts
+  #
+  echo "Removing existing lines containing bin/bash in update-script"
+  sed -i -e '/bin\/bash[ ]*$/d' META-INF/com/google/android/update-script
+  sed -i -e '/symlink.*\/bash .*/d' META-INF/com/google/android/update-script
+
+  #
+  # Do this to prevent conflicts with the update-script in ROMs that already have the binary
+  #
+  if [ -e system/xbin/bash ]
+  then
+    if [ "`find system/bin -name bash`" == "" ]
+    then
+      echo "Copying system/xbin/bash to system/bin/bash"
+      cp -f system/xbin/bash system/bin/bash
+    fi
+  fi
+
+  echo "Updating update-script with bash entries"
+
+  cd META-INF/com/google/android
+
+  sed -i -e 's/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh\nset_perm 0 0 04755 SYSTEM:bin\/bash\nsymlink \/system\/bin\/bash SYSTEM:bin\/sh/g' update-script
+
+  grep_bash=`grep -c bin/bash update-script` 
+  cd ../../../..
+
+  if [ $grep_bash != 2 ]
+  then
+    echo "Error: Unable to update the update-script with bash"
+
+  else
+
+    #
+    # Ensure the update-script does not cause conflicts with 'sh' when it is symlinked
+    #
+    sh0_path=`find . -name sh0`
+    if [ "$sh0_path" == "" ] 
+    then
+      if [ -e system/bin/sh ]
+      then
+        echo "Moving aside /system/bin/sh due to addition of bash's symlink"
+        mv system/bin/sh system/bin/sh0
+      fi        
+    fi
+  fi
+
+else
+  echo "Error: No update-script found!"
+fi
+
+cd ..
+echo
+

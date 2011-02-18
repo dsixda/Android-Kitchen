@@ -1,0 +1,18 @@
+
+if [ ! -d WORKING_* ]
+then
+  echo "No working folder found!"
+  exit 0
+fi
+
+cd WORKING_*
+
+if [ ! -e boot.img ]
+then
+  echo "No boot.img found!"
+  exit 0
+fi
+
+cmd_line=`od -A n --strings -j 64 -N 512 boot.img`
+
+echo $cmd_line

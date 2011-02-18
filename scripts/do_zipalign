@@ -1,0 +1,77 @@
+clear
+echo
+
+if [ -d WORKING_* ]
+then
+  echo Found working folder
+else
+  echo No working folder found!
+  exit 0
+fi
+
+
+if [ `uname | grep CYGWIN` ]
+then
+  zipalign_file=zipalign.exe
+
+elif [ `uname | grep Linux` ]
+then
+  zipalign_file=zipalign
+
+elif [ `sw_vers | grep -o Mac` ]
+then
+  zipalign_file=zipalign.mac
+
+else
+  echo Error: Operating system not detected, cannot use zipalign
+  exit 0
+fi
+
+
+clear
+
+echo
+echo "---------------------------------------------------------------"
+echo  
+echo "Zipalign is a procedure that will optimize all of the *.apk"
+echo "files under your working folder for better RAM utilization."
+echo
+echo "Use this as the *final step* before building your ROM."
+echo 
+echo "---------------------------------------------------------------"
+echo
+
+echo -n "Proceed with zipalign (y/n)? (default: y): "
+read do_zipalign
+
+if [ "$do_zipalign" == "n" ]
+then
+  exit 0
+fi
+
+
+echo
+cd WORKING_*
+
+grep_cmd=`find . | grep .apk$ | sort -f`
+
+for filename in $grep_cmd
+do
+  echo "Zipaligning $filename ..."
+  new_file=$filename\_new
+  ../tools/zipalign_files/$zipalign_file 4 $filename $new_file
+
+  if [ -e $new_file ]
+  then
+    mv -f $new_file $filename 
+  else
+    echo "Error: Unable to zipalign"
+  fi
+
+done
+
+cd ..
+echo
+echo "Finished"
+
+

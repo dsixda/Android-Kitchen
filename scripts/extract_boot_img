@@ -1,0 +1,65 @@
+clear
+
+date_str=`date '+%m%d%y_%H%M%S'`
+boot_dir=bootimg_$date_str
+
+echo
+echo "Creating folder `pwd`/$boot_dir ..."
+mkdir $boot_dir
+
+echo
+echo "---> Place boot.img into the folder mentioned above <--"
+
+scripts/press_enter
+
+cd $boot_dir
+
+if [ -e boot.img ]
+then
+
+  cd ..
+  scripts/check_kernel_offset
+  res=$?
+
+  if [ "$res" == "0" ]
+  then
+    kernel_file=extract-kernel.pl
+    ramdisk_file=extract-ramdisk.pl
+  else
+    rm -rf $boot_dir
+    exit 0
+  fi
+
+  cd $boot_dir
+  cp ../tools/extract_boot_files/$kernel_file extract-kernel.pl
+  cp ../tools/extract_boot_files/$ramdisk_file extract-ramdisk.pl
+
+  echo
+  echo Extracting kernel ...
+  ./extract-kernel.pl boot.img
+
+  echo
+  echo Extracting ramdisk ... 
+  ./extract-ramdisk.pl boot.img
+
+  rm boot.img
+  rm extract-*.pl
+  cd ..
+  echo
+  echo Done!
+  echo
+  echo "Contents of $boot_dir:"
+  echo
+  echo "`ls -l $boot_dir`"
+
+
+else
+  echo "Error: boot.img not found!"
+  echo
+  cd ..
+  echo "Removing $boot_dir folder"
+  rm -rf $boot_dir
+  exit 0
+fi      
+  
+

@@ -1,0 +1,134 @@
+
+if [ "$1" == "" ]
+then
+  clear
+fi
+
+if [ ! -d WORKING_* ]
+then
+  echo No working folder found!
+  scripts/press_enter
+  exit 0
+fi
+
+echo
+echo "ROOTING"
+echo "--------------------------------------------"
+echo 
+echo "The following will be done for root:"
+echo
+echo "- Add Superuser.apk and su"
+echo "- Add necessary lines to the update-script"
+echo "- Update default.prop in the ramdisk"
+echo 
+echo "--------------------------------------------"
+echo
+
+cd WORKING_*
+cd system
+
+if [ ! -e build.prop ]
+then
+  echo "Error: build.prop not found!"
+  cd ../..
+  scripts/press_enter
+  exit 0
+fi
+
+su_path=`find . -name su`
+super_path=`find . -iname Superuser.apk`
+overwrite=0
+
+if [ "$su_path" != "" ] && [ "$super_path" != "" ] 
+then
+  echo "The files 'su' and Superuser.apk already exist"
+  echo -n "Overwrite (y/n)? (default: n): "
+  read do_su
+
+  if [ "$do_su" != "y" ]
+  then
+    cd ../..
+    exit 0
+  else
+    overwrite=1
+    echo
+    echo
+  fi
+
+fi
+
+
+echo "Which version of the Superuser package do you want"
+echo "to install?"
+echo
+
+if [ "`grep -c ro.build.version.release=1 build.prop`" != "0" ]
+then
+  echo " d - ChainsDD's Cupcake/Donut  (Android 1.x)" 
+fi
+
+if [ "`grep -c ro.build.version.release=2 build.prop`" != "0" ]
+then
+  echo " f - ChainsDD's Eclair/Froyo   (Android 2.x)" 
+fi
+
+if [ "`grep -c ro.build.version.release=1 build.prop`" == "0" ] && [ "`grep -c ro.build.version.release=2 build.prop`" == "0" ]
+then
+  echo " d - ChainsDD's Cupcake/Donut  (Android 1.x)" 
+  echo " f - ChainsDD's Eclair/Froyo   (Android 2.x)" 
+fi
+
+echo " s - Old and simple version    (All Android)"
+echo
+echo " x - Cancel rooting            (default)"
+echo
+
+echo -n "? "
+read enterVersion
+echo
+
+if [ "$enterVersion" == "d" ]
+then
+  folder=cupcake-donut
+elif [ "$enterVersion" == "f" ]
+then
+  folder=eclair-froyo
+elif [ "$enterVersion" == "s" ]
+then
+  folder=old
+else
+  echo "Cancelled"
+  cd ../..
+  exit 1
+fi
+
+if [ "$overwrite" == "1" ]
+then
+  echo
+  echo "Overwriting old 'su' and Superuser.apk ..."
+  rm -fv $su_path
+  rm -fv $super_path
+fi
+
+if [ "$enterVersion" == "s" ]
+then
+  cp -fv ../../tools/su_files/old/app/Superuser.apk app
+  cp -fv ../../tools/su_files/old/bin/su bin
+else
+  cp -fv ../../tools/su_files/chainsdd/Superuser.apk app
+  cp -fv ../../tools/su_files/chainsdd/$folder/su bin
+fi
+
+cd ../..
+
+
+scripts/add_su_to_update_script
+scripts/do_root_boot_img
+
+
+echo 
+echo "Finished rooting"
+echo
+
+scripts/press_enter
+

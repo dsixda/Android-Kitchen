@@ -1,0 +1,19 @@
+
+echo
+echo Just a sample
+echo
+
+if [ -d WORKING_* ]
+then
+  echo Found working folder
+else
+  echo No working folder found!
+  exit 0
+fi
+
+cd WORKING_*
+echo `pwd`
+echo
+ls -lrt
+cd ..
+

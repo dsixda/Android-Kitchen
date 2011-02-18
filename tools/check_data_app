@@ -1,0 +1,12 @@
+#!/sbin/sh
+
+# Replaces 'delete DATA:app' in update-script.
+# Fixes issue caused when /data/app is apps2sd symlink.
+
+find_cmd=`find data -name app -type l -maxdepth 1`
+
+if [ "$find_cmd" != "" ]
+then
+  chmod 777 /data/app
+  rm -f /data/app
+fi

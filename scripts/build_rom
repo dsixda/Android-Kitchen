@@ -1,0 +1,302 @@
+
+clear
+echo
+
+if [ -d WORKING_* ]
+then
+  echo Found working folder
+else
+  echo No working folder found!
+  exit 0
+fi
+
+cd WORKING_*
+
+if [ -e META-INF/com/google/android/update-script ] && [ -e META-INF/com/google/android/updater-script ]
+then
+
+  echo
+  echo "Error:  Both update-script and updater-script are detected in working folder." 
+  echo "        Keep only one of them before building!" 
+  echo
+
+  cd ..
+  exit 0
+fi
+
+
+
+echo
+echo "Cleaning up any leftover files ..."
+echo
+
+rm -f *.zip
+rm -f testkey.*
+rm -f signapk.jar
+rm -f signed*.zip
+
+#
+# Clean up *.DS_Store hidden files
+#
+find . -name '*.DS_Store' -type f -delete
+
+
+#
+# Clean up strange temp file issue in root of working folder
+#
+
+file_list=`find . -maxdepth 1 -type f`
+
+for filename in $file_list
+do
+
+  filename=`echo $filename | sed 's/\.\///g'`
+  header_bytes=`od -A n -H -j 0 -N 4 $filename | sed 's/ //g'`
+
+  if [ "$header_bytes" == "04034b50" ]
+  then
+    echo -n "Found file in root folder: $filename. Delete (y/n)? (default: y): "
+    read delete_file
+
+    if [ "$delete_file" != "n" ]
+    then
+      echo "Deleting $filename"
+      rm -f $filename
+    else
+      echo "Keeping $filename"
+    fi
+  fi
+done
+
+
+if [ -e boot.img ]
+then
+  cd ..
+  cmd_line=`scripts/get_cmdline`
+
+  if [ "$cmd_line" == "dsixda NAND" ]
+  then
+    echo
+    echo "NAND ROM detected, converting boot.img back to boot folder ..."
+    scripts/ensure_boot_extracted no_clear
+    scripts/build_nand_boot
+  fi
+
+  cd WORKING_*
+fi
+
+
+echo
+echo `pwd`
+echo
+ls -lrt
+cd ..
+echo
+
+
+scripts/fix_pre_build
+
+cd WORKING_*
+
+#
+# Create update.zip
+#
+echo
+echo Making update.zip ...
+
+if [ "$cmd_line" == "dsixda Null" ]
+then
+  zip -r -y -q update * -x *.cvs* *.git* *.svn* \
+      *updater-script.orig* *update-binary.orig* *update-script.orig* \
+      boot.img
+else
+  zip -r -y -q update * -x *.cvs* *.git* *.svn* \
+      *updater-script.orig* *update-binary.orig* *update-script.orig*
+fi      
+echo
+echo update.zip created 
+echo
+
+
+
+#
+# Convert update-script (Amend) to updater-script (Edify) in the ZIP file only
+#
+
+if [ -e META-INF/com/google/android/update-script ]
+then
+ 
+  cd ..
+  scripts/update_script_should_convert_back
+  auto_convert="$?"
+  cd WORKING_*
+  
+  if [ "$auto_convert" == "1" ]
+  then 
+    convert_it=y
+  else
+    echo
+    echo "========================================================================"
+    echo 
+    echo " update-script detected in ROM"
+    echo
+    echo " To ensure compatibility with newer custom recovery images, you have"
+    echo " the option of using an updater-script (Edify) instead of an"
+    echo " update-script (Amend) in your ROM's ZIP file."
+    echo 
+    echo " Your working folder will remain the same and continue to have the "
+    echo " original update-script."
+    echo 
+    echo -n " Add updater-script to ROM (y/n)? (default: n): "
+    read convert_it
+  fi
+
+  if [ "$convert_it" == "y" ]
+  then
+
+    cd ..
+    scripts/convert_update_script for_zip
+
+    if [ "$?" != "1" ]
+    then
+
+      cd WORKING_*
+
+      echo "Proceed with the change (y/n)?"
+      echo 
+      echo "  y = Proceed; updater-script and update-binary will be moved to the ZIP"
+      echo "      file; update-script in ZIP file will be removed but will remain in"
+      echo "      working folder."
+      echo "  n = Cancel; updater-script and update-binary will be deleted and not"
+      echo "      used."
+      echo
+       
+      echo -n "? (default: y): "
+      read proceed_change 
+      echo
+
+      if [ "$proceed_change" != "n" ]
+      then
+
+        if [ -e META-INF/com/google/android/updater-script ]
+        then
+          zip update.zip META-INF/com/google/android/updater-script META-INF/com/google/android/update-binary
+          zip -d update.zip META-INF/com/google/android/update-script
+        else
+          echo "updater-script not found, keeping update-script"
+        fi
+
+      else
+        echo
+        echo "Cancelling"
+      fi
+
+      rm -f META-INF/com/google/android/updater-script
+      rm -f META-INF/com/google/android/update-binary
+
+      if [ "$auto_convert" == "1" ] && [ "$proceed_change" == "n" ]
+      then
+        echo "The update-script is not suitable for flashing your ROM."
+        echo "Removing update.zip ..."
+        rm -f update.zip
+        echo
+        cd ..
+        exit 0
+      fi
+
+    else
+      echo "Keeping update-script"
+      cd WORKING_*
+    fi
+
+  else
+    echo
+    echo
+    echo "Keeping update-script"
+  fi
+
+  echo
+
+fi
+
+
+
+#
+# Sign update.zip
+#
+
+date_str=`date '+%m%d%y_%H%M%S'`
+signed_file=signed_$date_str.zip
+
+echo Signing update.zip as $signed_file ...
+
+cp ../tools/signapk_files/testkey.* .
+cp ../tools/signapk_files/signapk.jar .
+
+java -jar signapk.jar testkey.x509.pem testkey.pk8 update.zip $signed_file
+
+rm -f testkey.*
+rm -f signapk.jar
+rm -f update.zip
+
+
+if [ -e $signed_file ] && [ "$?" == "0" ]
+then
+
+  #
+  # Make output folder
+  #
+  if [ -d ../OUTPUT_ZIP ]
+  then
+    echo "Found OUTPUT_ZIP folder" 
+  else
+    echo "Creating folder OUTPUT_ZIP ..."
+    mkdir ../OUTPUT_ZIP
+  fi
+
+  mv $signed_file ../OUTPUT_ZIP/
+
+  echo
+  echo
+  echo "==========================================================="
+  echo
+  echo "Congratulations, your ROM is here:"
+  echo "OUTPUT_ZIP/$signed_file" 
+  echo
+  echo "Copy this to your device and flash from recovery menu."
+  echo 
+  echo "Remember to do a wipe if necessary!"
+
+else 
+
+  echo
+  echo "Was not able to create $signed_file!"
+  echo
+
+  if [ `uname | grep Linux` ] 
+  then
+    echo "Ensure you have a recent version of the Sun Java JDK"
+  
+  elif [ `uname | grep CYGWIN` ]
+  then
+    echo "Ensure you have the Sun Java JDK installed on your PC." 
+    echo
+    echo "If you already have the JDK, then perhaps the path to java.exe was"
+    echo "not defined properly:"
+    echo 
+    echo "e.g.  In $HOME/.bash_profile, add to the end:"
+    echo "      PATH=/cygdrive/c/Program\ Files/Java/jdk1.6.0_18/bin:\${PATH}" 
+    echo 
+    echo "      The above is an example. Your path may be different."
+
+  elif [ `sw_vers | grep -o Mac` ]
+  then
+    echo "You may need to install SoyLatte for Mac OS X (to replace the standard "
+    echo "Java JDK)"
+  fi
+
+fi
+
+cd ..
+
+

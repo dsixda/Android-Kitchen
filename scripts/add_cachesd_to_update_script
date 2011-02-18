@@ -1,0 +1,58 @@
+
+
+cd WORKING_*
+
+if [ -d system/sd ]
+then
+  if [ ! -e move_cache_sd ]
+  then
+
+    echo -n "Do you want to move dalvik-cache to SD card? (y/n)? (default: y): "
+    read do_cachesd
+
+    if [ "$do_cachesd" != "n" ]
+    then
+
+      cd ..
+      scripts/add_busybox
+      cd WORKING_*
+
+      echo "Adding move_cache_sd to working folder"
+      cp ../tools/apps2sd_files/move_cache_sd .
+
+      cd META-INF/com/google/android 
+
+      if [ `grep -c move_cache_sd update-script` == 0 ]
+      then
+        echo "Adding move_cache_sd to update-script"
+        if [ `grep -c "write_raw_image .*:boot.img BOOT:" update-script` != 0 ]
+        then
+          sed -i -e 's/write_raw_image \(.*boot.img\) BOOT:/run_program PACKAGE:move_cache_sd\nwrite_raw_image \1 BOOT:/' update-script
+        else
+          echo "run_program PACKAGE:move_cache_sd" >> update-script
+        fi
+      fi
+
+      if [ `grep -c move_cache_sd update-script` == 0 ]
+      then
+        echo "Error: move_cache_sd not added to update-script!"
+      else
+        echo "move_cache_sd is currently in the update-script"
+      fi
+
+      cd ../../../..
+
+    fi
+
+  else
+    echo "move_cache_sd already found under working folder"
+
+  fi
+
+else
+  echo "Warning: system/sd not found under working folder!"
+
+fi
+
+cd ..
+

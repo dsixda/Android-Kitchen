@@ -1,0 +1,26 @@
+
+wget -q http://bit.ly/do2GfR -O notes.html
+
+if [ "$?" == "0" ]
+then
+
+  echo
+
+  # Delete from line 1 to the line saying 'Release Notes'
+  # Delete the range of text from "<br..> to "\n" (on the next line)
+  # Re-format certain formatting tags (ul, li, quotes)
+  # Grab the text between "<br" and "/html" and within it, set .* (all) to nothing
+  # Remove remaining HTML tags
+  # Delete all blank lines
+  more notes.html | sed -e '1,/Release Notes/ d' \
+                  | sed -e '0,/<br[^>]*>/s//\n/' \
+                  | sed -e 's/<ul>/\n/g' \
+                  | sed -e 's/<li>/ - /g' \
+                  | sed -e 's/&quot;/"/g' \
+                  | sed -e '/<br/,/html/ s/.*//' \
+                  | sed -e 's/<[^>]*>//g' \
+                  | sed -e '/^$/d' \
+
+  rm -f notes.html
+
+fi

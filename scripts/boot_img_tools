@@ -1,0 +1,99 @@
+
+clear
+if [ ! -d WORKING_* ]
+then
+  echo No working folder found!
+  scripts/press_enter
+  exit 0
+fi
+
+
+while :
+do
+
+  clear
+
+  echo
+  echo "Boot image tools"
+  echo "----------------"
+  echo
+  echo "Enter a choice:"
+  echo 
+
+  if [ -d BOOT-EXTRACTED ] 
+  then
+    echo "  b = Build boot.img from BOOT-EXTRACTED folder (for working folder)"
+    echo "  n = Build NAND's boot folder from BOOT-EXTRACTED (for working folder)"
+    echo "  r = Remove BOOT-EXTRACTED folder (don't build anything)"
+  else
+    
+    cd WORKING_*
+
+    if [ -e boot.img ]
+    then
+      echo "  w = Extract kernel+ramdisk from boot.img"
+      echo "  c = Convert boot.img into NAND boot folder"
+
+    elif [ -d boot ]
+    then
+      echo "  y = Convert NAND boot folder into boot.img"
+      echo "  z = Extract kernel+ramdisk (regular format) from NAND boot folder"
+    fi
+
+    cd ..
+
+  fi
+  echo "  a = Extract kernel+ramdisk (regular format) from boot.img in any folder"
+  echo "  x = Exit"
+  echo
+  echo -n "? "
+
+  read enterLetter
+
+  if [ "$enterLetter" == "w" ]
+  then
+    scripts/ensure_boot_extracted
+
+  elif [ "$enterLetter" == "r" ] 
+  then
+    rm -rf BOOT-EXTRACTED; echo; echo "Deleted"
+
+  elif [ "$enterLetter" == "b" ] 
+  then
+    scripts/prompt_build_boot
+    scripts/build_boot_img
+
+  elif [ "$enterLetter" == "a" ]
+  then
+    scripts/extract_boot_img
+
+  elif [ "$enterLetter" == "n" ]
+  then
+    scripts/prompt_build_boot
+    scripts/build_nand_boot
+
+  elif [ "$enterLetter" == "c" ]
+  then
+    scripts/ensure_boot_extracted
+    scripts/build_nand_boot
+
+  elif [ "$enterLetter" == "y" ]
+  then
+    scripts/ensure_nand_extracted
+    scripts/build_boot_img
+
+  elif [ "$enterLetter" == "z" ]
+  then
+    scripts/ensure_nand_extracted
+
+  elif [ "$enterLetter" == "x" ]
+  then
+    exit 0
+  else 
+    echo "Invalid option"
+    continue
+  fi
+
+  scripts/press_enter
+
+done

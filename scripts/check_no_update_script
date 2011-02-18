@@ -1,0 +1,98 @@
+ 
+temp=`ls WORKING_* 2>/dev/null`
+res=$?
+
+if [ "$res" == "2" ]
+then
+  echo "No working folder found!"
+  exit 0
+else
+  cd WORKING_*
+fi
+
+if [ ! -d META-INF/com/google/android ]
+then
+  echo "Warning: No META-INF/com/google/android folder found, creating it."
+  mkdir -p META-INF/com/google/android
+  echo
+fi
+
+cd META-INF/com/google/android
+
+
+if [ -e update-script ]
+then
+  echo "Found update-script"
+  cd ../../../../.. 
+
+else  
+
+  if [ -e updater-script ]
+  then
+
+    cd ../../../../..
+
+    echo
+    echo "======================================================="
+    echo
+    echo "Found an updater-script but not an update-script. The"
+    echo "kitchen currently can only modify an update-script."
+    echo "Choose an option number:"
+    echo 
+    echo "  1 = Convert it to update-script (recommended)"
+    echo "  2 = Do nothing, keep the updater-script"
+    echo
+    echo "- Option #1 tries to do a translation of the updater-"
+    echo "  script (Edify) into an update-script (Amend). If"
+    echo "  the update-script contains commands that are only"
+    echo "  supported in updater-script, then the update-script"
+    echo "  will automatically be converted back to an updater-"
+    echo "  script when you build the ROM."
+    echo
+    echo "- Option #2 should only be used if you wish not to use"
+    echo "  any of the options in the kitchen other than to"
+    echo "  build the ROM or to convert to update-script."
+    echo
+    echo -n "? (default=1) "
+
+    read enter_option
+    if [ "$enter_option" != "2" ]
+    then
+      scripts/convert_updater_script no_help
+      scripts/fix_update_script
+    else
+      echo
+      echo "WARNING: The kitchen may have problems without an update-script"
+      exit 2
+    fi
+
+  else
+
+    cd ../../../../..
+
+    echo -n "Did not find an update-script.  Shall I create one (y/n)? (default: y): "
+    read create_update
+
+    echo
+
+    if [ "$create_update" == "n" ]
+    then
+      echo "WARNING: The kitchen may have problems without an update-script"
+      exit 2
+      echo
+    else
+      create_new=1
+    fi
+  fi
+
+  if [ "$create_new" == "1" ]
+  then
+    echo "Adding an update-script ..."
+    cd WORKING_*
+    cp ../tools/update_files/update-script META-INF/com/google/android/
+    cd ..
+    scripts/fix_update_script
+    scripts/fix_update_script_with_features
+  fi
+fi
+

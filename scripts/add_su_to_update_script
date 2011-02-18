@@ -1,0 +1,60 @@
+
+cd WORKING_*
+cd META-INF/com/google/android
+
+if [ -e update-script ]
+then
+
+  #
+  # Deleting any existing lines that end with 'bin/su' to prevent conflicts
+  #
+  sed -i -e '/bin\/su[ ]*$/d' update-script
+
+  #
+  # Do this to prevent conflicts with the update-script in ROMs that already have the binary
+  #  
+  if [ -e ../../../../system/xbin/su ]
+  then
+
+    if [ "`find ../../../../system/bin -name su`" == "" ]
+    then
+      echo "Moving system/xbin/su to system/bin/su"
+      mkdir -p ../../../../system/bin
+      mv -f ../../../../system/xbin/su ../../../../system/bin/su
+    else
+      echo "/system/bin/su found, removing the one under /system/xbin/su"
+      rm -f ../../../../system/xbin/su
+    fi
+
+  elif [ "`find ../../../../system/bin -name su`" == "" ]
+  then
+    echo "Error: /system/xbin/su and /system/bin/su not found!"
+    cd ../../../../..
+    echo
+    exit 0
+  fi
+
+  echo
+  echo "Updating update-script with su entry and symbolic link"
+  sed -i -e 's/etc\/init.goldfish.sh/etc\/init.goldfish.sh\nset_perm 0 0 06755 SYSTEM:bin\/su\nsymlink \/system\/bin\/su SYSTEM:xbin\/su/g' update-script
+
+  if [ ! -d ../../../../system/xbin ]
+  then
+    echo "Creating /system/xbin folder"
+    mkdir -p ../../../../system/xbin
+    touch ../../../../system/xbin/placeholder
+  fi
+
+
+  if [ `grep -c "/bin/su " update-script` == 0 ]
+  then
+    echo "Error: Could no update update-script with su"
+  fi
+
+else
+  echo "Error: No update-script found!"
+fi
+
+cd ../../../../..
+echo
+

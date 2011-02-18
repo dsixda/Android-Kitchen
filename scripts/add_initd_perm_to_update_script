@@ -1,0 +1,47 @@
+
+cd WORKING_*
+
+if [ -d system/etc/init.d ]
+then
+
+  echo
+  echo "Checking whether update-script requires update for /system/etc/init.d ..."
+
+  cd META-INF/com/google/android
+
+  if [ -e update-script ]
+  then
+
+    if [ `grep -c "set_perm_recursive .*SYSTEM:etc/init.d$" update-script` == 0 ]
+    then
+
+      echo "update-script is being modified"
+
+      # Look for line with set_perm_recursive of SYSTEM:
+      grep_perm=`grep set_perm_recursive update-script | grep -m 1 "SYSTEM:[ ]*$"`
+      
+      if [ "$grep_perm" == "" ]
+      then
+        sed -i -e 's/copy_dir PACKAGE:system SYSTEM:/copy_dir PACKAGE:system SYSTEM:\nset_perm_recursive 0 0 0777 0777 SYSTEM:etc\/init.d/g' update-script
+      else
+        sed -i -e 's/\(set_perm_recursive[ ]*[^\ ]*[ ]*[^\ ]*[ ]*[^\ ]*[ ]*[^\ ]*[ ]*SYSTEM:[ ]*$\)/\1\nset_perm_recursive 0 0 0777 0777 SYSTEM:etc\/init.d/g' update-script
+      fi 
+
+      if [ `grep -c "set_perm_recursive .*SYSTEM:etc/init.d$" update-script` == 0 ]
+      then
+        echo "Error: Could not find the line to update in update-script"
+      fi
+
+    else
+      echo "update-script already has permissions set for init.d folder"
+    fi
+
+  else
+    echo "Error: No update-script found!"
+  fi
+
+  cd ../../../..
+
+fi
+
+

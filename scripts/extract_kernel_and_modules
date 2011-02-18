@@ -1,0 +1,115 @@
+clear
+
+if [ -d MY_DEVICE_WORKING ]
+then
+  echo "Removing MY_DEVICE_WORKING folder"
+  rm -rf MY_DEVICE_WORKING
+fi
+
+if [ -d MY_KERNEL ]
+then
+  echo "Removing MY_KERNEL folder"
+  rm -rf MY_KERNEL
+fi
+
+if [ -d BOOT-EXTRACTED ]
+then
+  echo "Removing BOOT-EXTRACTED folder"
+  rm -rf BOOT-EXTRACTED
+fi
+
+
+
+clear
+echo
+echo "--> Obtain a ROM meant for YOUR DEVICE <--"
+
+scripts/check_rom no_info
+
+# If working folder is open and cannot move it, handle the error properly
+if [ "$?" != "1" ]
+then
+  scripts/press_enter
+else
+  exit 1
+fi
+
+if [ -d WORKING_* ]
+then
+
+  cd WORKING_*
+
+  if [ -d system ]
+  then
+    cd ..
+    scripts/ensure_boot_extracted
+
+  else
+    cd ..
+    exit 0
+  fi
+
+else
+  exit 0
+fi
+
+if [ ! -d BOOT-EXTRACTED ]
+then
+  echo "Error: BOOT-EXTRACTED folder not found"
+  exit 0
+fi
+
+
+#
+# Get the device name so that it can be set in the second ROM
+#
+if [ "$1" == "for_porting" ]
+then 
+  scripts/set_device
+fi
+
+echo 
+echo "Renaming working folder to MY_DEVICE_WORKING"
+mv WORKING_* MY_DEVICE_WORKING
+
+echo
+echo "Creating folder MY_KERNEL"
+mkdir MY_KERNEL
+
+
+
+#
+# Copy my device's kernel to MY_KERNEL
+# Also copy my device's module files to MY_KERNEL
+#
+
+echo "Copying zImage to MY_KERNEL"
+cp BOOT-EXTRACTED/zImage MY_KERNEL/
+
+#
+# We need this step so that we can determine base address
+# when porting!
+#
+echo "Copying boot.img to MY_KERNEL"
+cp MY_DEVICE_WORKING/boot.img MY_KERNEL/
+
+
+if [ -d MY_DEVICE_WORKING/system/lib/modules ]
+then
+  mkdir -p MY_KERNEL/system/lib/modules
+  echo 
+  echo "Copying ..."
+  cp -v MY_DEVICE_WORKING/system/lib/modules/* MY_KERNEL/system/lib/modules/
+fi
+
+if [ -d MY_DEVICE_WORKING/system/modules ]
+then
+  mkdir -p MY_KERNEL/system/modules
+  echo 
+  echo "Copying ..."
+  cp -v MY_DEVICE_WORKING/system/modules/* MY_KERNEL/system/modules/
+fi
+
+
+rm -rf BOOT-EXTRACTED
+

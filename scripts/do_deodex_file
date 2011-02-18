@@ -1,0 +1,494 @@
+
+# Mandatory
+odex_file=$1
+
+# Mandatory
+bootclass_dir=$2
+
+# Optional; just have the file name, not path
+classfile=$3
+
+
+
+if [ "$odex_file" == "" ]
+then
+  echo "Error: No .odex file specified"
+
+elif [ -e $odex_file ]
+then
+  echo "Disassembling $odex_file ..."
+else
+  echo "Error: $odex_file not found"
+fi
+
+
+bin_list="baksmali.jar smali.jar"
+
+for bin_file in $bin_list
+do
+  if [ ! -e $bin_file ]
+  then
+    echo "Error: $bin_file not found!"
+    exit 0
+  fi
+done
+
+
+
+ignore_errors=no
+
+
+#
+# There may be .odex files that require classes in addition to those
+# included by default.  Many of them are defined below.
+#
+# These definitions may not cover every single case, so the parent 
+# script 'do_deodex' will utilize a brute-force method if the 
+# problematic .odex file is not covered here.
+#
+
+if [ "$odex_file" == "Bluetooth.odex" ]
+then
+  classfile=javax.obex.jar
+
+elif [ "$odex_file" == "HtcFootprints.odex" ] || \
+     [ "$odex_file" == "HtcLocationPicker.odex" ] || \
+     [ "$odex_file" == "Weather.odex" ]
+then
+  classfile=com.google.android.maps.jar
+
+elif [ "$odex_file" == "GmailProvider.odex" ] || \
+     [ "$odex_file" == "gtalkservice.odex" ] || \
+     [ "$odex_file" == "Talk.odex" ] ||
+     [ "$odex_file" == "Vending.odex" ]
+then
+  classfile=com.google.android.gtalkservice.jar
+
+elif [ "$odex_file" == "QuickLookup.odex" ]
+then
+  classfile=com.google.translate.jar
+  
+elif [ "$odex_file" == "services.odex" ] || \
+     [ "$odex_file" == "android.policy.odex" ]
+then
+  classfile=com.htc.framework.jar
+
+elif [ "$odex_file" == "Faves.odex" ]
+then
+  classfile=com.tmobile.pluto.jar:com.tmobile.widget.jar
+
+  elif [ "$odex_file" == "FavesWidget.odex" ]
+then
+  classfile=com.tmobile.pluto.jar
+
+elif [ "$odex_file" == "ProfileManager.odex" ]
+then
+  classfile=com.tmobile.widget.jar
+
+elif [ "$odex_file" == "Clicker.odex" ]
+then
+  classfile=android.test.runner.jar
+
+
+elif [ "$odex_file" == "RSS.odex" ]
+then
+  classfile=com.htc.rss.jar
+  ignore_errors=yes
+
+elif [ "$odex_file" == "com.htc.rss.odex" ]
+then
+  ignore_errors=yes
+fi
+
+
+
+#
+# HTC Ace / Thunderbolt
+#
+
+if [ -e ../framework/com.orange.authentication.simcard.jar ]
+then
+
+  if [ -e ../framework/evernote.jar ]
+  then
+    evernote=:evernote.jar
+  else
+    evernote=
+  fi
+
+  if [ "$odex_file" == "android.policy.odex" ] || \
+      [ "$odex_file" == "services.odex" ]
+  then
+    classfile=com.htc.framework.jar:com.orange.authentication.simcard.jar$evernote
+
+  elif [ "$odex_file" == "com.htc.android.easopen.odex" ] || \
+      [ "$odex_file" == "com.htc.android.pimlib.odex" ] || \
+      [ "$odex_file" == "com.htc.framework.odex" ] || \
+      [ "$odex_file" == "com.scalado.util.ScaladoUtil.odex" ] || \
+      [ "$odex_file" == "framework.odex" ]
+  then
+    classfile=com.orange.authentication.simcard.jar$evernote
+
+  elif [ "$odex_file" == "evernote.odex" ]
+  then
+    classfile=com.orange.authentication.simcard.jar
+
+  elif [ "$odex_file" == "ext.odex" ]
+  then
+    classfile=com.google.translate.jar
+  fi
+fi
+
+
+
+#
+# LG Shine Plus
+# 
+
+if [ -e ../framework/lge-res.apk ]
+then
+  if [ "$odex_file" == "qcnvitems.odex" ]
+  then
+    classfile=qcrilhook.jar
+
+  elif [ "$odex_file" == "MoviePlayer.odex" ]
+  then
+    classfile=com.nextreaming.NexSubtitle.jar
+
+  elif [ "$odex_file" == "OPP.odex" ]
+  then
+    classfile=javax.obex.jar
+  fi
+fi
+
+#
+# Motorola CLIQ / Motoblur entries follow - thanks to miharkula at modmymobile.com
+#
+
+if [ -e ../framework/com.motorola.blur.library.utilities.jar ]
+then
+
+  if [ "$odex_file" == "com.motorola.blur.library.friendfeed.odex" ] || \
+     [ "$odex_file" == "com.motorola.blur.library.home.odex" ] || \
+     [ "$odex_file" == "com.motorola.blur.library.service.odex" ] || \
+     [ "$odex_file" == "com.motorola.blur.library.friendfeed.odex" ] || \
+     [ "$odex_file" == "com.motorola.blur.library.home.odex" ] || \
+     [ "$odex_file" == "com.motorola.blur.library.service.odex" ] || \
+     [ "$odex_file" == "BlurContacts.odex" ]
+  then
+    classfile=com.motorola.blur.library.utilities.jar
+
+  elif [ "$odex_file" == "AdminFeedNotifier.odex" ]
+  then
+    classfile=com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
+
+  elif [ "$odex_file" == "AdService.odex" ]
+  then
+    classfile=com.motorola.android.mobad.jar
+
+  elif [ "$odex_file" == "BlurAlarmClock.odex" ]
+  then
+    classfile=com.motorola.android.widget.jar
+
+  elif [ "$odex_file" == "BlurCalendar.odex" ]
+  then
+    classfile=com.motorola.blur.library.utilities.jar:com.motorola.blur.library.messaging.jar
+
+  elif [ "$odex_file" == "BlurCalendarProvider.odex" ]
+  then
+    classfile=com.motorola.android.widget.jar:com.motorola.blur.library.home.jar:com.motorola.blur.library.utilities.jar
+
+  elif [ "$odex_file" == "BlurContactsSync.odex" ]
+  then
+    classfile=com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
+
+  elif [ "$odex_file" == "BlurEmailEngine.odex" ]
+  then
+    classfile=com.motorola.blur.library.messaging.jar:com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
+
+  elif [ "$odex_file" == "BlurEmail.odex" ]
+  then
+    classfile=com.motorola.blur.library.messaging.jar:com.motorola.blur.library.utilities.jar
+
+  elif [ "$odex_file" == "BlurHome.odex" ]
+  then
+    classfile=com.motorola.blur.library.home.jar:com.motorola.blur.library.utilities.jar
+
+  elif [ "$odex_file" == "BlurPhone.odex" ]
+  then
+    classfile=com.motorola.android.widget.jar:com.motorola.blur.library.utilities.jar
+
+  elif [ "$odex_file" == "BlurSNMessagingEngine.odex" ]
+  then
+    classfile=com.motorola.blur.library.messaging.jar:com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
+
+  elif [ "$odex_file" == "BlurUpdater.odex" ]
+  then
+    classfile=com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
+
+  elif [ "$odex_file" == "CalendarSync.odex" ]
+  then
+    classfile=com.motorola.blur.library.messaging.jar:com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
+
+  elif [ "$odex_file" == "ClockWidget.odex" ]
+  then
+    classfile=com.motorola.blur.library.home.jar:com.motorola.blur.library.utilities.jar
+
+  elif [ "$odex_file" == "ContactsData.odex" ]
+  then
+    classfile=com.motorola.blur.library.messaging.jar:com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
+
+  elif [ "$odex_file" == "ContactsUnconnected.odex" ]
+  then
+    classfile=com.motorola.blur.library.messaging.jar:com.motorola.blur.library.utilities.jar
+
+  elif [ "$odex_file" == "FirewallService.odex" ]
+  then
+    classfile=com.motorola.android.Firewall.jar
+
+  elif [ "$odex_file" == "megamaid.odex" ]
+  then
+    classfile=com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
+
+  elif [ "$odex_file" == "MessagesWidget.odex" ]
+  then
+    classfile=com.motorola.blur.library.home.jar:com.motorola.blur.library.utilities.jar
+
+  elif [ "$odex_file" == "Messaging.odex" ]
+  then
+    classfile=com.motorola.blur.library.messaging.jar:com.motorola.blur.library.utilities.jar
+
+  elif [ "$odex_file" == "NewsWidget.odex" ]
+  then
+    classfile=com.motorola.blur.library.home.jar:com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
+
+  elif [ "$odex_file" == "oma1motService.odex" ]
+  then
+    classfile=com.motorola.android.drm1.jar
+
+  elif [ "$odex_file" == "OMADownload.odex" ]
+  then
+    classfile=com.motorola.android.mime.jar
+
+  elif [ "$odex_file" == "PhoneAddons.odex" ]
+  then
+    classfile=com.motorola.android.telephony.jar
+
+  elif [ "$odex_file" == "QuickContactWidget.odex" ]
+  then
+    classfile=com.motorola.blur.library.home.jar:com.motorola.blur.library.utilities.jar
+
+  elif [ "$odex_file" == "SetupProvider.odex" ]
+  then
+    classfile=com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
+
+  elif [ "$odex_file" == "SocialShare.odex" ]
+  then
+    classfile=com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
+
+  elif [ "$odex_file" == "StatusWidget.odex" ]
+  then
+    classfile=com.motorola.blur.library.friendfeed.jar:com.motorola.blur.library.home.jar:com.motorola.blur.library.utilities.jar
+
+  elif [ "$odex_file" == "StickyNoteWidget.odex" ]
+  then
+    classfile=com.motorola.blur.library.home.jar:com.motorola.blur.library.utilities.jar
+
+  elif [ "$odex_file" == "UniversalInbox.odex" ]
+  then
+    classfile=com.motorola.blur.library.utilities.jar:com.motorola.blur.library.messaging.jar
+
+  elif [ "$odex_file" == "WeatherWidget.odex" ]
+  then
+    classfile=com.motorola.android.widget.jar:com.motorola.blur.library.home.jar:com.motorola.blur.library.utilities.jar
+
+  elif [ "$odex_file" == "WmdrmDla.odex" ]
+  then
+    classfile=com.motorola.android.wmdrm.jar
+
+  elif [ "$odex_file" == "WorkContacts.odex" ]
+  then
+    classfile=com.motorola.blur.library.messaging.jar:com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
+  fi
+
+fi
+
+
+#
+# Samsung TouchWiz
+#
+
+if [ -e ../framework/twframework.jar ]
+then
+
+  if [ "$odex_file" == "BluetoothOPP.odex" ]
+  then
+    classfile=javax.obex.jar
+
+  elif [ "$odex_file" == "TouchWizCalendar.odex" ]
+  then
+    classfile=twframework.jar:javax.obex.jar:com.google.android.maps.jar
+
+  elif [ "$odex_file" == "BuddiesNow.odex" ] || \
+       [ "$odex_file" == "ClockPackage.odex" ] ||
+       [ "$odex_file" == "Contacts.odex" ] || \
+       [ "$odex_file" == "DialerTabActivity.odex" ] || \
+       [ "$odex_file" == "Dlna.odex" ] || \
+       [ "$odex_file" == "Email.odex" ] ||
+       [ "$odex_file" == "InfoAlarm.odex" ] || \
+       [ "$odex_file" == "MusicPlayer.odex" ] || \
+       [ `echo $odex_file | grep -c SamsungWidget_` == 1 ] || \
+       [ "$odex_file" == "SoundPlayer.odex" ] || \
+       [ "$odex_file" == "VideoPlayer.odex" ] || \
+       [ "$odex_file" == "VoiceRecorder.odex" ] 
+  then
+    classfile=twframework.jar
+
+  elif [ "$odex_file" == "Camera.odex" ] || \
+       [ "$odex_file" == "FactoryTest.odex" ]
+  then
+    classfile=seccamera.jar
+  fi
+
+fi
+
+
+
+
+#
+# Call baksmali, but first check if the class files are required
+#
+
+
+# More than one classfile defined
+if [ "$classfile" != "" ] && [ `echo $classfile | grep -c :` -gt 0 ]
+then
+
+  java_cmd="java -Xmx512m -jar baksmali.jar -d $bootclass_dir -c :$classfile -x $odex_file"
+
+  echo $java_cmd
+  $java_cmd
+  is_error=$?
+
+# One classfile defined and it exists
+elif [ "$classfile" != "" ] && [ -e $bootclass_dir/$classfile ]
+then
+
+  if [ "$ignore_errors" == "yes" ]
+  then
+    echo
+    echo "-> Ignoring errors for this file!"
+    echo
+    java_cmd="java -Xmx512m -jar baksmali.jar -I -d $bootclass_dir -c :$classfile -x $odex_file"
+  else
+    java_cmd="java -Xmx512m -jar baksmali.jar -d $bootclass_dir -c :$classfile -x $odex_file"
+  fi
+
+  echo $java_cmd
+  $java_cmd
+  is_error=$?
+
+# No classfiles and ignore error
+elif [ "$classfile" == "" ] && [ "$ignore_errors" == "yes" ]
+then
+  echo "-> Ignoring errors for this file!"
+  java_cmd="java -Xmx512m -jar baksmali.jar -I -d $bootclass_dir -x $odex_file"
+
+  echo $java_cmd
+  $java_cmd
+  is_error=$?
+
+# No classfiles and don't ignore error
+# OR classfile defined but doesn't exist
+else
+  java_cmd="java -Xmx512m -jar baksmali.jar -d $bootclass_dir -x $odex_file"
+
+  echo $java_cmd
+  $java_cmd
+  is_error=$?
+fi
+
+
+
+  
+#
+# If there were no errors, then assemble it with smali
+#
+
+if [ "$is_error" == "0" ] && [ -d out ]
+then
+
+  echo "Assembling into classes.dex ..."
+  java_cmd="java -Xmx512m -jar smali.jar -o classes.dex out"
+  
+  echo $java_cmd
+  $java_cmd
+
+  rm -rf out
+
+  #
+  # Ensure classes.dex was produced
+  #
+  if [ -e classes.dex ]
+  then
+
+    #
+    # Ensure the .odex file's .apk or .jar is found
+    #
+
+    no_ext=`echo $odex_file | sed 's/.odex//'`
+    main_file=$no_ext.apk
+
+    error_found=no
+
+    if [ -e $main_file ]
+    then
+      echo "Found $main_file"
+      ext=apk
+
+    else
+      main_file=$no_ext.jar
+      
+      if [ -e $main_file ]
+      then
+        echo "Found $main_file"
+        ext=jar
+      else          
+        echo "ERROR: Can't find $no_ext.jar or $no_ext.apk"
+        error_found=yes
+      fi
+    fi
+
+
+    if [ $error_found == yes ]
+    then
+
+      echo "Removing classes.dex ..."
+      rm -f classes.dex
+
+      # Keep the odex file so that it's left unchanged
+
+    else
+
+      echo "Removing $odex_file ..."
+      rm -f $odex_file
+
+      echo "Put classes.dex into $main_file ..."
+      zip -r -q $main_file classes.dex
+      rm classes.dex
+      exit 0
+    
+    fi
+
+  else
+    echo "WARNING: Unable to produce classes.dex, not good!"
+    exit 0
+  fi          
+
+else
+  echo "WARNING: Cannot deodex $odex_file"
+  rm -rf out
+  exit 1
+fi
+
+

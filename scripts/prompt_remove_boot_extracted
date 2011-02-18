@@ -1,0 +1,20 @@
+
+if [ -d BOOT-EXTRACTED ]
+then
+  echo
+  echo    "Warning: Folder 'BOOT-EXTRACTED' already exists, may cause conflict."
+  echo -n "         It is recommended to remove it. Remove (y/n)? (default: y): "
+
+  read remove_it
+  echo
+
+  if [ "$remove_it" != "n" ]
+  then
+    echo "Removing"
+    rm -rf BOOT-EXTRACTED
+  else
+    echo "Warning: Using existing BOOT-EXTRACTED folder"
+  fi
+
+  echo
+fi

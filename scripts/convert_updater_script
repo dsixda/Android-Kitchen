@@ -1,0 +1,389 @@
+
+if [ "$1" == "" ]
+then
+  clear
+fi
+
+
+echo
+
+base_dir=`pwd`
+
+if [ -d WORKING_* ]
+then
+
+  cd WORKING_*
+  working_dir=`pwd`
+
+  cd META-INF/com/google/android
+
+else
+  echo
+  echo Working folder not found, you will need to create one!
+  exit 0
+fi
+
+
+if [ "$1" == "" ]
+then
+
+  echo "Conversion Tool: updater-script (Edify) to update-script (Amend)"
+  echo "--------------------------------------------------------------------"
+  echo
+  echo "This script will convert your updater-script into an update-script."
+  echo
+  echo "Ensure you have an updater-script under META-INF/com/google/android"
+  echo "of your working folder."
+  echo
+  echo -n "Proceed with conversion (y/n)? (default: y): "
+
+  read proceed_now
+  echo
+
+  if [ "$proceed_now" == "n" ] 
+  then
+    cd ../../../../..
+    exit 0
+  fi
+
+  echo "--------------------------------------------------------------------"
+  echo
+
+fi
+
+if [ -e updater-script ]
+then
+  
+  if [ -e update-script ]
+  then
+    echo "Error: Although you have an updater-script, you also have an"
+    echo "       update-script in the same folder. Remove one of them."
+    cd ../../../../..
+    exit 0
+  fi
+
+else
+  echo "Error: updater-script not found!"
+  cd ../../../../..
+  exit 0
+fi
+
+
+
+echo "Please wait ..."
+echo
+
+
+echo "- Initial formatting ..."
+
+more updater-script \
+| sed -e ':a;N;$!ba;s/||\n//g' \
+| sed -e ':a;N;$!ba;s/,\n//g' \
+| sed -e 's/","/", "/g' \
+| sed -e 's/ui_print.*//g' \
+| sed -e 's/^\([a-zA-Z_]*\)[ ]*(/\1(/g' \
+| sed -e 's/package_extract_dir(\"\([^ ]*\)\", \"\/tmp\");/copy_dir PACKAGE:\1 TMP:/g' \
+| sed -e 's/package_extract_dir(\"\([^ ]*\)\", \"\/system\");/copy_dir PACKAGE:\1 SYSTEM:/g' \
+| sed -e 's/package_extract_dir(\"\([^ ]*\)\", \"\/sdcard\");/copy_dir PACKAGE:\1 SDCARD:/g' \
+> temp.log
+
+
+#
+# Remove comments
+#
+sed -i -e '/^#/d' temp.log
+
+
+
+#
+# assert
+#
+echo "- assert ..."
+line_num=`grep -n -m 1 "assert(" temp.log | sed 's/:.*//g'`
+
+while [ "$line_num" != "" ]
+do
+  sed -i \
+    -e ''$line_num' s/assert(\(.*\));/\1;/g' \
+    -e ''$line_num' s/^.*getprop.*;//g' \
+    -e ''$line_num' s/)[ ]*/);\n/g' \
+    temp.log
+
+  sed -i -e 's/^;$//g' temp.log
+  line_num=`grep -n -m 1 "assert(" temp.log | sed 's/:.*//g'`
+done
+
+
+
+#
+# boot.img
+#
+echo "- boot.img ..."
+
+#
+# Replace 3 consecutive lines if they match the required strings
+#
+line_num1=`grep -n -m 1 "package_extract_file(\"boot.img\", \"/tmp/boot.img\");" temp.log | sed 's/:.*//g'`
+
+if [ "$line_num1" != "" ]
+then
+
+  line_num2=$(($line_num1+1))
+  str2=`sed -n ''"$line_num2"','"$line_num2"'p' temp.log`
+
+  if [ "$str2" == "write_raw_image(\"/tmp/boot.img\", \"boot\");" ]
+  then
+    
+    line_num3=$(($line_num2+1))
+    str3=`sed -n ''"$line_num3"','"$line_num3"'p' temp.log`
+
+    if [ "$str3" == "delete(\"/tmp/boot.img\");" ]
+    then
+      sed -i \
+        -e ''$line_num1' s/.*/write_raw_image PACKAGE:boot.img BOOT:/g' \
+        -e ''$line_num2' s/.*//g' \
+        -e ''$line_num3' s/.*//g' \
+      temp.log
+    fi
+  fi
+fi
+
+sed -i -e 's/write_raw_image("boot.img", "boot");/write_raw_image PACKAGE:boot.img BOOT:/g' temp.log
+
+
+#
+# run_program
+#
+echo "- run_program ..."
+line_num=`grep -n -m 1 "run_program(" temp.log | sed 's/:.*//g'`
+
+while [ "$line_num" != "" ]
+do
+  sed -i \
+    -e ''$line_num' s/run_program(/run_program /g' \
+    -e ''$line_num' s/"//g' \
+    -e ''$line_num' s/,//g' \
+    -e ''$line_num' s/)//g' \
+    -e ''$line_num' s/;//g' \
+    -e ''$line_num' s/run_program \/\([a-zA-Z]*\)/run_program PACKAGE:\1/g' \
+    -e ''$line_num' s/run_program PACKAGE:\//run_program \//g' \
+    temp.log
+
+  line_num=`grep -n -m 1 "run_program(" temp.log | sed 's/:.*//g'`
+done
+
+
+
+#
+# delete
+#
+echo "- delete ..."
+line_num=`grep -n -m 1 "delete(" temp.log | sed 's/:.*//g'`
+
+while [ "$line_num" != "" ]
+do
+  sed -i \
+    -e ''$line_num' s/delete(/delete /g' \
+    -e ''$line_num' s/"//g' \
+    -e ''$line_num' s/, /\ndelete /g' \
+    -e ''$line_num' s/)//g' \
+    -e ''$line_num' s/;//g' \
+    temp.log
+
+  line_num=`grep -n -m 1 "delete(" temp.log | sed 's/:.*//g'`
+done
+
+
+#
+# Remove apply_patch
+#
+sed -i -e 's/apply_patch.*[;]//g' temp.log
+
+
+
+#
+# symlink
+#
+echo  "- symlink (may take a few minutes) ..."
+
+line_num=`grep -n "symlink(" temp.log | grep -m 1 ";" | sed 's/:.*//g'`
+
+iterations=0
+
+while [ "$line_num" != "" ]
+do
+
+  cp temp.log temp.log.old
+
+  # The formatting code near the top of the script may have removed some commas
+  sed -i -e ''$line_num' s/"[ ]*"/", "/g' temp.log
+
+  # If line only has one symlink, then delimit it by removing the semi-colon, and then
+  # convert line to update-script when this 'while' loop is finished
+  count_dest=`grep "symlink(" temp.log | grep -m 1 ";" | grep -o , | wc -w`
+
+  if [ $count_dest == 1 ]
+  then
+    # Only one symlink left on this line
+    sed -i -e ''$line_num' s/;//g' temp.log
+
+  else
+    # Multiple symlinks on one line will be separated to their own lines
+    sed -i \
+      -e ''$line_num' s/symlink\(([^,]*\),[ \t]*\("[^"]*"\)\(.*\)/symlink\1, \2)\nsymlink\1\3/g' \
+    temp.log  
+  fi      
+
+  #
+  # Ensure we are not stuck in an endless loop doing nothing
+  #
+  diffs=`diff temp.log temp.log.old`
+  if [ "$diffs" == "" ]
+  then
+    echo "ERROR: Problem converting symlinks"
+    rm -f temp.log.old temp.log
+    exit 1
+  fi
+
+  rm -f temp.log.old
+
+  line_num=`grep -n "symlink(" temp.log | grep -m 1 ";" | sed 's/:.*//g'`
+
+done
+
+
+
+echo "- Final formatting ..."
+
+#
+# Fix up the update-script 
+#
+sed -i \
+  -e 's/;//g' \
+  -e 's/,//g' \
+  -e 's/(/ /g' \
+  -e 's/)//g' \
+  -e 's/^mount .*//g' \
+  -e 's/^unmount .*//g' \
+  -e 's/package_extract_dir \"\([^ ]*\)/copy_dir PACKAGE:\1/g' \
+  \
+  -e 's/\/system\//SYSTEM:/g' \
+  -e 's/\/system/SYSTEM:/g' \
+  -e 's/\"system\"/SYSTEM:/g' \
+  -e 's/\"SYSTEM:\"/SYSTEM:/g' \
+  -e 's/\" SYSTEM/ SYSTEM/g' \
+  -e 's/\"SYSTEM:\([^\"]*\)\"/SYSTEM:\1/g' \
+  -e 's/symlink SYSTEM:/symlink \/system\//g' \
+  \
+  -e 's/\/tmp\//TMP:/g' \
+  -e 's/\/tmp/TMP:/g' \
+  -e 's/\"tmp\"/TMP:/g' \
+  -e 's/\"TMP:\"/TMP:/g' \
+  -e 's/\" TMP/ TMP/g' \
+  -e 's/ \"TMP:/ TMP:/g' \
+  \
+  -e 's/\/data\//DATA:/g' \
+  -e 's/\/data/DATA:/g' \
+  -e 's/\"data\"/DATA:/g' \
+  -e 's/\"DATA:\"/DATA:/g' \
+  -e 's/\" DATA/ DATA/g' \
+  -e 's/"userdata"/DATA:/g' \
+  \
+  -e 's/\/sdcard\//SDCARD:/g' \
+  -e 's/\/sdcard/SDCARD:/g' \
+  -e 's/\"sdcard\"/SDCARD:/g' \
+  -e 's/\"SDCARD:\"/SDCARD:/g' \
+  -e 's/\" SDCARD/ SDCARD/g' \
+  \
+  -e 's/\/cache\//CACHE:/g' \
+  -e 's/\/cache/CACHE:/g' \
+  -e 's/\"cache\"/CACHE:/g' \
+  -e 's/\"CACHE:\"/CACHE:/g' \
+  -e 's/\" CACHE/ CACHE/g' \
+  \
+  -e 's/\/sdext\//SDEXT:/g' \
+  -e 's/\/sdext/SDEXT:/g' \
+  -e 's/\"sdext\"/SDEXT:/g' \
+  -e 's/\"SDEXT:\"/SDEXT:/g' \
+  -e 's/\" SDEXT/ SDEXT/g' \
+  \
+  -e 's/"\/boot\//BOOT:/g' \
+  -e 's/"\/boot/BOOT:/g' \
+  -e 's/ \/boot\// BOOT:/g' \
+  -e 's/\"boot\"/BOOT:/g' \
+  -e 's/\"BOOT:\"/BOOT:/g' \
+  -e 's/\" BOOT/ BOOT/g' \
+  \
+  -e 's/\"MTD //g' \
+  -e 's/set_perm\([^\"]*\)\"\([^\"]*\)\"/set_perm\1\2/g' \
+  -e 's/\"\([^\"]*\)\"/\1/g' \
+  -e 's/^[ \t]*//g' \
+  -e 's/\/$//g' \
+  -e 's/"$/\n/g' \
+temp.log
+
+
+
+#
+# Patch up conversion issues
+#
+
+sed -i \
+  -e 's/\/dataSYSTEM:/DATA:system\//g' \
+  -e 's/DATA:SYSTEM:/DATA:system\//g' \
+  -e 's/MTD //g' \
+temp.log
+
+
+# Remove blank lines
+sed -i -e '/^$/d' temp.log
+
+
+
+#
+# Finished
+#
+
+mv -f temp.log update-script
+rm -f temp.log.old
+
+echo
+
+if [ -e update-script ]
+then
+
+  mv -f updater-script updater-script.orig
+
+  echo "--------------------------------------------------------------------"
+  echo
+  echo "An update-script has been created under META-INF/com/google/android"
+  echo "of your working folder.  Please review it for potential errors."
+  echo ""
+  echo "The original updater-script has been renamed to updater-script.orig."
+  echo "It will not be included in your completed ROM's ZIP file."
+  echo
+
+  if [ -e update-binary ]
+  then
+    mv -f update-binary update-binary.orig
+    echo "The update-binary has also been renamed to update-binary.orig."
+  fi
+
+  cd $base_dir
+  scripts/update_script_should_convert_back
+
+  if [ "$?" == "1" ]
+  then
+    echo
+    echo "WARNING:  Due to incompatibilities between Edify and Amend, this"
+    echo "          update-script will automatically be converted back to an"
+    echo "          updater-script in the final ROM's update.zip.  However,"
+    echo "          your working folder will still have the update-script."
+    echo
+  fi
+
+else
+  echo "Error: update-script not created!"
+fi
+
+cd $base_dir

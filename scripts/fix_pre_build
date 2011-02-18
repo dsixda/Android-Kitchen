@@ -1,0 +1,277 @@
+
+cd WORKING_*
+
+
+if [ ! -e META-INF/com/google/android/update-script ] && [ ! -e META-INF/com/google/android/updater-script ]
+then
+  echo "Warning: update-script/updater-script not found"
+  echo
+
+  cd ..
+  exit 0
+elif [ -e META-INF/com/google/android/updater-script ]
+then
+  cd ..
+  exit 0
+fi
+
+
+########### update-script enhancements follow ###########
+
+
+#
+# Hack for duplicate filenames with different case
+#
+# - liba2dp.so will be moved to a folder above /system.  The folder contents 
+#   will be copied to system/lib during update-script execution
+# - libA2DP.so will be copied to a new folder under /system.  The file's symbolic
+#   link will go under system/lib with UPPER CASE letters during update-script
+#   execution.
+#
+if [ `uname | grep CYGWIN` ]
+then
+
+  cd system
+
+  #
+  # Check for Android 1.x and Sense ROM (e.g. All Sense ROMs have the HTC Add Program widget)
+  #
+  if [ "`grep -c ro.build.version.release=1 build.prop`" == "1" ] && [ -e app/HtcAddProgramWidget.apk ]
+  then
+
+    if [ -d liba2dp_upper ] && [ -d ../liba2dp_lower ]
+    then
+      echo "liba2dp.so duplicate filename hack for Cygwin found, no need to do it again"
+      echo
+    else
+
+      if [ -e lib/liba2dp.so ]
+      then
+
+        echo 
+        echo "Applying liba2dp.so duplicate filename hack for Cygwin"
+
+        if [ -d liba2dp_upper ]
+        then
+          # Nandroid backup may have it already
+          echo "Folder system/liba2dp_upper already exists"
+
+        else
+          mkdir liba2dp_upper
+          cp ../../tools/liba2dp_upper.so liba2dp_upper/
+        fi
+
+        # Make a new folder but not under system (contents will be copied later under system/lib)
+        mkdir -p ../liba2dp_lower/lib
+        mv lib/liba2dp.so ../liba2dp_lower/lib/liba2dp.so
+ 
+        # Nandroid backup may have symbolic link still there
+        if [ -e lib/libA2DP.so ]
+        then
+          rm lib/libA2DP.so
+        fi
+
+        sed -i -e 's/copy_dir PACKAGE:system SYSTEM:/copy_dir PACKAGE:system SYSTEM:\n\n# liba2dp.so duplicate filename hack for Cygwin\ncopy_dir PACKAGE:liba2dp_lower SYSTEM:\nsymlink SYSTEM:liba2dp_upper\/liba2dp_upper.so SYSTEM:lib\/libA2DP.so/g' ../META-INF/com/google/android/update-script
+        
+        echo
+  
+      fi
+    fi
+  fi
+
+  cd ..
+
+fi
+
+
+
+#
+# Check for radio.img in working folder, and then modify the update-script if required
+#
+if [ -e radio.img ]
+then
+  if [ "`grep -c write_radio_image META-INF/com/google/android/update-script`" == "0" ] 
+  then
+    echo "radio.img found."
+    echo "Modifying update-script with syntax for flashing radio ..."
+    echo "write_radio_image PACKAGE:radio.img" >> META-INF/com/google/android/update-script
+    echo
+  fi
+
+else
+  if [ "`grep -c write_radio_image META-INF/com/google/android/update-script`" == "1" ] 
+  then
+    echo "radio.img not present in ROM."
+    echo "Modifying update-script to remove syntax for flashing radio ..."
+    sed -i -e 's/write_radio_image PACKAGE:radio.img[ ]*$//g' META-INF/com/google/android/update-script
+  fi
+fi
+
+
+
+
+#
+# Fix entries in update-script for boot partition
+#
+
+if [ -e boot.img ]
+then
+  cd ..
+  cmd_line=`scripts/get_cmdline`
+  cd WORKING_*
+elif [ -e boot/initrd.gz ] && [ -e boot/zImage ]
+then
+  cmd_line="dsixda NAND"
+fi
+
+if [ "$cmd_line" == "dsixda NAND" ]
+then
+  if [ "`grep -c "write_raw_image .*:boot.img [ ]*BOOT:" META-INF/com/google/android/update-script`" != "0" ] 
+  then
+    echo "Replacing entries in update-script with NAND ROM boot folder instructions ..."
+    sed -i -e 's/write_raw_image .*:boot.img [ ]*BOOT:/copy_dir PACKAGE:boot BOOT:/g' META-INF/com/google/android/update-script
+
+  elif [ "`grep -c "copy_dir PACKAGE:boot.img BOOT:" META-INF/com/google/android/update-script`" == "0" ] 
+  then
+    echo "Adding entry in update-script for NAND ROM boot folder ..."
+    echo "copy_dir PACKAGE:boot.img BOOT:" >> META-INF/com/google/android/update-script
+  fi    
+
+else
+
+  if [ -e boot.img ] && [ "$cmd_line" != "dsixda Null" ]
+  then
+    if [ "`grep -c "write_raw_image .*:boot.img [ ]*BOOT:" META-INF/com/google/android/update-script`" == "0" ] 
+    then
+      echo "boot.img found."
+      echo "Modifying update-script with syntax for flashing boot.img ..."
+      echo "write_raw_image PACKAGE:boot.img BOOT:" >> META-INF/com/google/android/update-script
+      echo
+    fi
+
+  elif [ "`grep -c " BOOT:" META-INF/com/google/android/update-script`" != "0" ] 
+  then
+    echo "boot.img not present in ROM."
+    echo "Modifying update-script to remove syntax for flashing boot.img ..."
+    sed -i -e '/ BOOT:[ ]*$/d' META-INF/com/google/android/update-script
+  fi
+fi
+
+
+
+#
+# Check for /system/bin/reboot in working folder, and then modify the update-script if required.
+# In some ROMs, 'reboot' may not be a symbolic link, so the kitchen did not delete it.
+#
+echo
+if [ -e system/bin/reboot ]
+then
+
+  if [ "`grep -c "symlink toolbox SYSTEM:bin/reboot" META-INF/com/google/android/update-script`" == "1" ] 
+  then
+    echo "/system/bin/reboot found."
+    echo "Modifying update-script so that the symlink is not required ..."
+    sed -i -e '/symlink toolbox SYSTEM:bin\/reboot$/d' META-INF/com/google/android/update-script
+    echo
+  fi
+
+else
+
+  if [ "`grep -c "symlink toolbox SYSTEM:bin/reboot" META-INF/com/google/android/update-script`" == "0" ] 
+  then
+    echo "/system/bin/reboot not present in ROM."  
+    echo "Modifying update-script so that the symlink is created ..."
+    sed -i -e 's/symlink toolbox SYSTEM:bin\/ps$/symlink toolbox SYSTEM:bin\/ps\nsymlink toolbox SYSTEM:bin\/reboot/g' META-INF/com/google/android/update-script
+ 
+    if [ "`grep -c "symlink toolbox SYSTEM:bin/reboot" META-INF/com/google/android/update-script`" == "0" ] 
+    then
+      sed -i -e 's/copy_dir PACKAGE:system SYSTEM:$/copy_dir PACKAGE:system SYSTEM:\nsymlink toolbox SYSTEM:bin\/reboot/g' META-INF/com/google/android/update-script
+    fi
+
+    echo
+  fi
+fi
+
+
+
+#
+# Fix the apps2sd issue where update-script wants to remove /data/app but it returns an error
+#
+
+grep_cmd=`grep -c "delete DATA:app[ ]*$" META-INF/com/google/android/update-script`
+
+if [ "$grep_cmd" != "0" ]
+then
+
+  cd META-INF/com/google/android
+  echo
+  echo "Replacing the line 'delete DATA:app' in the update-script with a script,"
+  echo "to ensure /data/app actually exists ..."
+  sed -i -e '/delete DATA:app[ ]*$/d' update-script
+
+  if [ "`grep -c check_data_app update-script`" == "0" ]
+  then
+    sed -i -e 's/copy_dir PACKAGE:data DATA:/run_program PACKAGE:check_data_app\ncopy_dir PACKAGE:data DATA:/g' update-script
+  fi
+
+  cd ../../../..
+
+  if [ ! -e check_data_app ]
+  then
+    echo "Adding check_data_app to working folder"
+    cp ../tools/check_data_app .
+  else
+    echo "check_data_app already exists"
+  fi
+fi
+
+
+
+#
+# Add permissions for init.d if run-parts enabled
+#
+
+if [ -e boot.img ] 
+then
+
+  echo "Checking boot.img ..."
+
+  cd ..
+  scripts/ensure_boot_extracted no_clear
+  if [ -d BOOT-EXTRACTED ]
+  then
+    
+    if [ ! -e BOOT-EXTRACTED/boot.img-ramdisk/init.rc ]
+    then
+      echo "Warning: init.rc not found in boot.img"
+
+    elif [ `grep -c run-parts BOOT-EXTRACTED/boot.img-ramdisk/init.rc` ]
+    then
+      scripts/add_initd_perm_to_update_script
+    fi
+
+    rm -rf BOOT-EXTRACTED
+  fi
+else
+  cd ..
+fi
+
+scripts/fix_update_script_blanks
+cd WORKING_*
+
+#
+# Remove update-script backup file created by perl file operations in Cygwin
+#
+if [ -e META-INF/com/google/android/update-script.bak ]
+then
+  echo
+  echo "Removing update-script.bak"
+  rm META-INF/com/google/android/update-script.bak
+fi
+
+echo
+
+
+cd ..
+
+

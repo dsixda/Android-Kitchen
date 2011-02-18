@@ -1,0 +1,32 @@
+
+img_dir=$1
+img_file=$2
+
+if [ "$img_dir" == "" ] || [ "$img_file" == "" ] 
+then
+  echo "Error:  check_if_img_yaffs is missing information."
+  echo "        Syntax: check_if_img_yaffs <file_directory> <img_file_name>"
+  echo
+  exit 1
+fi
+
+img_path=$img_dir/$img_file
+
+if [ ! -e $img_path ]
+then
+  echo "Error: $img_path not found!"
+  echo
+  exit 1
+fi
+
+echo
+
+str1=`od -A n -h -j 264 -N 4 $img_path | sed -e 's/ //g'`
+str2=`od -A n -h -j 269 -N 1 $img_path | sed -e 's/ //g'`
+
+if [ "$str1" == "ff00ffff" ] && [ "$str2" == "0041" ]
+then
+  exit 1
+else
+  exit 0
+fi

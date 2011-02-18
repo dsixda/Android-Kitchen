@@ -1,0 +1,69 @@
+scripts/ensure_boot_extracted dont_clear
+
+if [ -d BOOT-EXTRACTED ]
+then
+  if [ -d WORKING_* ]
+  then
+    echo -n 
+  else
+    exit 0
+  fi
+else
+  exit 0
+fi
+
+echo
+
+if [ -d BOOT-EXTRACTED/boot.img-ramdisk ]
+then
+  cd BOOT-EXTRACTED/boot.img-ramdisk
+else
+  echo "Error: BOOT-EXTRACTED/boot.img-ramdisk folder not found!"
+  exit 0
+fi
+
+changed=0
+echo "Checking default.prop ..."
+
+if [ "`grep -om 1 ro.secure=1 default.prop`" == "ro.secure=1" ]
+then
+  echo "Set: ro.secure=0"
+  perl -pi -e 's/ro.secure=1/ro.secure=0/g' default.prop
+  changed=1
+fi
+
+if [ "`grep -om 1 ro.debuggable=0 default.prop`" == "ro.debuggable=0" ]
+then
+  echo "Set: ro.debuggable=1"
+  perl -pi -e 's/ro.debuggable=0/ro.debuggable=1/g' default.prop
+  changed=1
+fi
+
+if [ "`grep -om 1 persist.service.adb.enable=0 default.prop`" == "persist.service.adb.enable=0" ]
+then
+  echo "Set: persist.service.adb.enable=1"
+  perl -pi -e 's/persist.service.adb.enable=0/persist.service.adb.enable=1/g' default.prop
+  changed=1
+fi
+
+if [ $changed == 1 ]
+then
+  echo
+  echo New default.prop:
+  more default.prop
+  echo
+
+  if [ -e default.prop.bak ]
+  then
+    rm default.prop.bak
+  fi
+
+  cd ../..
+  scripts/build_boot_img
+
+else
+  echo "No changes to default.prop made"
+  cd ../..
+  rm -rf BOOT-EXTRACTED
+fi
+

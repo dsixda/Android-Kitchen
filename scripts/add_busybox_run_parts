@@ -1,0 +1,174 @@
+
+if [ "$1" == "show_help" ]
+then
+
+  clear
+  echo
+  echo "-----------------------------------------------------------------"
+  echo  
+  echo "The BusyBox Run-Parts feature allows the device to run scripts"
+  echo "from the /system/etc/init.d folder during a reboot. "
+  echo 
+  echo "Normally the script names start with a number to indicate the "
+  echo "order in which they will be executed."
+  echo
+  echo "-----------------------------------------------------------------"
+  echo
+
+  echo -n "Proceed with Run-Parts feature (y/n)? (default: y): "
+  read do_runparts
+
+  if [ "$do_runparts" == "n" ]
+  then
+    exit 0
+  fi
+
+
+elif [ "$1" == "for_apps2sd" ]
+then
+
+  echo
+  echo "Optional: You can decide to add the BusyBox Run-Parts method for apps2sd."
+  echo "          This option allows you to run scripts under /system/etc/init.d,"
+  echo "          and not just those for a2sd."
+  echo
+  echo -n "Do you want to implement the BusyBox Run-Parts method? (y/n)? (default: n): "
+  read do_runparts
+
+  if [ "$do_runparts" != "y" ]
+  then
+    exit 0
+  fi
+
+fi
+
+
+
+cd WORKING_*
+
+su_path=`find . -name su`
+
+if [ "$su_path" == "" ]
+then
+  echo "'su' binary not found under working folder!"
+  echo "You must root your ROM first."
+  cd ..
+  exit 0
+fi
+
+cd ..
+scripts/ensure_boot_extracted
+
+if [ -d BOOT-EXTRACTED ]
+then
+  if [ -d WORKING_* ]
+  then
+    echo
+  else
+    exit 0
+  fi
+else
+  exit 0
+fi
+
+
+if [ -d BOOT-EXTRACTED/boot.img-ramdisk ]
+then
+  cd BOOT-EXTRACTED/boot.img-ramdisk
+else
+  echo "Error: BOOT-EXTRACTED/boot.img-ramdisk folder not found!"
+  exit 0
+fi
+
+
+test_property=`grep -c "on property:cm.filesystem.ready=1" init.rc`
+test_start=`grep -c "start sysinit" init.rc`
+test_service=`grep -c "service sysinit" init.rc`
+test_cm_sysinit=`grep -c "exec /system/bin/sysinit" init.rc`
+
+if [ "$test_start" != "0" ] && [ "$test_service" != "0" ]
+then
+  echo "Busybox Run-Parts already implemented in init.rc!"
+  cd ../..
+  echo
+  echo "Removing BOOT-EXTRACTED folder ..."
+  rm -rf BOOT-EXTRACTED
+  scripts/add_initd_perm_to_update_script
+  exit 0
+
+elif [ "$test_cm_sysinit" != "0" ]
+then
+  echo "CyanogenMod sysinit for /etc/init.d is already enabled in init.rc!"
+  cd ../..
+  echo
+  echo "Removing BOOT-EXTRACTED folder ..."
+  rm -rf BOOT-EXTRACTED
+  scripts/add_initd_perm_to_update_script
+  exit 0
+
+else
+
+  cd ../..
+  scripts/add_busybox
+
+  cd WORKING_*
+  #bb_path=`find . -name busybox | grep -m 1 busybox | sed -e 's/\.//g' -e 's/\//\\\\\//g'`
+    
+  cd ..
+  cd BOOT-EXTRACTED/boot.img-ramdisk
+
+
+  if [ `grep -c "start a2sd" init.rc` != 0 ]
+  then
+    echo
+    echo "Ensuring 'start sysinit' is in init.rc in ramdisk ..."
+
+    sed -i -e 's/start a2sd/start sysinit/g' init.rc    
+
+    echo
+    echo "Ensuring 'service sysinit' is in init.rc in ramdisk ..."
+
+    #sed -i -e 's/service a2sd[ ]*\/system\/bin\/logwrapper[ ]*\/system\/bin\/sh[ ]*\/system\/bin\/a2sd/service sysinit \/system\/bin\/logwrapper '"$bb_path"' run-parts \/system\/etc\/init.d/' init.rc
+    sed -i -e 's/service a2sd[ ]*\/system\/bin\/logwrapper[ ]*\/system\/bin\/sh[ ]*\/system\/bin\/a2sd/service sysinit \/system\/bin\/logwrapper \/system\/xbin\/busybox run-parts \/system\/etc\/init.d/' init.rc
+
+  else
+
+    echo
+    echo Modifying init.rc in ramdisk ...
+
+    if [ "$test_start" == "0" ] && [ "$test_property" == "0" ]
+    then
+      sed -i -e 's/class_start default/start sysinit\n\n    class_start default/' init.rc
+   
+    elif [ "$test_start" == "0" ] && [ "$test_property" != "0" ]
+    then
+      #
+      # If a2sd was present before
+      #
+      sed -i -e 's/on property:cm.filesystem.ready=1/start sysinit\n    on property:cm.filesystem.ready=1/' init.rc 
+    fi
+
+    if [ "$test_service" == "0" ]
+    then
+      #sed -i -e 's/service media /service sysinit \/system\/bin\/logwrapper '"$bb_path"' run-parts \/system\/etc\/init.d\n    disabled\n    oneshot\n\nservice media /' init.rc
+      sed -i -e 's/service media /service sysinit \/system\/bin\/logwrapper \/system\/xbin\/busybox run-parts \/system\/etc\/init.d\n    disabled\n    oneshot\n\nservice media /' init.rc
+      
+    fi
+
+  fi
+
+  
+  if [ "`grep sysinit init.rc`" == "" ]
+  then
+    echo
+    echo "Error: Unable to modify init.rc!"
+  fi
+
+  cd ../..
+  scripts/add_initd_perm_to_update_script
+  scripts/build_boot_img
+
+fi
+
+echo
+

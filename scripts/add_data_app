@@ -1,0 +1,62 @@
+
+if [ "$1" == "" ]
+then
+  clear
+
+elif [ "$1" == "show_help" ]
+then
+
+  clear
+  echo
+  echo "------------------------------------------------------------------"
+  echo  
+  echo "Copying your apps to the /data/app folder (instead of /system/app)"
+  echo "allows you to update them from the Android Market or to uninstall"
+  echo "them easily from your device when you no longer want them."
+  echo 
+  echo "------------------------------------------------------------------"
+  echo
+
+fi
+
+if [ "$1" != "dont_ask" ]
+then
+  echo -n "Proceed with /data/app feature (y/n)? (default: y): "
+  read do_app
+
+  if [ "$do_app" == "n" ]
+  then
+    exit 0
+  fi
+fi
+
+echo 
+
+if [ -d WORKING_* ]
+then
+  echo Working folder found
+  cd WORKING_*
+else
+  echo Working folder not found, you will need to create one!
+  exit 0
+fi
+
+if [ -d data/app ]
+then
+  echo /data/app already exists
+else
+  echo Creating /data/app
+  mkdir -p data/app
+fi
+
+if [ ! -e data/app/placeholder ]
+then
+  touch data/app/placeholder
+fi
+
+cd ..
+scripts/add_data_app_to_update_script
+
+echo
+echo Finished
+

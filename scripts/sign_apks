@@ -1,0 +1,243 @@
+clear
+
+if [ ! -d WORKING_* ]
+then
+  echo No working folder found!
+  scripts/press_enter
+  exit 0
+fi
+
+
+
+base_path=`pwd`
+util_dir=../tools/signapk_files
+
+while :
+do
+
+  clear
+
+  echo
+  echo "Sign APK"
+  echo "--------"
+  echo
+  echo "Enter a choice:"
+  echo 
+  echo "  a = Sign all *.apk in working folder"
+  echo "  s = Sign a single APK or set of APKs"
+  echo "  x = Exit"
+  echo
+  echo -n "? "
+
+  read enterNumbers
+
+
+  #
+  # All files
+  #
+
+  if [ "$enterNumbers" == "a" ]
+  then
+
+    echo
+    cd $base_path
+    cd WORKING_*
+
+    grep_cmd=`find system/app | grep \\.apk$ | sort -f`
+
+    if [ -d data/app ]
+    then
+      echo
+      echo "NOTE: If you sign all *.apk in the /data/app folder, then their Android"
+      echo "      Market updates will fail.  You can choose to not sign them now and"
+      echo "      later individually sign the ones you want."
+      echo
+      echo "      All *.apk under /system/app will still be signed."
+      echo 
+      echo
+      echo -n "Sign all *.apk under /data/app (y/n)? (default: n): "
+      read do_data
+
+      echo
+
+      if [ "$do_data" == "y" ]
+      then
+        grep_data=`find data/app | grep \\.apk$ | sort -f`
+        grep_cmd="$grep_data $grep_cmd"
+      else
+        echo "Not signing data/app/*.apk"
+      fi
+    fi
+
+    for filename in $grep_cmd
+    do
+      new_file=$filename\_new
+      echo "Signing $filename ..."
+
+      java -jar $util_dir/signapk.jar $util_dir/testkey.x509.pem $util_dir/testkey.pk8 $filename $new_file
+
+      if [ -e $new_file ]
+      then
+        mv -f $new_file $filename 
+      else
+        echo "Error: Unable to sign"
+      fi
+    done
+
+    cd $base_path
+    echo
+    echo "Finished"
+    scripts/press_enter
+
+  #
+  # Single file / Set of files
+  #
+
+  elif [ "$enterNumbers" == "s" ] 
+  then
+
+    echo
+    cd $base_path
+    cd WORKING_*
+
+    grep_cmd=`find . | grep .apk$ | sort -f`
+    count=0
+
+    rm -f ../temp.list
+
+    echo >> ../temp.list
+    echo "All APKs:" >> ../temp.list
+    echo >> ../temp.list
+
+    for filename in $grep_cmd 
+    do
+      count=$(($count+1))
+
+      # Store file names in an array
+      file_array[$count]=$filename
+      file_to_sign[$count]=0
+      echo "  ($count) $filename" >> ../temp.list
+
+    done
+
+    more ../temp.list
+
+    rm -f ../temp.list
+
+
+    echo
+    echo "Enter file number, or set of file numbers (0 = cancel)"
+    echo "For example:  1 24-39 22"
+    echo -n "> "
+
+    read enterNumbers
+    echo
+
+    if [ "$enterNumbers" == "0" ] || [ "$enterNumbers" == "" ]
+    then
+      continue
+   
+    else 
+      
+      #
+      # Parse the input and set the array
+      #
+
+      for num in $enterNumbers
+      do
+
+        num_start=$num
+        num_end=$num
+
+        num_start=`echo $num | sed 's/\([0-9]*\)-[0-9]*/\1/'`
+        num_end=`echo $num | sed 's/[0-9]*-\([0-9]*\)/\1/'`
+
+        if [ "$num_start" == "" ] || [ "`echo $num_start | sed 's/[0-9]*//'`" != "" ]
+        then
+          echo "Error: Invalid input ('$num' is not a valid number or range)"
+          continue
+        fi
+
+        if [ "$num_end" == "" ] || [ "`echo $num_end | sed 's/[0-9]*//'`" != "" ]
+        then
+          echo "Error: Invalid input ('$num' is not a valid number or range)"
+          continue
+        fi
+
+        if [ $num_end -lt $num_start ]
+        then
+          echo "Error: Invalid input ($num_start is not less than $num_end)"
+          continue
+        fi
+
+        
+        #
+        # Designate the files that were selected
+        #
+
+        for (( i=$num_start; i<=$num_end; i++ ))
+        do
+      
+          if [ "${file_array[$i]}" == "" ]
+          then
+            echo "Error: No files at #$i"
+            continue
+          else
+            file_to_sign[$i]=1
+          fi
+
+        done
+
+      done
+
+      #
+      # Go through the array and sign the appropriate files
+      #
+
+      for (( i=1; i<=$count; i++ ))
+      do
+
+        if [ "${file_to_sign[$i]}" == "1" ]
+        then
+          
+          file_chosen=${file_array[$i]}
+        
+          if [ "$file_chosen" == "" ]
+          then
+            echo "Error: Invalid input (file not found for $i)"
+            cd $base_path
+            scripts/press_enter
+            break
+          fi
+
+          new_file=$file_chosen\_new
+          echo "Signing #$i: $file_chosen ..."
+          java -jar $util_dir/signapk.jar $util_dir/testkey.x509.pem $util_dir/testkey.pk8 $file_chosen $new_file
+          
+          if [ -e $new_file ]
+          then
+            mv -f $new_file $file_chosen
+          else
+            echo "Error: Unable to sign"
+            cd $base_path
+            scripts/press_enter
+          fi
+        fi
+
+      done
+
+      cd $base_path
+      scripts/press_enter
+    fi
+
+
+  elif [ "$enterNumbers" == "x" ]
+  then
+    exit 0
+  else 
+    echo "Invalid option"
+    continue
+  fi
+
+done
+

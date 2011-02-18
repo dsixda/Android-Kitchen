@@ -1,0 +1,207 @@
+
+#
+# Check for xbin folder and BusyBox first
+#
+
+cd WORKING_*
+
+if [ -d system/xbin ]
+then
+
+  # Don't go all the way into system/xbin, because some of the binaries in
+  # there may collide with your operating system's file operation commands
+  # (e.g. ls, rm)!
+  cd system
+
+  echo
+  echo "Looking for symbolic links under system/xbin of working folder ..."
+
+  symlinks=`find xbin -type l -exec ls -l {} \; | sed 's/.* xbin\/\([^ ]*\).*/\1/g'`
+  source_files=`find xbin -type l -exec ls -l {} \; | sed 's/.*-> //g'`
+  
+  symlinks=( $symlinks )
+  source_files=( $source_files )
+
+  if [ "$symlinks" == "" ]
+  then
+    echo "None detected"
+  else
+    echo "They will now be added to the update-script and removed from system/xbin"
+
+    for (( i=0 ; i < ${#symlinks[@]} ; i++ ))
+    do
+
+      link=${symlinks[$i]}
+      src=${source_files[$i]}
+
+      # Deleting the symbolic link
+      rm -f xbin/$link
+
+      #
+      #  Remove full paths for some binaries
+      #
+      if [ `echo $src | grep -c /busybox$` == 1 ]
+      then
+        # Add busybox script to the ROM instead of hundreds of symlinks to update-script
+        continue
+      elif [ `echo $src | grep -c /toolbox$` == 1 ]
+      then
+        src=toolbox
+      elif [ `echo $src | grep -c /dumpstate$` == 1 ]
+      then
+        src=dumpstate
+      elif [ `echo $src | grep -c /iwmulticall$` == 1 ]
+      then
+        src=iwmulticall
+      fi
+
+      export XLINK=$link
+      export XSRC=$src
+
+      perl -pi -e 's/set_perm_recursive 0 0 0755 0644 SYSTEM:/symlink $ENV{"XSRC"} SYSTEM:xbin\/$ENV{"XLINK"}\nset_perm_recursive 0 0 0755 0644 SYSTEM:/' ../META-INF/com/google/android/update-script 
+    done
+
+  fi
+
+  #
+  # Check for BusyBox
+  #
+  if [ -e xbin/busybox ]
+  then
+    cd ../..
+    scripts/add_busybox no_clear_screen
+  else
+    cd ../..
+  fi
+
+else
+  cd ..
+  echo
+fi
+
+
+#
+# Check for root properties
+#
+
+cd WORKING_*
+su_path=`find . -name su`
+cd ..
+
+if [ "$su_path" != "" ]
+then
+  echo
+  echo "Found $su_path"
+  scripts/add_su_to_update_script
+fi
+
+
+#
+# Check for /data/app 
+#
+
+cd WORKING_*
+
+if [ -d data/app ] 
+then
+  
+  cd ..
+  echo
+  echo "data/app found under working folder"
+  scripts/add_data_app_to_update_script
+
+else
+  cd ..
+fi
+
+
+
+#
+# Check for /data/local 
+#
+
+cd WORKING_*
+
+if [ -d data/local ] 
+then
+
+  cd ..
+  echo
+  echo "data/local found under working folder"
+  scripts/add_data_local_to_update_script
+
+else
+  cd ..
+fi
+
+
+
+#
+# Check for nano 
+#
+
+cd WORKING_*
+nano_path=`find . -name nano`
+cd ..
+
+if [ "$nano_path" != "" ]
+then
+  echo
+  echo "Found $nano_path"
+  scripts/add_nano_to_update_script
+fi
+
+
+#
+# Check for sysrw/sysro
+#
+
+cd WORKING_*
+sysrw_path=`find . -name sysrw`
+cd ..
+
+if [ "$sysrw_path" != "" ]
+then
+  echo
+  echo "Found $sysrw_path"
+  scripts/add_sysrorw_to_update_script
+fi
+
+
+
+#
+# Check for apps2sd
+#
+
+scripts/a2sd_exists
+
+if [ "$?" == "1" ]
+then
+  echo
+  echo "Detected apps2sd"
+  scripts/add_apps2sd_files
+  scripts/add_apps2sd_to_update_script
+fi
+
+echo
+
+
+
+#
+# Check for bash (check after apps2sd because it adds bash)
+#
+
+cd WORKING_*
+bash_path=`find . -name bash`
+cd ..
+
+if [ "$bash_path" != "" ]
+then
+  echo
+  echo "Found $bash_path"
+  scripts/add_bash_to_update_script
+fi
+
+
+scripts/fix_update_script_blanks
+

@@ -1,0 +1,325 @@
+
+while :
+do
+
+  clear
+
+  echo
+  echo "----------------------------------------------------------------"
+  echo  
+  echo "Deodexing (or de-odex'ing) will take the *.odex files in your "
+  echo "ROM and convert them into classes.dex files, which will then be" 
+  echo "zipped into their *.apk or framework *.jar files."
+  echo ""
+  echo "The intent is to improve the performance of all apps. It also"
+  echo "puts certain *.apk files into a state where they can be used for"
+  echo "themes, icons, trackball/trackpad modifications, etc."
+  echo
+  echo "The process usually takes several minutes and does NOT require"
+  echo "you to sign any of the files afterwards."
+  echo
+  echo "----------------------------------------------------------------"
+  echo
+
+  if [ `ls tools/deodex_files | grep -c smali` -gt 2 ]
+  then
+    echo "Error: tools/deodex_files has multiple versions of smali/baksmali!"
+    scripts/press_enter
+    exit 0
+  fi
+
+  if [ ! -d WORKING_* ]
+  then
+    echo No working folder found!
+    scripts/press_enter
+    exit 0
+  fi
+
+  cd WORKING_*
+
+  if [ ! -d system/app ]
+  then
+    echo "system/app is missing!"
+    cd ..
+    scripts/press_enter
+    exit 0
+  fi
+
+  if [ ! -d system/framework ]
+  then
+    echo "system/framework is missing!"
+    cd ..
+    scripts/press_enter
+    exit 0
+  fi
+
+
+  num_odex=`find . | grep -c "\.odex$"`
+
+  if [ "$num_odex" == "0" ]
+  then
+    echo "No *.odex files found, no need to deodex!"
+    cd ..
+    scripts/press_enter
+    exit 0
+
+  else
+
+    num_odex_fr=`find system/framework | grep -c "\.odex$"`
+    num_odex_app=`find system/app | grep -c "\.odex$"`
+
+    echo "Found $num_odex_fr *.odex files in system/framework"
+    echo "Found $num_odex_app *.odex files in system/app"
+
+    if [ $num_odex_fr == 0 ] && [ $num_odex_app -gt 0 ]
+    then
+      echo
+      echo "WARNING: You must deodex the app folder if you had already"
+      echo "deodexed the framework folder."
+    fi
+
+
+    #
+    # Show menu choices
+    #
+
+    echo
+    echo "Enter a choice:"
+    echo
+
+    if [ $num_odex_app -gt 0 ] && [ $num_odex_fr -gt 0 ]
+    then
+      echo " bb  = Back up both folders (do first!)"
+    fi
+    if [ $num_odex_fr -gt 0 ]
+    then
+      echo "  f  = Deodex /system/framework"
+    fi
+    if [ $num_odex_app -gt 0 ]
+    then
+      echo "  a  = Deodex /system/app"
+    fi
+    if [ $num_odex_app -gt 0 ] && [ $num_odex_fr -gt 0 ]
+    then
+      echo "  b  = Deodex both folders (recommended)"
+    fi
+    echo "  s  = Deodex a single file"
+    echo "  x  = Exit"
+    echo
+    echo -n "? "
+
+    read enterNumber
+
+    list1=( app )
+    list2=( framework )
+    list3=( framework app )
+
+    if [ "$enterNumber" == "a" ]
+    then
+      dir_list=( app )
+    elif [ "$enterNumber" == "f" ] 
+    then
+      dir_list=( framework )
+    elif [ "$enterNumber" == "b" ] 
+    then
+      dir_list=( framework app )
+    elif [ "$enterNumber" == "s" ]
+    then
+      cd ..
+      scripts/choose_single_deodex
+      continue
+    elif [ "$enterNumber" == "bb" ]
+    then
+
+      #
+      # Backup
+      #
+
+      folder_list=( framework app )
+      date_str=`date '+%m%d%y_%H%M%S'`
+
+      for f in ${folder_list[@]}
+      do
+
+        backup_folder="old_`echo -n $f`_$date_str"
+        cd system/$f
+
+        echo
+        echo "Creating backup folder $backup_folder outside working folder ..."
+        mkdir ../../../$backup_folder
+        cp  * ../../../$backup_folder/
+        echo "Finished backup of $f folder."
+
+        cd ../..
+      done
+
+      cd ..
+      scripts/press_enter
+      continue
+
+    elif [ "$enterNumber" == "x" ]
+    then
+      cd ..
+      exit 0
+    else
+      cd ..
+      continue
+    fi
+  fi
+
+
+
+  #
+  # Go through each folder that was selected
+  #
+
+  for folder in ${dir_list[@]}
+  do
+
+    if [ $folder == framework ]
+    then
+      num_odex_folder=$num_odex_fr
+    else
+      num_odex_folder=$num_odex_app
+    fi
+
+    count=0
+    found_error=0
+    path=system/$folder
+
+    echo
+    echo
+    echo "Going into $path ..."
+    echo
+
+    cd $path
+
+    grep_cmd=`find . | grep "\.odex$" | sed 's/.\///g' | sort -f`
+
+    if [ "$grep_cmd" == "" ]
+    then
+      echo "Nothing found under $path!"
+    else
+
+      #
+      # Finally, deodex each file
+      #
+
+      cp ../../../tools/deodex_files/baksmali*.jar baksmali.jar
+      cp ../../../tools/deodex_files/smali*.jar smali.jar
+     
+
+      for odex_file in $grep_cmd
+      do
+        count=$(($count+1))
+        echo
+        echo "NOW AT FILE $count OF $num_odex_folder IN $path: $odex_file"
+        ../../../scripts/do_deodex_file $odex_file ../framework
+        
+        result=$?
+
+        #
+        # Use brute-force method if it requires an additional class
+        #
+
+        if [ "$result" == "1" ]
+        then
+
+          current_dir=`pwd`
+          cd ../framework
+
+          # Get a list of all the framework JARs
+          fr_jar_list=`find . | grep "\.jar$" | sed 's/.\///g' | sort -f`
+          fr_jar_list=`echo $fr_jar_list | sed 's/baksmali.jar//' | sed 's/smali.jar//'`
+
+          cd $current_dir
+
+          echo
+          echo 
+          echo "-> Using brute-force method to find the required class for $odex_file:"
+          echo
+
+          first_try=1
+
+          for classfile in $fr_jar_list
+          do
+
+            if [ $first_try == 1 ]
+            then  
+              first_try=0
+            else
+              echo
+              echo
+              echo "-> Trying another class file for $odex_file:"
+              echo
+            fi
+
+            echo
+            echo "Trying dependency with $classfile ..."
+            ../../../scripts/do_deodex_file $odex_file ../framework $classfile
+            
+            result=$?
+
+            if [ "$result" == "1" ]
+            then
+              continue
+            else
+              break
+            fi
+          done
+
+          if [ -e $odex_file ]
+          then
+            found_error=1
+            echo "ERROR: Aborting $odex_file"
+          fi
+        fi
+
+      done
+
+      rm -f baksmali.jar
+      rm -f smali.jar
+
+      echo
+      echo "Finished $path"
+
+      if [ "$found_error" == "1" ]
+      then
+        echo "Could not deodex the following (try to deodex these files again):"
+        echo `ls *.odex`
+        echo
+        cd ../..
+        break
+      fi
+
+    fi
+
+    cd ../..
+
+  done
+
+
+
+  num_odex_app=`find system/app | grep -c "\.odex$"`
+  num_odex_fr=`find system/framework | grep -c "\.odex$"`
+
+  echo
+  echo "$num_odex_app *.odex files remain in system/app"
+  echo "$num_odex_fr *.odex files remain in system/framework"
+
+  if [ $num_odex_fr == 0 ] && [ $num_odex_app -gt 0 ]
+  then
+    echo
+    echo "WARNING: You must deodex the app folder if you had already"
+    echo "deodexed the framework folder."
+  fi
+
+  cd ..
+  scripts/press_enter
+
+  if [ $num_odex_fr == 0 ] && [ $num_odex_app == 0 ]
+  then
+    exit 0
+  fi
+
+done

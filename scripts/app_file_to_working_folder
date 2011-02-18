@@ -1,0 +1,64 @@
+
+update_file=$1
+ 
+echo "Selected $update_file"
+
+# Trim spaces in file name
+update_file2=`echo $update_file | tr ' ' '_'`
+
+if [ "$update_file" != "$update_file2" ]
+then
+  echo "Renaming to $update_file2"
+  mv "original_update/$update_file" original_update/$update_file2
+  update_file=$update_file2
+fi
+
+#
+# Working folder name
+#
+date_str=`date '+%m%d%y_%H%M%S'`
+build_dir=WORKING_$date_str
+
+#
+# Creating folder structure
+#
+echo
+echo "Creating working folder $build_dir ..."
+mkdir $build_dir
+
+echo "Copying $update_file to $build_dir ..."
+cp original_update/$update_file $build_dir
+
+echo "Renaming to UPDATA.APP ..."
+cd $build_dir
+mv -f $update_file UPDATA.APP
+
+echo
+echo "Extracting system.img and boot.img using ZeBadger's script ..."
+temp=`perl ../tools/huawei_files/split_updata.pl 2>/dev/null`
+
+if [ ! -e output/system.img ] 
+then
+  echo "Error: system.img not found"
+fi
+
+if [ ! -e output/boot.img ]
+then
+  echo "Error: boot.img not found"
+fi
+
+if [ ! -e output/system.img ] || [ ! -e output/boot.img ]
+then
+  cd ..
+  exit 1
+fi
+
+mv -f output/boot.img .
+mv -f output/system.img .
+rm -rf output
+rm -f UPDATA.APP
+
+cd ..
+scripts/img_files_to_working_folder no_create
+exit $?
+

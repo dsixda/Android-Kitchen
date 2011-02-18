@@ -1,0 +1,372 @@
+ 
+temp=`ls WORKING_* 2>/dev/null`
+res=$?
+
+if [ "$res" == "2" ]
+then
+  echo
+  echo "No working folder found!"
+  exit 1
+fi
+
+cd WORKING_*
+
+if [ ! -e META-INF/com/google/android/update-script ]
+then
+  echo
+  echo "META-INF/com/google/android/update-script not found!"
+  cd ..
+  exit 1
+fi
+
+cd ..
+scripts/fix_update_script_blanks
+
+# This file may have been left behind earlier, if script was terminated
+# unexpectedly
+rm -f symlinks.log
+
+
+if [ "$1" != "no_clear" ]
+then
+  clear
+fi
+
+echo
+echo "Verification of META-INF/com/google/android/update-script"
+echo "-------------------------------------------------------------------"
+echo  
+echo "The following tool will check your update-script for errors, so "
+echo "that you will be able to catch and diagnose potential problems"
+echo "now instead of during flashing (when the error messages are"
+echo "sometimes not descriptive enough)."
+echo 
+echo "Please note that the script will not detect every possible error "
+echo "and may also report false alarms. Also, depending on the size of "
+echo "your update-script, it may take a few minutes to complete."
+echo
+echo "-------------------------------------------------------------------"
+echo
+
+if [ "$1" != "no_clear" ]
+then
+  echo -n "Check update-script for errors (y/n)? (default: y): "
+  read do_verify
+
+  if [ "$do_verify" == "n" ]
+  then
+    exit 0
+  else
+    clear
+  fi
+else
+
+  echo -n "Check update-script for errors (y/n)? (default: n): "
+  read do_verify
+
+  if [ "$do_verify" != "y" ]
+  then
+    exit 0
+  fi
+fi
+
+
+echo
+cd WORKING_*
+
+#
+# Remove commas at end of line (special syntax)
+#
+sed -i -e ':a;N;$!ba;s/,\n[ ]*/, /g' META-INF/com/google/android/update-script
+
+
+#
+# Get number of lines from file
+#
+num_lines=`sed -n '$=' META-INF/com/google/android/update-script`
+
+echo "update-script has $num_lines lines"
+echo
+
+errors_found=0
+
+for (( i = 1 ; i <= $num_lines ; i++ ))
+do
+
+  expect_path=
+  expect_path2=
+  not_expect_path=
+
+  error_now=0
+  symlink=0
+
+
+  #
+  # Read current line in file
+  #
+
+  curr_line=`sed -n $i\\p META-INF/com/google/android/update-script`
+  echo "$i/$num_lines: $curr_line"
+
+
+  #
+  # Revise the current line so that it can be parsed easier
+  #
+  curr_line=`echo $curr_line | \
+            sed -e 's/PACKAGE://g' -e 's/SYSTEM:/system\//g' -e 's/DATA:/data\//g'`
+
+
+  #
+  # Is line a comment?
+  #
+
+  comment_result=`echo $curr_line | sed -e 's/^#.*//g'`
+
+  if [ "$comment_result" == "" ]
+  then
+    continue
+  fi
+
+
+  #
+  # Does line refer to "TMP" partition?
+  #
+
+  tmp_result=`echo $curr_line | grep TMP:`
+
+  if [ "$tmp_result" != "" ]
+  then  
+    errors_found=$(($errors_found+1))           
+    echo ">> WARNING: TMP partition is not supported in update-script.  You must"
+    echo ">>          convert this update-script to an updater-script."
+    continue
+  fi
+
+  first_word=`echo $curr_line | sed -e 's/[ ]*\([^ ]*\) .*/\1/'`
+
+  case "$first_word" in
+
+    "copy_dir") \
+      expect_path=`echo $curr_line | sed -e 's/copy_dir[ ]*\([^ ]*\)[ ]*[^ ]*/\1/'`
+      expect_path2=`echo $curr_line | sed -e 's/copy_dir[ ]*[^ ]*[ ]*\([^ ]*\)/\1/'`
+      if [ "`echo $expect_path2 | grep -c SDCARD:`" != "0" ]
+      then
+        expect_path2=
+      fi
+
+      ;;
+
+    "symlink") \
+      symlink=1
+      expect_path=`echo $curr_line | sed -e 's/symlink[ ]*\([^ ]*\)[ ]*[^ ]*/\1/'`
+      not_expect_path=`echo $curr_line | sed -e 's/symlink[ ]*[^ ]*[ ]*\([^ ]*\)/\1/'`
+      echo "$not_expect_path " >> ../symlinks.log
+      ;;
+
+    "set_perm_recursive") \
+      expect_path=`echo $curr_line | \
+           sed -e 's/set_perm_recursive[ ]*[^ ]*[ ]*[^ ]*[ ]*[^ ]*[ ]*[^ ]*[ ]*\([^ ]*\)/\1/'`
+      
+      #
+      # Check for location of SYSTEM: permissions in update-script
+      #
+      if [ `echo $curr_line | grep set_perm_recursive | grep -c "system/[ ]*$"` != 0 ]
+      then
+
+        #
+        # Check for references to subfolders under SYSTEM:
+        #
+        grep_first_line=`grep -n set_perm_recursive META-INF/com/google/android/update-script | grep -v "SYSTEM:[ ]*$" | grep -m 1 SYSTEM:[a-z0-9]*`
+
+        if [ "$grep_first_line" != "" ]
+        then
+          first_line_num=`echo $grep_first_line | sed -e 's/\([0-9]*\).*/\1/'`
+
+          if [ $first_line_num -lt $i ]
+          then
+            errors_found=$(($errors_found+1))
+            echo ">> WARNING: Overwriting permissions set in $grep_first_line"
+          fi
+        fi
+
+        #
+        # Check for another occurrence of root folder of SYSTEM: 
+        #
+        grep_first_line=`grep -n set_perm_recursive META-INF/com/google/android/update-script | grep "SYSTEM:[ ]*$"`
+        if [ "$grep_first_line" != "" ]
+        then
+          first_line_num=`echo $grep_first_line | sed -e 's/\([0-9]*\).*/\1/'`
+
+          if [ $first_line_num -lt $i ]
+          then
+            errors_found=$(($errors_found+1))
+            echo ">> WARNING: Same folder was referenced in $grep_first_line"
+          fi
+        fi
+      fi
+      ;;
+  
+    "set_perm") \
+      expect_path=`echo $curr_line | \
+           sed -e 's/set_perm[ ]*[^ ]*[ ]*[^ ]*[ ]*[^ ]*[ ]*\([^ ]*\)/\1/'`
+      ;;
+ 
+    "run_program") \
+      expect_path=`echo $curr_line | \
+           sed -e 's/run_program[ ]*\([^ ]*\)[ ]*.*/\1/'`
+      ;;
+
+    "write_raw_image") \
+      expect_path=`echo $curr_line | \
+           sed -e 's/write_raw_image[ ]*\([^ ]*\)[ ]*.*/\1/'`
+      ;;
+
+    "write_radio_image") \
+      expect_path=`echo $curr_line | \
+           sed -e 's/write_radio_image[ ]*\([^ ]*\)[ ]*.*/\1/'`
+      ;;
+
+    "format") \
+      partition=`echo $curr_line | \
+           sed -e 's/format[ ]*\([^ ]*\)[ ]*.*/\1/'`
+      if [[ "$partition" != "system/" && "$partition" != "data/" && \
+          "$partition" != "BOOT:" && "$partition" != "CACHE:" && \
+          "$partition" != "RECOVERY:" && "$partition" != "SDCARD:" ]]
+      then
+        errors_found=$(($errors_found+1))
+        echo ">> WARNING: Partition not recognized"
+      fi
+
+      #
+      # Ensure that the 'format' keyword doesn't come after copy_dir of the partition
+      #
+      if [[ "$partition" == "system/" || "$partition" == "data/" ]]
+      then
+
+          # Find line number of the copy_dir line
+          
+          if [ "$partition" == "system/" ]
+          then  
+            orig_name=SYSTEM:
+          else
+            orig_name=DATA:
+          fi
+
+          grep_line=`grep -n -m 1 "copy_dir .* $orig_name" META-INF/com/google/android/update-script`
+
+          if [ "$grep_line" != "" ]
+          then
+            grep_line_num=`echo $grep_line | sed -e 's/\([0-9]*\).*/\1/'`
+
+            if [ $grep_line_num -lt $i ]
+            then
+              errors_found=$(($errors_found+1))
+              echo ">> ERROR: Should not be formatting this partition after files were already copied to it!"
+            fi
+          fi
+
+      fi
+
+      ;;
+
+    "package_extract_file") \
+      expect_path=`echo $curr_line | \
+           sed -e 's/package_extract_file[ ]*\([^ ]*\)[ ]*.*/\1/'`
+
+      errors_found=$(($errors_found+1))           
+      echo ">> WARNING: Command package_extract_file not supported in update-script."
+      echo ">>          However, do not remove this line.  Convert file to updater-script."
+      ;;
+
+    "show_progress") \
+      ;;
+
+    "delete") \
+      ;;
+
+    "delete_recursive") \
+      ;;
+
+    "assert") \
+      ;;
+
+    *) \
+
+      grep_cmd=`echo $first_word | grep -c "assert("`
+      if [ $grep_cmd == 1 ]
+      then
+        continue
+      fi
+
+      errors_found=$(($errors_found+1))
+      echo ">> WARNING: Command \"$first_word\" not recognized by script"
+      ;;
+  esac
+
+  #
+  # Verify the paths
+  #
+
+  var_list=( $expect_path $expect_path2 $not_expect_path )
+
+  for var in ${var_list[@]}
+  do
+
+    # Remove slash in front of path
+    var=`echo $var | sed 's/^\///g'`
+
+    if [ "$var" != "" ]
+    then
+      if [ "$var" != "$not_expect_path" ] && [ ! -e $var ]
+      then
+
+        if [ $symlink == 1 ] && [ `echo $var | grep -c /` == 0 ]
+        then
+
+          # Check if it's something like 'busybox', 'toolbox', etc.
+          # and not a full path
+
+          find_result=`find . -name $var`
+          if [ "$find_result" == "" ]
+          then
+            errors_found=$(($errors_found+1))
+            echo ">> ERROR: $var not found in working folder"
+            break
+          fi
+
+        else
+
+          if [ ! -e ../symlinks.log ] || [ `grep -c "$var " ../symlinks.log` == 0 ]
+          then
+            errors_found=$(($errors_found+1))
+            echo ">> WARNING: $var not found in working folder"
+            break
+          fi
+        fi
+
+      fi 
+
+      if [ "$var" == "$not_expect_path" ] && [ -e $var ]
+      then
+        errors_found=$(($errors_found+1))
+        echo ">> ERROR: $var found in working folder"
+      fi   
+    fi
+  done
+
+done
+
+cd ..
+
+rm -f symlinks.log
+
+echo
+if [ "$errors_found" != "0" ]
+then
+  echo "$errors_found issue(s) found.  Please review the update-script to ensure it is correct."
+else
+  echo "No issues found."
+fi
+
+scripts/update_script_should_convert_back
+scripts/press_enter

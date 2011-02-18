@@ -1,0 +1,86 @@
+
+if [ "$1" == "" ]
+then
+  clear
+fi
+
+scripts/prompt_remove_boot_extracted
+
+if [ ! -d BOOT-EXTRACTED ]
+then
+
+  if [ -d WORKING_* ]
+  then
+    echo
+    echo Working folder found
+  else
+    echo
+    echo Working folder not found, you will need to create one!
+    exit 0
+  fi
+
+  cd WORKING_*
+
+  if [ -d system ]
+  then
+
+    if [ -e boot.img ]
+    then
+
+      echo Making folder 'BOOT-EXTRACTED' ...
+      mkdir ../BOOT-EXTRACTED
+
+      cp boot.img ../BOOT-EXTRACTED/
+      
+      cd ..
+      scripts/check_kernel_offset
+      res=$?
+
+      if [ "$res" == "0" ]
+      then
+        kernel_file=extract-kernel.pl
+        ramdisk_file=extract-ramdisk.pl
+      else
+        rm -rf BOOT-EXTRACTED
+        exit 0
+      fi
+
+      cp tools/extract_boot_files/$kernel_file BOOT-EXTRACTED/extract-kernel.pl
+      cp tools/extract_boot_files/$ramdisk_file BOOT-EXTRACTED/extract-ramdisk.pl
+      cd BOOT-EXTRACTED
+
+      echo
+      echo Extracting kernel ...
+      ./extract-kernel.pl boot.img
+
+      echo
+      echo Extracting ramdisk ... 
+      ./extract-ramdisk.pl boot.img
+
+      rm boot.img
+      rm extract-*.pl
+      cd ..
+      echo
+
+    else
+
+      if [ -e boot/initrd.gz ] && [ -e boot/zImage ]
+      then
+        cd ..
+        scripts/ensure_nand_extracted
+
+      else
+        echo "Error: boot.img not found!"
+        echo
+        cd ..
+        exit 0
+      fi
+    fi      
+  
+  else
+    echo "Error: system folder not found under working folder!"
+    cd ..
+    exit 0
+  fi
+fi
+

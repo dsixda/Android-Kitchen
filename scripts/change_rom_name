@@ -1,0 +1,84 @@
+clear
+
+if [ -d WORKING_* ]
+then
+  echo Found working folder
+else
+  echo No working folder found!
+  exit 0
+fi
+
+clear
+cd WORKING_*
+cd system
+
+echo
+
+if [ `grep -c ro.product.version build.prop` == 0 ]
+then
+  id_var=ro.build.display.id
+else
+  id_var=ro.product.version
+fi
+
+
+str=^$id_var=
+file_count=`grep -l $str *.prop | grep -c .prop`
+
+if [ $file_count == 0 ] 
+then
+  echo "Error: Cannot find $id_var"
+  cd ../..
+  exit 0
+
+elif [ $file_count -gt 1 ]
+then
+  echo "Error:  Too many occurrences of $id_var in *.prop."
+  echo "        Please remove redundant definitions."
+  echo
+  cd ../..
+  exit 0
+fi
+
+
+
+rom_name=`grep -m 1 $str *.prop | sed 's/'"$id_var"'=//g' | sed 's/[^:]*://g'`
+filename=`grep -lm 1 $str *.prop`
+
+echo
+echo "The current name of the ROM is:"
+echo
+echo "$rom_name"
+echo
+echo
+echo -n "Would you like to rename it (y/n)? (default: y): "
+
+read do_rename
+echo
+
+if [ "$do_rename" != "n" ]
+then
+
+  echo -n "Please enter the new name: "
+
+  read new_name
+
+  cat $filename | sed 's/'"$id_var"'=[^\n]*/'"$id_var"'='"$new_name"'/g' > $filename.new
+  mv -f $filename.new $filename
+  
+  rom_name=`grep -m 1 $str $filename | sed 's/'"$id_var"'=//g'`
+
+  echo
+  echo
+  echo "In $filename, $id_var is now set to:"
+  echo
+  echo "$rom_name"
+
+
+else
+  echo "Ok, nothing will be changed"
+fi
+
+cd ../..
+echo
+

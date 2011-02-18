@@ -1,0 +1,71 @@
+
+if [ "$1" == "" ]
+then
+  clear
+
+elif [ "$1" == "show_help" ]
+then
+
+  clear
+  echo
+  echo "-----------------------------------------------------------------"
+  echo  
+  echo "BusyBox is an executable file that combines tiny versions of"
+  echo "many common UNIX utilities.  It is required for some root-enabled"
+  echo "applications."
+  echo
+  echo "-----------------------------------------------------------------"
+  echo
+  echo -n "Add BusyBox (y/n)? (default: y): "
+  read do_bb
+
+  if [ "$do_bb" == "n" ]
+  then
+    exit 0
+  fi    
+fi
+
+if [ ! -d WORKING_* ]
+then
+  echo No working folder found!
+  exit 0
+fi
+
+cd WORKING_*
+
+su_path=`find . -name su`
+
+if [ "$su_path" == "" ]
+then
+  echo "'su' binary not found under working folder!"
+  cd ..
+  exit 1
+else
+  echo
+  echo "Found $su_path"
+fi
+
+echo
+
+if [ -d system/xbin ]
+then
+  echo Found /system/xbin
+else
+  echo Creating /system/xbin
+  mkdir system/xbin
+fi
+
+echo
+
+if [ -e system/xbin/busybox ] 
+then
+  echo "/system/xbin/busybox already present"
+else
+  echo "Adding /system/xbin/busybox"
+  cp ../tools/busybox_files/busybox system/xbin/
+fi
+
+
+cd ..
+
+scripts/add_busybox_to_update_script

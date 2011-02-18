@@ -1,0 +1,96 @@
+
+clear
+echo
+echo "-----------------------------------------------------------------"
+echo 
+echo "This option will disable the 'noise' that plays whenever certain"
+echo "Android devices are turned on. This option may not be supported"
+echo "for your device."
+echo
+echo "-----------------------------------------------------------------"
+echo
+
+echo -n "Proceed with disabling boot screen sound (y/n)? (default: y): "
+read do_disable
+
+if [ "$do_disable" == "n" ]
+then
+  exit 0
+fi
+
+echo
+
+if [ -d WORKING_* ]
+then
+  echo Working folder found
+else
+  echo Working folder not found, you will need to create one!
+  exit 0
+fi
+
+if [ -d WORKING_* ]
+then
+  cd WORKING_*
+else
+  exit 0
+fi
+
+if [ -e system/media/bootscreen/boot_animation.xml ]
+then
+  cd system/media/bootscreen/
+
+  echo
+  echo "CURRENTLY IN boot_animation.xml:"
+  grep useAudio boot_animation.xml
+  echo
+
+  if [ "`grep useAudio='"1"' boot_animation.xml`" == "" ]
+  then
+    echo Sound is already turned off, no need to change
+  else
+    echo Modifying boot_animation.xml ...
+    perl -pi -e 's/useAudio="1"/useAudio="0"/g' boot_animation.xml
+
+    echo
+    echo "NOW:"
+    grep useAudio boot_animation.xml
+  fi
+
+  if [ -e boot_animation.xml.bak ]
+  then
+    echo
+    echo "Removing boot_animation.xml.bak"  
+    rm boot_animation.xml.bak
+  fi
+
+
+  cd ../../../..
+
+
+else
+
+  echo
+  echo "/system/media/bootscreen/boot_animation.xml not found in this ROM"
+
+  file_list="system/customize/resource/android_audio.mp3 system/media/android_audio.mp3 system/sounds/lgeSounds/PowerOn.mp3"
+
+  for mp3 in $file_list 
+  do
+
+    echo
+
+    if [ -e $mp3 ]
+    then
+      echo "--> Renaming /$mp3"
+      mv $mp3 $mp3.bak
+    else
+      echo "/$mp3 not found in this ROM"
+    fi
+  
+  done
+
+  cd ..
+fi
+
+echo
+

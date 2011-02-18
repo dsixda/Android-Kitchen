@@ -1,0 +1,72 @@
+echo
+
+if [ -d BOOT-EXTRACTED ]
+then
+  echo Found BOOT-EXTRACTED folder, checking contents ...
+
+  if [ -d BOOT-EXTRACTED/boot.img-ramdisk ]
+  then
+    echo Found boot.img-ramdisk
+
+    if [ -e BOOT-EXTRACTED/zImage ]
+    then
+      echo Found zImage
+    else
+      echo Did not find BOOT-EXTRACTED/zImage
+      exit 0
+    fi
+
+  else
+    echo Did not find BOOT-EXTRACTED/boot.img-ramdisk folder!
+    exit 0
+  fi
+
+else
+  echo Did not find BOOT-EXTRACTED folder!
+  exit 0
+fi
+
+
+
+
+if [ -d WORKING_* ]
+then
+  echo Working folder found
+else
+  echo Working folder not found!
+  exit 0
+fi
+
+
+
+
+
+echo 
+echo "Building initrd.gz ..."
+
+cd BOOT-EXTRACTED/boot.img-ramdisk
+find . | cpio -o -H newc | gzip > ../initrd.gz
+cd ..
+rm -rf boot.img-ramdisk
+
+cd ..
+cd WORKING_*
+
+if [ -e boot.img ]
+  then
+  echo
+  echo "Replacing boot.img in working folder with NAND boot folder ..."
+  rm -f boot.img
+fi
+
+if [ -d boot ]
+then
+  echo
+  echo "Removing old NAND boot folder ..."
+  rm -rf boot
+fi
+
+mv ../BOOT-EXTRACTED boot
+cd ..
+
+

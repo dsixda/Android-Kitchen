@@ -1,0 +1,120 @@
+
+cd WORKING_*
+echo
+
+if [ -e META-INF/com/google/android/update-script ]
+then
+
+  cd META-INF/com/google/android
+
+  #
+  # Remove installation of recovery image
+  #
+  
+  grep_cmd=`grep "copy_dir PACKAGE:recovery SYSTEM:$" update-script`
+
+  if [ "$grep_cmd" != "" ]
+  then
+    echo -n "Remove recovery folder reference in update-script (y/n)? (default: n): "
+    read do_remove
+
+    if [ "$do_remove" == "y" ]
+    then
+      sed -i -e '/copy_dir PACKAGE:recovery SYSTEM:/d' update-script 
+    else
+      echo "Not removing"
+    fi
+  fi
+
+  grep_cmd=`grep "set_perm 0 0 0544 SYSTEM:etc/install-recovery.sh" update-script`
+
+  if [ "$grep_cmd" != "" ]
+  then
+    echo -n "Remove install-recovery.sh from update-script (y/n)? (default: n): "
+    read do_remove
+
+    if [ "$do_remove" == "y" ]
+    then
+      sed -i -e '/set_perm 0 0 0544 SYSTEM:etc\/install-recovery.sh/d' update-script
+    else
+      echo "Not removing"
+    fi
+  fi
+
+
+
+
+  #
+  # Remove the assert command for installing radio in OTA update
+  #
+
+  sed -i -e ':a;N;$!ba;s/,\n//g' -e 's/assert(htc.install_radio[^;]*[;]//' update-script
+
+  #
+  # Remove any "delete SYSTEM:bin...." lines in OTA update  
+  #
+
+  sed -i -e 's/delete SYSTEM:bin[^\n]*[\n]*//g' update-script
+
+  cd ../../../../..
+
+  scripts/fix_update_script_blanks
+
+
+else
+  cd ..
+fi  
+
+
+cd WORKING_*
+
+if [ -d recovery ]
+then
+
+  echo -n "Remove recovery folder (y/n)? (default: n): "
+  read do_remove
+
+  if [ "$do_remove" == "y" ]
+  then
+    echo "Removing recovery folder ..."
+    rm -rf recovery
+  else
+    echo "Not removing"
+  fi    
+fi
+
+if [ -e system/etc/install-recovery.sh ]
+then
+
+  echo -n "Remove system/etc/install-recovery.sh (y/n)? (default: n): "
+  read do_remove
+
+  if [ "$do_remove" == "y" ]
+  then
+    echo "Removing system/etc/install-recovery.sh ..."
+    rm -f system/etc/install-recovery.sh  
+  else
+    echo "Not removing"
+  fi  
+fi
+
+
+
+if [ -e system/recovery-from-boot.p ]
+then
+
+  echo -n "Remove system/recovery-from-boot.p (y/n)? (default: y): "
+  read do_remove
+
+  if [ "$do_remove" != "n" ]
+  then
+    echo "Removing system/recovery-from-boot.p ..."
+    rm -f system/recovery-from-boot.p
+  else
+    echo "Not removing"
+  fi  
+fi
+
+echo
+cd ..
+

@@ -1,0 +1,18 @@
+set_perm 0 0 0777 SYSTEM:bin/a2sd
+set_perm 0 0 0777 SYSTEM:etc/init.d/00banner
+set_perm 0 0 0777 SYSTEM:etc/init.d/01sysctl
+set_perm 0 0 0777 SYSTEM:etc/init.d/02firstboot
+set_perm 0 0 0777 SYSTEM:etc/init.d/04apps2sd
+set_perm 0 0 0777 SYSTEM:etc/init.d/99complete
+set_perm 0 0 0777 SYSTEM:bin/launcha2sd
+set_perm 0 0 0777 SYSTEM:bin/starta2sd
+set_perm 0 0 0777 SYSTEM:bin/jita2sd
+set_perm 0 0 0777 SYSTEM:bin/chka2sd
+set_perm 0 0 0777 SYSTEM:bin/zipalign
+set_perm 0 0 0777 SYSTEM:bin/sysinit
+set_perm 0 0 0777 SYSTEM:bin/bash
+set_perm 0 0 0777 SYSTEM:bin/busybox.a2sd
+set_perm 0 0 0644 SYSTEM:bin/apps2sd.hlp
+set_perm 0 0 0777 SYSTEM:xbin/a2sd
+set_perm 0 0 0777 SYSTEM:bin/dtinstall
+

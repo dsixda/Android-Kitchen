@@ -1,0 +1,53 @@
+
+cd WORKING_*
+cd META-INF/com/google/android
+
+if [ -e update-script ]
+then
+
+  if [ "`grep -om 1 sysro update-script`" == "sysro" ] && [ "`grep -om 1 sysrw update-script`" == "sysrw" ]
+  then
+    echo "update-script already has sysro/sysrw content"
+
+  else
+
+    #
+    # Do this to prevent conflicts with the update-script in ROMs that already have the binary
+    #
+    if [ -e ../../../../system/xbin/sysro ]
+    then
+
+      if [ "`find ../../../../system/bin -name sysro`" == "" ]
+      then
+        echo "Copying system/xbin/sysro to system/bin/sysro"
+        cp -f ../../../../system/xbin/sysro ../../../../system/bin/sysro
+      fi
+    fi
+
+    if [ -e ../../../../system/xbin/sysrw ]
+    then
+
+      if [ "`find ../../../../system/bin -name sysrw`" == "" ]
+      then
+        echo "Copying system/xbin/sysrw to system/bin/sysrw"
+        cp -f ../../../../system/xbin/sysrw ../../../../system/bin/sysrw
+      fi
+    fi
+
+    echo
+    echo "Updating update-script with sysro and sysrw entries"
+    perl -pi -e 's/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh\nset_perm 0 0 04755 SYSTEM:bin\/sysrw\nset_perm 0 0 04755 SYSTEM:bin\/sysro\n/g' update-script
+ 
+    if [ "`grep -om 1 sysro update-script`" != "sysro" ] || [ "`grep -om 1 sysrw update-script`" != "sysrw" ]
+    then
+      echo "Error: Unable to update update-script with sysro/sysrw"
+    fi
+  fi
+
+else
+  echo "Error: No update-script found!"
+fi
+
+cd ../../../../..
+echo
+

@@ -1,0 +1,32 @@
+clear 
+
+
+if [ ! -d WORKING_* ]
+then
+  echo No working folder found!
+  exit 0
+fi
+
+if [ -d BOOT-EXTRACTED ]
+then
+  echo
+  echo "---------------------------------------------------------------"
+  echo  
+  echo "Ensure your BOOT-EXTRACTED folder has the kernel and ramdisk"
+  echo "files that you need."
+  echo 
+  echo "Kernel  = zImage (sometimes referred to as boot.img-kernel)"
+  echo "Ramdisk = boot.img-ramdisk folder"
+  echo
+  echo "---------------------------------------------------------------"
+  echo
+  echo "These files will be re-packed into a boot.img that will be"
+  echo "copied to your current working folder."
+  echo 
+  echo "---------------------------------------------------------------"
+  echo 
+  echo -n "<Press ENTER> "
+  read enterKey
+fi
+
+

@@ -1,0 +1,20 @@
+cd WORKING_*
+cd META-INF/com/google/android
+grep_data_app=`grep set_perm update-script | grep -c DATA:app`
+cd ../../../../..
+
+if [ "$grep_data_app" == "0" ]
+then
+  exit 0
+else
+
+  cd WORKING_*
+  if [ -d data/app ]
+  then
+    cd ..
+    exit 1
+  else
+    cd ..
+    exit 0
+  fi
+fi

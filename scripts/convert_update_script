@@ -1,0 +1,555 @@
+
+if [ "$1" == "" ]
+then
+  clear
+fi
+
+
+echo
+
+if [ -d WORKING_* ]
+then
+
+  cd WORKING_*
+  cd META-INF/com/google/android
+
+else
+  echo
+  echo Working folder not found, you will need to create one!
+  exit 0
+fi
+
+
+
+if [ "$1" == "" ]
+then
+
+  echo "Conversion Tool: update-script (Amend) to updater-script (Edify)"
+  echo "-------------------------------------------------------------------"
+  echo
+  echo "This script will convert your update-script into an updater-script"
+  echo "and will also add the update-binary file."
+  echo 
+  echo "This option will also be given when you build your ROM, so it is"
+  echo "not necessary to convert your update-script now.  The kitchen is NOT"
+  echo "compatible with updater-scripts, so only the 'Build ROM' option "
+  echo "should be used afterwards."
+  echo
+  echo "Ensure you have an update-script under META-INF/com/google/android"
+  echo "of your working folder."
+  echo
+  echo -n "Proceed with conversion (y/n)? (default: y): "
+
+  read proceed_now
+  echo
+
+  if [ "$proceed_now" == "n" ] 
+  then
+    cd ../../../../..
+    exit 0
+  fi
+
+  echo "-------------------------------------------------------------------"
+  echo
+
+fi
+
+if [ -e update-script ]
+then
+  
+  if [ -e updater-script ]
+  then
+    echo "Error: Although you have an update-script, you also have an"
+    echo "       updater-script in the same folder. Remove one of them."
+    cd ../../../../..
+    exit 0
+  fi
+
+else
+  echo "Error: update-script not found!"
+  cd ../../../../..
+  exit 0
+fi
+
+
+cd ../../../../..
+
+
+if [ "$1" != "for_zip" ]
+then
+  echo "Checking for final modifications to the update-script before conversion ..."
+  scripts/fix_pre_build 
+fi
+
+echo
+echo "-------------------------------------------------------------------"
+echo
+echo "Converting to updater-script, please wait ..."
+echo
+
+cd WORKING_*
+cd META-INF/com/google/android
+
+cp update-script updater-script
+
+sed -i \
+-e ':a;N;$!ba;s/,\n//g' \
+-e 's/copy_dir PACKAGE:system SYSTEM:/mount("MTD", "system", "\/system");\npackage_extract_dir("system", "\/system");/g' \
+-e 's/copy_dir PACKAGE:data DATA:/mount("MTD", "userdata", "\/data");\npackage_extract_dir("data", "\/data");/g' \
+-e 's/copy_dir PACKAGE:data SDCARD:/mount("MTD", "sdcard", "\/sdcard");\npackage_extract_dir("sdcard", "\/sdcard");/g' \
+-e 's/copy_dir PACKAGE:\([^ ]*\) SYSTEM:/package_extract_dir("\1", "\/system");/g' \
+-e 's/copy_dir PACKAGE:\([^ ]*\) DATA:/package_extract_dir("\1", "\/data");/g' \
+-e 's/copy_dir PACKAGE:\([^ ]*\) SDCARD:/package_extract_dir("\1", "\/sdcard");/g' \
+-e 's/copy_dir PACKAGE:\([^ ]*\) TMP:/package_extract_dir("\1", "\/tmp");/g' \
+-e 's/copy_dir PACKAGE:\([^ ]*\) BOOT:/package_extract_dir("\1", "\/boot");/g' \
+-e 's/assert[^\n]*[\n]*//g' \
+updater-script
+
+#
+# Remove leading whitespace and tabs
+# Not sure why this requires a separate statement from the above, to work!
+#
+sed -i -e 's/^[ \t]*//g' updater-script
+
+#
+# Remove lines with comments
+#
+sed -i -e '/^#/d' updater-script
+
+#
+# boot.img
+#
+sed -i -e 's/write_raw_image PACKAGE:boot.img BOOT:/package_extract_file("boot.img", "\/tmp\/boot.img");\nwrite_raw_image("\/tmp\/boot.img", "boot");\ndelete("\/tmp\/boot.img");/g' updater-script
+
+
+
+#
+# set_perm_recursive
+#
+echo "- set_perm_recursive ..."
+line_num=`grep -n -m 1 "set_perm_recursive " updater-script | sed -e 's/:.*//g'`
+
+while [ "$line_num" != "" ]
+do
+  sed -i \
+    -e ''$line_num' s/set_perm_recursive \(.*\)/set_perm_recursive(\1);/g' \
+    -e ''$line_num' s/ /, /g' \
+    -e ''$line_num' s/SYSTEM:)/\"\/system\")/g' \
+    -e ''$line_num' s/SYSTEM:\([^)]*\))/\"\/system\/\1\")/g' \
+    -e ''$line_num' s/DATA:\([^)]*\))/\"\/data\/\1\")/g' \
+    -e ''$line_num' s/TMP:\([^)]*\))/\"\/tmp\/\1\")/g' \
+    updater-script
+
+  line_num=`grep -n -m 1 "set_perm_recursive " updater-script | sed -e 's/:.*//g'`
+done
+
+
+#
+# set_perm
+#
+echo "- set_perm ..."
+line_num=`grep -n -m 1 "set_perm " updater-script | sed -e 's/:.*//g'`
+
+while [ "$line_num" != "" ]
+do
+  sed -i \
+    -e ''$line_num' s/set_perm \(.*\)/set_perm(\1);/g' \
+    -e ''$line_num' s/ /, /g' \
+    -e ''$line_num' s/SYSTEM:\([^)]*\))/\"\/system\/\1\")/g' \
+    -e ''$line_num' s/DATA:\([^)]*\))/\"\/data\/\1\")/g' \
+    -e ''$line_num' s/TMP:\([^)]*\))/\"\/tmp\/\1\")/g' \
+    updater-script
+
+  line_num=`grep -n -m 1 "set_perm " updater-script | sed -e 's/:.*//g'`
+done
+
+
+#
+# run_program
+#
+echo "- run_program ..."
+line_num=`grep -n -m 1 "run_program " updater-script | sed -e 's/:.*//g'`
+
+while [ "$line_num" != "" ]
+do
+  sed -i \
+    -e ''$line_num' s/run_program \(.*\)/run_program(\"\1\");/g' \
+    -e ''$line_num' s/ /", "/g' \
+    -e ''$line_num' s/PACKAGE:/\//g' \
+    -e ''$line_num' s/TMP:/\/tmp\//g' \
+    -e ''$line_num' s/BOOT:/\/boot\//g' \
+    -e ''$line_num' s/SYSTEM:/\/system\//g' \
+    -e ''$line_num' s/DATA:/\/data\//g' \
+    updater-script
+
+  # Check for scripts that are at the root of the ROM; move them to /tmp; 
+  # otherwise they won't run!!
+  sed -i \
+    -e ''$line_num' s/run_program("\/\([^\/^\"]*\)"\(.*\)/package_extract_file("\1", "\/tmp\/\1");\nrun_program("\/tmp\/\1"\2/g' \
+    updater-script
+
+  line_num=`grep -n -m 1 "run_program " updater-script | sed -e 's/:.*//g'`
+done
+
+#
+# Add permissions to run_program.
+# If the permission already exists, then unfortunately a duplicate line will be created;
+# however this script will clean up duplicates later.
+#
+sed -i \
+  -e ''$line_num' s/run_program("\([^\"]*\)"/set_perm(0, 0, 0777, "\1");\nrun_program("\1"/g' \
+  updater-script
+
+
+#
+# package_extract_file
+#
+echo "- package_extract_file ..."
+line_num=`grep -n -m 1 "package_extract_file " updater-script | sed -e 's/:.*//g'`
+
+while [ "$line_num" != "" ]
+do
+  sed -i \
+    -e ''$line_num' s/package_extract_file \(.*\)/package_extract_file(\"\1\");/g' \
+    -e ''$line_num' s/ /", "/g' \
+    -e ''$line_num' s/SYSTEM:\([^)]*\))/\/system\/\1)/g' \
+    -e ''$line_num' s/DATA:\([^)]*\))/\/data\/\1)/g' \
+    -e ''$line_num' s/TMP:\([^)]*\))/\/tmp\/\1)/g' \
+    updater-script
+
+  line_num=`grep -n -m 1 "package_extract_file " updater-script | sed -e 's/:.*//g'`
+done
+
+
+#
+# show_progress
+#
+echo "- show_progress ..."
+line_num=`grep -n -m 1 "show_progress " updater-script | sed -e 's/:.*//g'`
+
+while [ "$line_num" != "" ]
+do
+  sed -i \
+    -e ''$line_num' s/show_progress \(.*\)/show_progress(\1);/g' \
+    -e ''$line_num' s/ /, /g' \
+    updater-script
+
+  line_num=`grep -n -m 1 "show_progress " updater-script | sed -e 's/:.*//g'`
+done
+
+
+#
+# delete
+#
+echo "- delete ..."
+line_num=`grep -n -m 1 "delete " updater-script | sed -e 's/:.*//g'`
+
+while [ "$line_num" != "" ]
+do
+  sed -i \
+    -e ''$line_num' s/delete \(.*\)/delete(\"\1\");/g' \
+    -e ''$line_num' s/ /", "/g' \
+    -e ''$line_num' s/SYSTEM:/\/system\//g' \
+    -e ''$line_num' s/DATA:/\/data\//g' \
+    -e ''$line_num' s/CACHE:/\/cache\//g' \
+    -e ''$line_num' s/TMP:\([^)]*\))/\/tmp\/\1)/g' \
+    updater-script
+
+  line_num=`grep -n -m 1 "delete " updater-script | sed -e 's/:.*//g'`
+done
+
+
+#
+# delete_recursive
+#
+echo "- delete_recursive ..."
+line_num=`grep -n -m 1 "delete_recursive " updater-script | sed -e 's/:.*//g'`
+
+while [ "$line_num" != "" ]
+do
+  sed -i \
+    -e ''$line_num' s/delete_recursive \(.*\)/delete_recursive(\"\1\");/g' \
+    -e ''$line_num' s/ /", "/g' \
+    -e ''$line_num' s/SYSTEM:/\/system\//g' \
+    -e ''$line_num' s/DATA:/\/data\//g' \
+    -e ''$line_num' s/CACHE:/\/cache\//g' \
+    -e ''$line_num' s/SDEXT:/\/sdext\//g' \
+    updater-script
+
+  line_num=`grep -n -m 1 "delete_recursive " updater-script | sed -e 's/:.*//g'`
+done
+
+
+#
+# symlink
+#
+echo "- symlink (may take a few minutes) ..."
+line_num=`grep -n -m 1 "symlink " updater-script | sed -e 's/:.*//g'`
+
+while [ "$line_num" != "" ]
+do
+  sed -i \
+    -e ''$line_num' s/symlink \(.*\)/symlink(\"\1\");/g' \
+    -e ''$line_num' s/ /", "/g' \
+    -e ''$line_num' s/SYSTEM:/\/system\//g' \
+    updater-script
+
+  line_num=`grep -n -m 1 "symlink " updater-script | sed -e 's/:.*//g'`
+done
+
+
+#
+# write_raw_image
+#
+echo "- write_raw_image ..."
+line_num=`grep -n -m 1 "write_raw_image " updater-script | sed -e 's/:.*//g'`
+
+while [ "$line_num" != "" ]
+do
+  sed -i \
+    -e ''$line_num' s/write_raw_image \(.*\)/write_raw_image(\"\1\");/g' \
+    -e ''$line_num' s/ /", "/g' \
+    -e ''$line_num' s/PACKAGE://g' \
+    -e ''$line_num' s/BOOT:/boot/g' \
+    -e ''$line_num' s/TMP:\([^)]*\))/\/tmp\/\1)/g' \
+    updater-script
+
+  line_num=`grep -n -m 1 "write_raw_image " updater-script | sed -e 's/:.*//g'`
+done
+
+
+#
+# format, mount
+#
+echo "- format and mount ..."
+orig_list=( DATA SYSTEM CACHE SDEXT BOOT )
+new_list=( userdata system cache sdext boot )
+
+for i in 0 1 2 3 4
+do
+
+  orig=${orig_list[${i}]}
+  new=${new_list[${i}]}
+
+  new2=$new
+  if [ "$new" == "userdata" ]
+  then
+    new2=data
+  fi
+
+  #
+  # Convert the 'format' line
+  #
+  sed -i -e 's/format '"$orig"':/format("MTD", "'"$new"'");/g' updater-script
+  sed -i -e 's/format \(.*\) '"$orig"':/format("\1", "MTD", "'"$new"'");\nmount("\1", "MTD", "'"$new"'", "\/'"$new2"'");/g' updater-script
+
+  #
+  # We don't want to move/remove the mount command for the boot partition, due to 
+  # the boot.img commands we used previously... unless we have a NAND ROM!
+  #
+  if [ "$new" == "boot" ]
+  then
+
+    if [ -e ../../../../boot/initrd.gz ] && [ -e ../../../../boot/zImage ]
+    then
+        sed -i -e 's/\(format(.*"\/boot");\)/\1\nmount("MTD", "boot", "\/boot");/g' updater-script
+
+        grep_mnt=`grep "mount(.* \"/boot\");" updater-script`
+
+        if [ "$grep_mnt" == "" ]
+        then
+          sed -i -e 's/\(mount.*"\/system");\)/\1\nmount("MTD", "boot", "\/boot");/g' updater-script
+        fi          
+    fi
+
+    continue
+  fi
+
+  grep_mnt=`grep "mount(\"MTD\", \"$new\", \"/$new2\");" updater-script`
+
+
+  #
+  # If a special mount is found, then remove the regular mount
+  #
+
+  grep_fmt2=`grep "format(\"[A-Za-z0-9]*\", \"MTD\", \"$new\");" updater-script`
+
+  if [ "$grep_fmt2" != "" ]
+  then
+
+    grep_mnt2=`grep "mount(\"[A-Za-z0-9]*\", \"MTD\", \"$new\", \"/$new2\");" updater-script`
+
+    if [ "$grep_mnt" != "" ] && [ "$grep_mnt2" != "" ]
+    then
+      sed -i -e '/mount("MTD", "'"$new"'", "\/'"$new2"'");/d' updater-script
+    fi
+  fi
+
+
+  #
+  # Move the associated 'mount' line (if it exists), so that it goes directly below the 'format' line
+  #
+
+  grep_fmt=`grep "format(\"MTD\", \"$new\");" updater-script`
+
+  if [ "$grep_fmt" != "" ]
+  then
+
+    if [ "$grep_mnt" != "" ]
+    then
+      # Delete the line
+      sed -i -e '/mount("MTD", "'"$new"'", "\/'"$new2"'");/d' updater-script
+
+      # Add it after the format
+      sed -i -e 's/format("MTD", "'"$new"'");/format("MTD", "'"$new"'");\nmount("MTD", "'"$new"'", "\/'"$new2"'");/g' updater-script
+    fi
+  fi
+
+done
+
+
+#
+# Look for any other 'format' commands that were not covered above
+#
+line_num=`grep -n -m 1 "format " updater-script | sed -e 's/:.*//g'`
+
+while [ "$line_num" != "" ]
+do
+  sed -i \
+    -e ''$line_num' s/format \(.*\)/format(\"\1\");/g' \
+    -e ''$line_num' s/ /", "/g' \
+    -e ''$line_num' s/format\(.*\));/format\1);\nmount\1, "???");/g' \
+    updater-script
+
+  line_num=`grep -n -m 1 "format " updater-script | sed -e 's/:.*//g'`
+done
+
+
+#
+# Fix any incomplete ("???") mounts, using the updater-script.orig file
+#
+if [ -e updater-script.orig ]
+then
+  line_num=`grep -n "^mount(" updater-script | grep -m 1 ??? | sed -e 's/:.*//g'`
+
+  while [ "$line_num" != "" ]
+  do
+
+    partial_str=`grep "^mount(" updater-script | grep -m 1 ??? | \
+                sed \
+                  -e 's/"???");//g' \
+                  -e 's/"/\\\"/g' `
+
+    # Get the string we want, from the original file, but replace special characters
+    # such as the forward slash to prevent formatting issues
+    orig_str=`grep -m 1 "$partial_str" updater-script.orig | sed -e 's/\//fwdslash/g'`
+
+    if [ "$orig_str" != "" ]
+    then
+      sed -i \
+        -e ''$line_num' s/.*/'"$orig_str"'/g' \
+        -e ''$line_num' s/fwdslash/\//g' \
+      updater-script
+    else
+      # We don't want to be stuck in an infinite loop
+      break
+    fi
+    
+    line_num=`grep -n "^mount(" updater-script | grep -m 1 ??? | sed -e 's/:.*//g'`
+  done
+fi
+
+
+#
+# unmount
+#
+echo "- unmount ..."
+for i in 0 1 2 3 4
+do
+
+  new=${new_list[${i}]}
+
+  new2=$new
+  if [ "$new" == "userdata" ]
+  then
+    new2=data
+  fi
+
+  grep_mnt=`grep "mount(.* \"/$new2\");" updater-script`
+
+  if [ "$grep_mnt" != "" ] 
+  then
+    echo "unmount(\"/$new2\");" >> updater-script      
+  fi
+
+done
+
+
+#
+# Clean up any mess left by my script
+#
+sed -i -e 's/\/");/");/g' updater-script
+
+
+#
+# Remove blank lines
+#
+sed -i -e '/^$/d' updater-script
+
+#
+# Cool solution from the web :-)
+#
+# Delete duplicate, consecutive lines from a file (emulates "uniq").
+# First line in a set of duplicate lines is kept, rest are deleted.
+#
+sed -i -e '$!N; /^\(.*\)\n\1$/!P; D' updater-script
+
+
+
+if [ -e updater-script ]
+then
+
+  cp ../../../../../tools/update_files/update-binary .
+
+  echo
+  echo "-------------------------------------------------------------------"
+  echo
+  echo "An updater-script has been created under META-INF/com/google/android of"
+  echo "your working folder.  Please review it and make any necessary changes."
+  echo "An update-binary has also been added."
+  echo ""
+
+  if [ "$1" != "for_zip" ]
+  then
+    mv -f update-script update-script.orig
+    echo "The original update-script has been renamed to update-script.orig -"
+    echo "it will not be included in your completed ROM's ZIP file."
+  else
+    echo "DO NOT delete any of the files under META-INF/com/google/android."
+    echo
+  fi
+
+  grep_fmt=`grep -n "^format(" updater-script`
+  grep_mount=`grep -n "^mount(" updater-script`
+  grep_huh=`grep -n "???" updater-script`
+
+  if [ "$grep_huh" != "" ]
+  then
+    echo
+    echo "---------------------------------------------------------------------"
+    echo
+    echo "NOTE: Ensure you fix the unknown reference(s) at the line number(s)"
+    echo "      below. Compare with the original version of the updater-script,"
+    echo "      if you have one."
+    echo
+    echo $grep_huh | sed -e 's/;[ ]*/;\n/g'    
+    echo
+  fi
+
+
+else
+  echo "Error: updater-script not created!"
+fi
+
+cd ../../../../..
+

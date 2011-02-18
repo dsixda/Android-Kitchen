@@ -1,0 +1,2 @@
+#!/sbin/sh
+/system/bin/bash /system/bin/dtinstall

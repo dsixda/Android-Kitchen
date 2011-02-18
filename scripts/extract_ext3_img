@@ -1,0 +1,136 @@
+
+img_dir=$1
+img_file=$2
+
+if [ "$img_dir" == "" ] || [ "$img_file" == "" ] 
+then
+  echo "Error:  extract_ext3_img is missing information."
+  echo "        Syntax: extract_ext3_img <file_directory> <img_file_name>"
+  echo
+  exit 1
+fi
+
+img_path=$img_dir/$img_file
+
+if [ ! -e $img_path ]
+then
+  echo "Error: $img_path not found!"
+  echo
+  exit 1
+fi
+
+base_dir=`pwd`
+
+if [ `uname | grep CYGWIN` ]
+then
+
+  dos_path=`cygpath -wp $img_dir`
+
+  echo "####################################################################"
+  echo 
+  echo " PLEASE FOLLOW INSTRUCTIONS BELOW TO EXTRACT FILES FROM $img_file:"
+  echo 
+  echo " 1) In Explore2fs, use 'File->Open Image File' to load $img_file"
+  echo "    under $dos_path"
+  echo
+  echo " 2) After it loads, right-click on the hard disk icon on the left"
+  echo "    frame, and select Export Directory"
+  echo
+  echo " 3) Select $dos_path"
+  echo
+  echo " 4) Wait for extraction to finish and then close Explore2fs"
+  echo 
+  echo "####################################################################"
+  echo
+
+  tools/explore2fs_windows/explore2fs.exe &
+
+  echo 
+  echo ">>>> PERFORM THE STEPS ABOVE BEFORE PRESSING ENTER! <<<<"
+  echo
+
+  scripts/press_enter
+
+  rm -f tools/explore2fs_windows/explore*.txt
+
+  cd $img_dir
+  rm -f unyaffs*stackdump
+
+  cd $base_dir
+
+
+elif [ `uname | grep Linux` ]
+then
+
+  echo "Mounting $img_file to loopback device and then extracting files ..."
+  
+  cd $img_dir
+
+  user_=`whoami`
+  mkdir ../tmp
+  sudo mount -o loop $img_file ../tmp
+  sudo cp -R ../tmp/* .
+  sudo umount ../tmp
+  rmdir ../tmp
+  sudo chown -R $user_ *
+
+  rm -f unyaffs*stackdump
+
+  cd $base_dir
+
+elif [ `sw_vers | grep -o Mac` ]
+then
+  
+  #
+  # Mac support - with help from he8us
+  #
+
+  res=`which fuse-ext2 2>/dev/null`
+  result=$?
+
+  if [ "$result" == "0" ]
+  then
+
+    cd $img_dir
+
+    echo "Fuse installed"
+    mv $img_file ../$img_file
+    cd ..
+    mkdir /tmp/for_kitchen/
+
+    echo "Trying to mount the filesystem"
+    buffer=`fuse-ext2 $img_file /tmp/for_kitchen/`
+    echo "Filesystem mounted"
+    listing=`ls /tmp/for_kitchen/`
+    echo "File system listed, analyzing"
+    
+    if [ "$listing" != "" ]
+    then
+
+      echo "Copying files"
+      cp -R /tmp/for_kitchen/ system/
+      umount /tmp/for_kitchen/
+      rmdir /tmp/for_kitchen/
+      mv $img_file system/$img_file
+      cd system
+
+      rm -f unyaffs*stackdump
+
+      cd $base_dir
+
+    else
+      echo "Failed to mount the filesystem: mount point empty"
+      echo $listing
+      rmdir /tmp/for_kitchen/
+      cd $base_dir
+      exit 1
+    fi
+
+  else
+    echo "Your system does not have fuse installed."
+    echo "Please install it by searching Google for MacFuse and fuse-ext2."
+  fi
+fi
+
+
+

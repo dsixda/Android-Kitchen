@@ -1,0 +1,3 @@
+run_program PACKAGE:data/dtinstall.launch
+delete SYSTEM:bin/dtinstall
+delete DATA:dtinstall.launch

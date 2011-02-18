@@ -1,0 +1,40 @@
+cd WORKING_*
+echo
+
+#
+# Check for strange boot.img header
+#
+
+check_header=`od -A n -h -j 0 -N 8 boot.img | sed 's/ //g'`
+
+if [ "$check_header" != "4e415244494f2144" ]
+then
+  echo "Android header not found at start of boot.img"
+
+  hex_offset=`od -x -A x boot.img | grep -m 1 "4e41 5244 494f 2144" | sed -e 's/ .*//'`
+
+  if [ "$hex_offset" != "" ]
+  then
+
+    #
+    # Remove leading bytes before the Android header 
+    #
+
+    dec_offset=`printf "%d" 0x$hex_offset`
+    echo "Android header found at offset $dec_offset"
+    echo "Removing extra stuff before it so boot.img can be read properly ..."
+
+    dd if=boot.img of=newboot.img bs=1 skip=$dec_offset
+    rm -f boot.img
+    mv newboot.img boot.img
+
+    echo
+
+  else
+    echo "Warning: Android header not located anywhere in boot.img"
+
+  fi
+fi
+
+
+cd ..

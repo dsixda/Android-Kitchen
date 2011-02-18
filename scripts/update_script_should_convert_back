@@ -1,0 +1,18 @@
+
+base_dir=`pwd`
+cd WORKING_*
+cd META-INF/com/google/android
+
+if [ "`grep package_extract_file update-script`" != "" ] || \
+    [ "`grep TMP: update-script`" != "" ] || \
+    [ "`grep \"format yaffs2\" update-script`" != "" ]
+then
+  echo
+  echo "NOTE: update-script must be converted to an updater-script before flashing"
+  cd $base_dir
+  exit 1
+else
+  cd $base_dir
+  exit 0
+fi
+

@@ -1,0 +1,45 @@
+
+cd WORKING_*
+cd META-INF/com/google/android
+
+echo
+
+if [ -e update-script ]
+then
+
+  if [ "`grep -om 1 nano update-script`" == "nano" ]
+  then
+    echo "update-script already has nano content"
+
+  else
+
+    #
+    # Do this to prevent conflicts with the update-script in ROMs that already have the binary
+    #
+    if [ -e ../../../../system/xbin/nano ]
+    then
+
+      if [ "`find ../../../../system/bin -name nano`" == "" ]
+      then
+        echo "Copying system/xbin/nano to system/bin/nano"
+        cp -f ../../../../system/xbin/nano ../../../../system/bin/nano
+      fi
+    fi
+
+    echo "Updating update-script with nano entries"
+    sed -i -e 's/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh\nset_perm 0 0 04755 SYSTEM:bin\/nano\n/g' update-script
+
+
+    if [ "`grep -om 1 nano update-script`" != "nano" ]
+    then
+      echo "Error: Unable to update the update-script with nano"
+    fi
+  fi
+
+else
+  echo "Error: No update-script found!"
+fi
+
+cd ../../../../..
+echo
+

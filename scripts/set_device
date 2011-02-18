@@ -1,0 +1,118 @@
+listing=`ls | grep WORKING_*`
+
+if [ "$listing" == "" ]
+then
+
+  # Under working folder
+  if [ -d META-INF ]
+  then
+    cd ..
+
+  # Under system folder
+  elif [ -d app ]
+  then
+    cd ../..
+  fi
+
+  listing=`ls | grep WORKING_*`
+  if [ "$listing" == "" ]
+  then
+    curr_dir=`pwd`
+    echo "Error: No working folder found under $curr_dir"
+    exit 0
+  fi
+fi
+
+
+if [ -d WORKING_* ]
+then
+  cd WORKING_*
+
+  if [ -d system ]
+  then
+    cd system
+  else
+    echo
+    echo "Error: No system folder found under working folder!"
+    break
+  fi
+else
+  current_path=`pwd`
+  echo "Error: Could not change to working folder (now at $current_path)"
+  exit 0
+fi
+
+
+
+while :
+do
+
+  clear
+
+  if [ `ls | grep -m 1 prop` ]
+  then
+    
+    grep_device=`grep ro.product.device= *.prop | grep -c device`
+
+    if [ "$grep_device" == "1" ]
+    then
+      my_device=`grep -m 1 ro.product.device= *.prop | grep -o '=[a-zA-Z0-9\ \-]*' | sed 's/=//g'`
+      cd ../..
+    
+    elif [ "$grep_device" == "0" ]
+    then
+      echo "Warning: No references found for ro.product.device"
+      cd ../..
+    else
+      echo "Warning: Found more than one reference to ro.product.device"
+      cd ../..
+    fi
+
+  else 
+    current_path=`pwd`
+    echo "Error: build.prop not found under $current_path!"
+  fi
+
+  echo
+  if [ "$my_device" == "" ]
+  then
+    echo "The kitchen could not detect the ROM's device type."
+    echo
+  else
+    echo "The ROM in the working folder was made for the $my_device."
+    break
+  fi
+
+  echo "What is your own device's model?"
+  echo 
+  echo "1) HTC Hero"
+  echo "2) Nexus One (Passion)"
+  echo "3) HTC Dream"
+  echo "4) HTC Magic (Sapphire)"
+  echo "5) HTC Tattoo (Bahamas)"
+  echo "6) HTC Legend"
+  echo "7) HTC Desire (Bravo)"
+  echo "8) HTC Droid Eris (DesireC)"
+  echo "9) Other"
+  echo 
+  echo -n "Select the number: "
+  read opt
+
+  case $opt in
+    1) my_device="hero"; break;;
+    2) my_device="passion"; break;;
+    3) my_device="dream"; break;;
+    4) my_device="sapphire"; break;;
+    5) my_device="bahamas"; break;;
+    6) my_device="legend"; break;;
+    7) my_device="bravo"; break;;
+    8) my_device="desirec"; break;;
+    9) my_device="other"; break;;
+    *) echo "Invalid option";;
+
+  esac
+
+done
+
+echo $my_device > device.cfg
+

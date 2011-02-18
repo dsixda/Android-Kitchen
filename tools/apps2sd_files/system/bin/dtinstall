@@ -1,0 +1,142 @@
+#!/system/bin/bash
+export bbcmd="/system/bin/busybox.a2sd"
+export a2sdlog="/data/dtinstall.log";
+
+$bbcmd echo "[ ] Darktremor Apps2SD Installation Program" > $a2sdlog;
+$bbcmd echo "[ ] Install Date: `/system/bin/busybox.a2sd date`" >> $a2sdlog;
+$bbcmd echo "" >> $a2sdlog;
+if [ -d /sd-ext ];
+  then
+    $bbcmd echo "[ ] Creating temporary /sd-ext" | $bbcmd tee -a $a2sdlog;
+    $bbcmd mkdir /sd-ext | $bbcmd tee -a $a2sdlog;
+    $bbcmd chmod 777 /sd-ext | $bbcmd tee -a $a2sdlog;
+    $bbcmd /sd-ext/app | $bbcmd tee -a $a2sdlog;
+    $bbcmd /sd-ext/app-private | $bbcmd tee -a $a2sdlog;
+    $bbcmd /sd-ext/dalvik-cache | $bbcmd tee -a $a2sdlog;
+    $bbcmd chmod 777 /sd-ext/app | $bbcmd tee -a $a2sdlog;
+    $bbcmd chmod 777 /sd-ext/app-private | $bbcmd tee -a $a2sdlog;
+    $bbcmd chmod 777 /sd-ext/dalvik-cache | $bbcmd tee -a $a2sdlog;
+
+fi;
+$bbcmd echo "[ ] Attempting to mount SD card" | $bbcmd tee -a $a2sdlog;
+
+if [ -e /dev/block/mmcblk1p2 ];
+  then
+    export a2sddevmnt="/dev/block/mmcblk1p2";
+  else
+    if [ -e /dev/block/mmcblk0p2 ];
+      then
+        export a2sddevmnt="/dev/block/mmcblk0p2";
+      else
+        export a2sddevmnt="none";
+    fi;
+fi;
+
+if [ $a2sddevmnt != "none" ];
+  then
+    $bbcmd mount -t auto -o rw $a2sddevmnt /system/sd | $bbcmd tee -a $a2sdlog;
+    if [ $? != 0 ];
+      then
+        $bbcmd echo "[X] Can't mount $a2sddevmnt." | $bbcmd tee -a $a2sdlog;
+        if [ -e /data/.dalvikcache ];
+          then
+            $bbcmd echo "[!] Resetting Dalvik Cache to Internal Storage" | $bbcmd tee -a $a2sdlog;
+            if [ -h /data/dalvik-cache ];
+              then
+                 $bbcmd rm -f /data/dalvik-cache | $bbcmd tee -a $a2sdlog;
+                 $bbcmd mkdir /data/dalvik-cache | $bbcmd tee -a $a2sdlog;
+                 $bbcmd chmod 777 /data/dalvik-cache | $bbcmd tee -a $a2sdlog;
+             fi;
+             $bbcmd rm -f /data/.dalvikcache | $bbcmd tee -a $a2sdlog;
+        fi;
+        if [ -h /data/app ];
+          then
+            $bbcmd echo "[!] Resetting Applications to Internal Storage" | $bbcmd tee -a $a2sdlog;
+            $bbcmd rm -f /data/app | $bbcmd tee -a $a2sdlog;
+            $bbcmd mkdir /data/app | $bbcmd tee -a $a2sdlog;
+            $bbcmd chmod 777 /data/app | $bbcmd tee -a $a2sdlog;
+        fi;
+        if [ -h /data/app-private ];
+          then
+            $bbcmd echo "[!] Resetting Private Apps to Internal Storage" | $bbcmd tee -a $a2sdlog;
+            $bbcmd rm -f /data/app-private | $bbcmd tee -a $a2sdlog;
+            $bbcmd mkdir /data/app-private | $bbcmd tee -a $a2sdlog;
+            $bbcmd chmod 777 /data/app-private | $bbcmd tee -a $a2sdlog;
+        fi;
+      else
+        $bbcmd echo "[ ] Mounting $a2sddevmnt successful." | $bbcmd tee -a $a2sdlog; 
+    fi;
+  else
+    if [ -e /data/.dalvikcache ];
+      then
+        $bbcmd echo "[!] Resetting Dalvik Cache to Internal Storage" | $bbcmd tee -a $a2sdlog;
+         if [ -h /data/dalvik-cache ];
+           then
+             $bbcmd rm -f /data/dalvik-cache | $bbcmd tee -a $a2sdlog;
+             $bbcmd mkdir /data/dalvik-cache | $bbcmd tee -a $a2sdlog;
+             $bbcmd chmod 777 /data/dalvik-cache | $bbcmd tee -a $a2sdlog;
+          fi;
+          $bbcmd rm -f /data/.dalvikcache | $bbcmd tee -a $a2sdlog;
+    fi;
+    if [ -h /data/app ];
+      then
+        $bbcmd echo "[!] Resetting Applications to Internal Storage" | $bbcmd tee -a $a2sdlog;
+        $bbcmd rm -f /data/app | $bbcmd tee -a $a2sdlog;
+        $bbcmd mkdir /data/app | $bbcmd tee -a $a2sdlog;
+        $bbcmd chmod 777 /data/app | $bbcmd tee -a $a2sdlog;
+    fi;
+    if [ -h /data/app-private ];
+      then
+        $bbcmd echo "[!] Resetting Private Apps to Internal Storage" | $bbcmd tee -a $a2sdlog;
+        $bbcmd rm -f /data/app-private | $bbcmd tee -a $a2sdlog;
+        $bbcmd mkdir /data/app-private | $bbcmd tee -a $a2sdlog;
+        $bbcmd chmod 777 /data/app-private | $bbcmd tee -a $a2sdlog;
+    fi; 
+fi; 
+    
+if [ ! -h /cache/dalvik-cache ];
+  then
+    $bbcmd echo "[ ] Installing CyanogenMod Dalvik Patch" | $bbcmd tee -a $a2sdlog;
+    if [ ! -d /cache/dc ];
+      then
+        $bbcmd echo "[ ] Creating /cache/dc" | $bbcmd tee -a $a2sdlog;
+        $bbcmd mkdir /cache/dc | $bbcmd tee -a $a2sdlog;
+        $bbcmd chmod 777 /cache/dc | $bbcmd tee -a $a2sdlog;
+    fi;
+    if [ -e /data/.dcpartition ];
+      then
+        $bbcmd echo "[ ] Moving contents of /cache/dalvik-cache" | $bbcmd tee -a $a2sdlog;
+        $bbcmd echo "    to /cache/dc" | $bbcmd tee -a $a2sdlog;
+        $bbcmd mv -f /cache/dalvik-cache/* /cache/dc | $bbcmd tee -a $a2sdlog;
+        $bbcmd echo "[ ] Relinking /data/dalvik-cache to /cache/dc" | $bbcmd tee -a $a2sdlog;
+        $bbcmd rm -f /data/dalvik-cache | $bbcmd tee -a $a2sdlog;
+        $bbcmd ln -s /cache/dc /data/dalvik-cache | $bbcmd tee -a $a2sdlog;
+    fi;
+    $bbcmd echo "[ ] Linking /cache/dalvik-cache to" | $bbcmd tee -a $a2sdlog;
+    $bbcmd echo "    /data/dalvik-cache" | $bbcmd tee -a $a2sdlog;
+    $bbcmd rm -f /cache/dalvik-cache | $bbcmd tee -a $a2sdlog;
+    $bbcmd ln -s /data/dalvik-cache /cache/dalvik-cache | $bbcmd tee -a $a2sdlog;
+fi;
+
+$bbcmd echo "[ ] Resetting Apps2SD Launcher" | $bbcmd tee -a $a2sdlog;
+$bbcmd rm -f /system/etc/init.d/*a2sd* | $bbcmd tee -a $a2sdlog;
+$bbcmd rm -f /system/etc/init.d/*apps2sd* | $bbcmd tee -a $a2sdlog;
+$bbcmd rm -f /system/etc/init.d/*cache* | $bbcmd tee -a $a2sdlog;
+$bbcmd rm -f /system/etc/init.d/*dalvik* | $bbcmd tee -a $a2sdlog;
+$bbcmd echo "[ ] Restoring Launcher" | $bbcmd tee -a $a2sdlog;
+export launchcpy=0;
+export launcher=`ls /system/etc/init.d/04*;echo $?`;
+if [ $launcher == 1 ];
+  then
+    $bbcmd cp -fp /system/bin/a2sd /system/etc/init.d/04apps2sd | $bbcmd tee -a $a2sdlog;
+    exit
+fi;
+export launcher=`ls /system/etc/init.d/10*;echo $?`;
+if [ $launcher == 1 ];
+  then
+    $bbcmd cp -fp /system/bin/a2sd /system/etc/init.d/10apps2sd | $bbcmd tee -a $a2sdlog;
+    exit;
+fi;
+$bbcmd cp -fp /system/bin/a2sd /system/etc/init.d/35apps2sd | $bbcmd tee -a $a2sdlog;
+exit;
+    

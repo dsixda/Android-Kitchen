@@ -1,0 +1,217 @@
+
+scripts/extract_kernel_and_modules for_porting
+
+if [ -e device.cfg ]
+then
+  my_device=`cat device.cfg`
+  rm device.cfg
+fi
+
+if [ -d MY_KERNEL ] 
+then
+  echo
+  scripts/press_enter
+else
+  exit 1
+fi
+
+
+#
+# Now grab the donor ROM
+#
+
+clear
+echo
+echo "--> Obtain a ROM that you want to port from ANOTHER DEVICE <--"
+
+scripts/check_rom no_info
+scripts/press_enter
+
+if [ -d WORKING_* ]
+then
+
+  cd WORKING_*
+
+  if [ -d system ]
+  then
+    cd ..
+    scripts/ensure_boot_extracted
+
+  else
+    cd ..
+    echo
+    echo "Quitting and cleaning up folders ..."
+
+    rm -rf MY_KERNEL
+    rm -rf MY_DEVICE_WORKING
+    exit 0
+  fi
+
+else
+  echo "You did not choose a ROM"
+  echo "Quitting and cleaning up folders ..."
+  rm -rf MY_KERNEL
+  rm -rf MY_DEVICE_WORKING
+  exit 0
+fi
+
+if [ ! -d BOOT-EXTRACTED ]
+then
+  echo "Error: BOOT-EXTRACTED folder not found"
+  exit 0
+fi
+
+
+
+#
+# Set ro.product.device
+#
+
+if [ "$my_device" == "other" ]
+then
+  echo "WARNING: Not going to change ro.product.device in build.prop (device=other)"
+else
+
+  cd WORKING_*
+  cd system
+
+  if [ -e build.prop ]
+  then
+
+    if [ `grep -m 1 ro.product.device= build.prop` ]
+    then
+
+      echo "Setting ro.product.device=$my_device in build.prop"
+
+      export MY_DEVICE=${my_device}
+      perl -pi -e 's/ro.product.device=[a-zA-Z0-9\ \-]*/ro.product.device=$ENV{"MY_DEVICE"}/g' build.prop
+
+      if [ -e build.prop.bak ]
+      then
+        rm build.prop.bak
+      fi
+
+    else
+      echo "NOTE: No reference to ro.product.device found in build.prop, so we won't modify the file"
+      #echo "Adding ro.product.device=$my_device to build.prop"
+      #echo >> build.prop
+      #echo "ro.product.device=$my_device" >> build.prop
+    fi
+
+  else
+    echo "WARNING: build.prop not found!"
+  fi
+
+  cd ../..
+
+fi
+  
+
+
+
+#
+# Replace kernel and then build new boot.img
+#
+
+echo
+echo "Copying MY_KERNEL/zImage to BOOT-EXTRACTED folder"
+cp -f MY_KERNEL/zImage BOOT-EXTRACTED/
+
+
+echo
+echo "Copying MY_KERNEL/boot.img to the new working folder so that"
+echo "the correct base address can be determined before building"
+echo "the new boot.img."
+
+cd WORKING_*
+cp -f ../MY_KERNEL/boot.img .
+cd ..
+
+echo
+echo "Press Enter to continue"
+read enterKey
+
+
+#
+# Check if init.rc refers to busybox, and if the busybox binary is
+# found in the working folder
+# 
+cd BOOT-EXTRACTED/boot.img-ramdisk
+
+if [ "`grep -o -m 1 busybox init.rc`" == "busybox" ]
+then
+  cd ../../WORKING_*
+  find_busybox=`find . -name busybox`
+  cd ..
+
+  if [ "$find_busybox" == "" ]
+  then
+    echo
+    echo "----------------------------------------------------------------------"
+    echo 
+    echo "WARNING:  The ramdisk's init.rc refers to busybox, but it is not found "
+    echo "          in the working folder.   If you build this ROM the way it is"
+    echo "          right now, it may not get past the boot screen on your device."
+    echo 
+    echo "          I found this:"
+    echo 
+    grep busybox BOOT-EXTRACTED/boot.img-ramdisk/init.rc
+    echo 
+    echo "Some tips:"
+    echo 
+    echo "- You may need to copy busybox to the folder referenced above. You can "
+    echo "  find the binary under the 'tools' folder."
+    echo "- Ensure your update-script file also has the following line or similar:"
+    echo "  set_perm 0 0 04755 SYSTEM:xbin/busybox"
+    echo "- You might still be missing some symlinks under /system/xbin"
+    echo ""
+    echo -n "Do you want the script to fix this for you (y/n)? (default: y): "
+    
+    read proceed_fix
+    if [ "$proceed_fix" == "" ] || [ "$proceed_fix" == "y" ]
+    then
+      scripts/add_busybox
+    else
+      echo "No fix made" 
+    fi
+
+    echo
+    echo "When you are ready to build the boot.img, press Enter to continue ..."
+    read enterKey
+  fi
+
+else
+  cd ../..
+fi
+
+scripts/build_boot_img
+
+
+#
+# Copy module files to donor ROM
+#
+
+if [ -d MY_KERNEL/system ]
+then
+  cd WORKING_*
+  echo 
+  echo "Copying ..."
+  cp -rfv ../MY_KERNEL/system/* system/
+  cd ..
+fi
+
+
+rm -rf MY_KERNEL
+rm -rf MY_DEVICE_WORKING
+
+
+
+echo
+echo "=============================================================="
+echo
+echo "If all went well, you should now have the ROM ported for your"
+echo "kitchen.  Make any necessary changes and then build the ROM"
+echo "when you are ready."
+echo 
+
+

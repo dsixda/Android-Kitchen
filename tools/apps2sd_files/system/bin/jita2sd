@@ -1,0 +1,80 @@
+#!/system/bin/bash
+#
+# Darktremor Apps2SD 2.7.5 JIT Install/Remove program
+# By: Robert Travis Kirton
+# Date: August 6, 2010
+# Based on the process documented by Jus10o (http://forum.xda-developers.com/showthread.php?t=659387)
+
+$bbcmd echo "[ ] Remounting /system in read-write";
+$bbcmd mount -o remount,rw /system;
+$bbcmd echo "[ ] Running JIT Setup.";
+case $1
+  in
+     "install")
+               if [ ! -e /data/dalvik-backup/build.prop ];
+                 then
+                   $bbcmd echo "[ ] Installing JIT.";
+                  if [ ! -d /data/dalvik-backup ];
+                     then
+                       $bbcmd mkdir /data/dalvik-backup;
+                       $bbcmd mkdir /data/dalvik-backup/bin;
+                       $bbcmd mkdir /data/dalvik-backup/lib;
+                   fi;
+                   $bbcmd echo "[ ] Backing up critical files.";
+                   $bbcmd cp -fp /system/build.prop /data/dalvik-backup/build.prop;
+                   $bbcmd cp -fp /system/bin/dalvikvm /data/dalvik-backup/bin/dalvikvm;
+                   $bbcmd cp -fp /system/lib/libdvm.so /data/dalvik-backup/lib/libdvm.so;
+                   $bbcmd cp -fp /system/lib/libnativehelper.so /data/dalvik-backup/lib/libnativehelper.so;
+                   $bbcmd cp -fp /system/app/HtcLockScreen.apk /data/dalvik-backup/app/HtcLockScreen.apk;
+                   $bbcmd echo "[ ] Modifying /system/build.prop";
+                   $bbcmd echo "dalvik.vm.execution-mode=int:jit" >> /system/build.prop;
+                   $bbcmd echo "[ ] Removing HTC Lock Screen (for stability)";
+                   $bbcmd rm -f /system/app/HtcLockScreen.apk;
+                   $bbcmd echo "[ ] Installing JIT";
+                   $bbcmd cp -fp /data/jit/bin/dalvikvm /system/bin;
+                   $bbcmd chmod 755 /system/bin/dalvikvm;
+                   $bbcmd cp -fp /data/jit/lib/* /system/lib;
+                   $bbcmd chmod 644 /system/lib/libdvm.so;
+                   $bbcmd chmod 644 /system/lib/libnativehelper.so;
+                   $bbcmd chmod 666 /system/build.prop;
+                   $bbcmd echo "[ ] Synchronizing...";
+                   sync;
+                   $bbcmd echo "[ ] Erasing contents of Dalvik-Cache";
+                   $bbcmd rm -f /data/dalvik-cache/*;
+                   $bbcmd echo "[ ] Rebooting Phone.";
+                   reboot;
+                fi;
+                ;;
+     "remove")
+                if [ -e /data/dalvik-backup/build.prop ];
+                  then
+                    $bbcmd echo "[ ] Removing JIT."
+                    $bbcmd rm -f /system/build.prop;
+                    $bbcmd rm -f /system/bin/dalvikvm;
+                    $bbcmd rm -f /system/lib/libdvm.so;
+                    $bbcmd rm -f /system/lib/libnativehelper.so;
+                    $bbcmd echo "[ ] Restoring critical files.";
+                    $bbcmd cp -fp /data/dalvik-backup/build.prop /system/build.prop;
+                    $bbcmd cp -fp /data/dalvik-backup/bin/dalvikvm /system/bin/dalvikvm;
+                    $bbcmd cp -fp /data/dalvik-backup/lib/libdvm.so /system/lib/libdvm.so;
+                    $bbcmd cp -fp /data/dalvik-backup/lib/libnativehelper.so /system/lib/libnativehelper.so;
+                    $bbcmd cp -fp /data/dalvik-backup/app/HtcLockScreen.apk /system/app/HtcLockScreen.apk;
+                    $bbcmd echo "[ ] Changing permissions";
+                    $bbcmd chmod 755 /system/bin/dalvikvm;
+                    $bbcmd chmod 644 /system/lib/libdvm.so;
+                    $bbcmd chmod 644 /system/lib/libnativehelper.so;
+                    $bbcmd chmod 666 /system/build.prop;
+                    $bbcmd echo "[ ] Synchronizing...";
+                    sync;
+                    $bbcmd echo "[ ] Removing backup...";
+                    $bbcmd rm -rf /data/dalvik-backup;
+                    $bbcmd echo "[ ] Erasing contents of Dalvik-Cache";
+                    $bbcmd rm -f /data/dalvik-cache/*;
+                    $bbcmd echo "[ ] Rebooting Phone.";
+                    reboot;
+                fi;
+                ;;
+esac; 
+$bbcmd echo "[ ] Remounting /system in read-only.";
+$bbcmd mount -o remount,ro /system;
+exit;

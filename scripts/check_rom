@@ -1,0 +1,98 @@
+
+echo
+echo "Ensure the ROM is under the original_update folder.  The format"
+echo "may be one of the following:"
+echo 
+echo " - A ZIP file for a custom ROM  (e.g. update.zip)"
+echo " - A ZIP file containing *.img  (e.g. rom.zip from shipped ROM)"
+echo " - system.img + boot.img        (e.g. from shipped ROM or Nandroid)"
+echo " - An APP file from Huawei      (e.g. UPDATE.APP from software update)"
+echo
+
+scripts/make_backup_working
+
+#
+# Check if the working folder was actually backed up
+#
+result=$?
+
+if [ "$result" == "1" ]
+then
+
+  echo
+  echo "Error: Old working folder is in use. Ensure its files or folders are not open."
+
+  dir_working=`ls OLD_WORKING`
+  if [ "$dir_working" == "" ]
+  then
+    echo
+    echo "Removing empty folder OLD_WORKING"
+    rmdir OLD_WORKING
+  fi
+
+  scripts/press_enter
+  exit 1
+
+else
+
+  scripts/choose_rom
+  res=$?
+
+  if [ `ls | grep -m 1 WORKING_` ] && [ "$res" != "1" ] && [ "$1" == "" ]
+  then
+
+    #
+    # Check for radio.img
+    #
+
+    echo
+    cd WORKING*
+    if [ -e radio.img ]
+    then
+      echo
+      echo "NOTE: radio.img was found in the working folder. If you wish to"
+      echo "remove it, you may do so at any time before building the ROM."
+    else
+      echo
+      echo "NOTE: If you wish to add radio.img, place it under the root of the"
+      echo "working folder.  When you build the ROM, the update-script will be"
+      echo "automatically modified to account for the presence of the radio.img."
+    fi
+
+    if [ -e boot.img ] 
+    then
+      boot_found=yes
+    elif [ -e boot/zImage ] && [ -e boot/initrd.gz ]
+    then
+      boot_found=yes
+    else
+      boot_found=no
+    fi
+
+    if [ "$boot_found"=="yes" ]
+    then
+
+      #
+      # Prompt to show ROM info
+      # 
+
+      if [ "$1" == "" ]
+      then
+        cd ..
+        scripts/prompt_show_rom_info
+      else
+        cd ..
+      fi
+
+    else
+      echo
+      echo "No boot image found!"
+      cd ..
+    fi
+  fi
+fi
+
+if [ "$1" == "" ]
+then
+  scripts/press_enter
+fi

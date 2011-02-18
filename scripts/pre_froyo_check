@@ -1,0 +1,16 @@
+cd WORKING_*
+cd system
+
+android_os=`grep -m 1 ^ro.build.version.release= *.prop \
+           | sed -e 's/ro.build.version.release=//g' -e 's/[^:]*://g'`
+
+if [[ `echo $android_os | grep -c "^1\."` == 1 || `echo $android_os | grep -c "^2\.1"` == 1 ]]
+then
+  cd ../..
+  exit 1
+fi
+  cd ../..
+  exit 0
+fi
+
+

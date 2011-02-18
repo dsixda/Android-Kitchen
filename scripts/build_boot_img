@@ -1,0 +1,234 @@
+echo
+
+if [ -d BOOT-EXTRACTED ]
+then
+  echo Found BOOT-EXTRACTED folder, checking contents ...
+
+  if [ -d BOOT-EXTRACTED/boot.img-ramdisk ]
+  then
+    echo Found boot.img-ramdisk
+
+    if [ -e BOOT-EXTRACTED/zImage ]
+    then
+      echo Found zImage
+    else
+      echo Did not find BOOT-EXTRACTED/zImage
+      exit 0
+    fi
+
+  else
+    echo Did not find boot-extracted/boot.img-ramdisk folder!
+    exit 0
+  fi
+
+else
+  echo Did not find BOOT-EXTRACTED folder!
+  exit 0
+fi
+
+
+
+
+if [ -d WORKING_* ]
+then
+  echo Working folder found
+else
+  echo Working folder not found!
+  exit 0
+fi
+
+
+
+
+cd WORKING_*
+
+if [ -e boot.img ] 
+then
+ 
+  cd ..
+  scripts/check_kernel_offset
+  res=$?
+
+  if [ "$res" != "0" ]
+  then
+    exit 0
+  fi
+  
+
+else
+
+  if [ ! -e boot/initrd.gz ] || [ ! -e boot/zImage ]
+  then
+    echo "boot.img not found under working folder!"
+    cd ..
+    exit 0
+  else
+
+    # Using a fake base address and command line to create the boot.img, since
+    # we don't have a boot.img and are using the NAND method; boot.img won't 
+    # be in final NAND ROM.
+
+    base=0x200000
+    cmd_line="dsixda NAND"
+
+    cd ..
+  fi
+fi
+
+
+
+#
+# Compile mkboot*
+#
+
+mkbootimg_src=mkbootimg.c
+mkbootimg_out=mkbootimg
+
+if [ `uname | grep CYGWIN` ]
+then
+  mkbootfs_file=mkbootfs.exe
+  mkbootimg_file=$mkbootimg_out.exe
+else
+  mkbootfs_file=mkbootfs
+  mkbootimg_file=$mkbootimg_out
+fi
+
+
+if [ -e tools/mkboot/$mkbootfs_file ]
+then
+  echo "Found $mkbootfs_file"
+else
+  echo
+  echo "Compiling mkbootfs ..."
+  cd tools/mkboot
+  gcc -o mkbootfs mkbootfs.c
+  cd ../..
+
+  if [ -e tools/mkboot/$mkbootfs_file ]
+  then
+    echo mkbootfs successfully compiled
+  else
+    echo "Error: mkbootfs not successfully compiled!"
+    exit 0   
+  fi
+fi
+
+
+if [ -e tools/mkboot/$mkbootimg_file ]
+then
+  rm -f $mkbootimg_file
+fi
+
+echo
+echo "Compiling mkbootimg ..."
+cd tools/mkboot
+gcc -c rsa.c
+gcc -c sha.c
+gcc rsa.o sha.o $mkbootimg_src -w -o $mkbootimg_out
+rm *.o
+cd ../..
+
+if [ -e tools/mkboot/$mkbootimg_file ]
+then
+  echo "$mkbootimg_out successfully compiled"
+else
+  echo "Error: $mkbootimg_out not successfully compiled!"
+  exit 0
+fi    
+
+
+cp tools/mkboot/$mkbootfs_file BOOT-EXTRACTED/
+cp tools/mkboot/$mkbootimg_file BOOT-EXTRACTED/
+cd BOOT-EXTRACTED
+
+
+#
+# Run mkbootfs
+#
+
+echo 
+echo Building ramdisk-boot ...
+./$mkbootfs_file boot.img-ramdisk | gzip > ramdisk-boot
+
+
+
+#
+# Determine kernel base address before running mkbootimg
+#
+
+cd ..
+echo
+
+cd WORKING_*
+
+if [ -e boot.img ]
+then
+  echo "Attempting to determine kernel base address ..."
+
+  base_temp=`od -A n -h -j 34 -N 2 boot.img | sed 's/ //g'`
+  zeros=0000
+  base=0x$base_temp$zeros
+
+  echo "Using base address of $base"
+
+  echo "Attempting to determine command line parameter ..."
+  cd ..
+  cmd_line=`scripts/get_cmdline`
+
+  if [ "$cmd_line" == "" ]
+  then
+    echo "No cmdline found"
+  else
+    echo "Using cmdline: $cmd_line"
+  fi    
+
+else
+  cd ..
+fi  
+
+
+#
+# Run mkbootimg
+#
+
+cd BOOT-EXTRACTED
+
+echo
+echo Building newBoot.img ...
+
+./$mkbootimg_file --kernel zImage --ramdisk ramdisk-boot --cmdline "$cmd_line" -o newBoot.img --base $base
+
+rm $mkbootfs_file
+rm $mkbootimg_file
+
+
+if [ -e newBoot.img ]
+then
+  echo
+  echo newBoot.img created
+
+  echo Copying as boot.img to working folder
+  cd ../WORKING_*
+  rm -f boot.img
+  cp ../BOOT-EXTRACTED/newBoot.img boot.img
+
+  if [ -d boot ] && [ -e boot/initrd.gz ] && [ -e boot/zImage ]
+  then
+    echo
+    echo "Removing NAND boot folder ..."
+    rm -rf boot
+  fi
+
+  cd ..
+    
+  echo
+  echo "Removing BOOT-EXTRACTED folder ..."
+  rm -rf BOOT-EXTRACTED
+
+else
+  echo
+  echo newBoot.img not created!
+  exit 0
+fi
+
+cd ..

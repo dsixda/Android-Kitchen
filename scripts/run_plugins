@@ -1,0 +1,125 @@
+
+clear
+
+echo 
+
+if [ ! -d scripts/plugins ] 
+then
+  echo "Error: /scripts/plugins folder not found!"
+  exit 0
+fi
+
+cd scripts/plugins
+chmod 755 *
+grep_cmd=`find . | grep "\.plugin\$" | sed 's/.\///'`
+cd ../..
+
+
+if [ "$grep_cmd" == "" ]
+then
+  echo "No *.plugin files found under /scripts/plugins!"
+  echo
+  echo "Press Enter to continue"
+  read enterKey
+  exit 0
+
+else
+
+  long_line="--------------------------------------"
+  count=0
+
+  for plugin_file in $grep_cmd
+  do
+    # Converting end-of-line character in files created in DOS 
+    cat scripts/plugins/$plugin_file | tr -d '\r' > scripts/plugins/temp.plugin
+    rm -f scripts/plugins/$plugin_file
+    mv scripts/plugins/temp.plugin scripts/plugins/$plugin_file
+    chmod +x scripts/plugins/$plugin_file
+  done
+
+
+  #
+  # Show the menu
+  #
+
+  while :
+  do
+
+    clear
+    count=0
+    refresh_names=0
+
+    echo
+    echo "PLUGIN SCRIPTS"
+    echo $long_line
+    echo
+
+    for plugin_file in $grep_cmd 
+    do
+      count=$(($count+1))
+
+      # Store file names in an array
+      file_array[$count]=$plugin_file
+
+      no_ext=`echo $plugin_file | sed 's/.plugin[.]*[a-zA-Z0-9]*//'`
+      echo "  ($count) $no_ext"
+
+    done
+
+    echo
+    echo $long_line
+    echo
+    echo "  0 - Exit    r - Refresh list"
+    echo
+    echo
+    echo -n "Enter an option: "
+    read enterOption
+
+    if [ "$enterOption" == "0" ]
+    then
+      exit 0
+    fi
+
+    if [ "$enterOption" == "r" ]
+    then
+      refresh_names=1
+    
+    # Verify input is a number
+    elif [ "`echo $enterOption | sed 's/[0-9]*//'`" == "" ]
+    then
+
+      file_chosen=${file_array[$enterOption]}
+    
+      if [ "$file_chosen" == "" ]
+      then
+        continue
+      fi
+
+      #
+      # Run script
+      #
+      if [ -e scripts/plugins/$file_chosen ]
+      then
+        clear
+        scripts/plugins/$file_chosen
+      else
+        echo "Error: File not found!"
+        refresh_names=1 
+      fi
+
+      scripts/press_enter
+
+    else
+      continue
+    fi
+
+    if [ refresh_names==1 ]
+    then
+      cd scripts/plugins
+      grep_cmd=`find . | grep "\.plugin\$" | sed 's/.\///'`
+      cd ../..  
+    fi
+
+  done
+fi
+

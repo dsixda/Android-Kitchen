@@ -1,0 +1,118 @@
+
+clear
+
+curr_dir=`pwd`
+
+echo
+echo "This script will extract the contents from a 'data.img' file"
+echo "(normally found in a Nandroid backup) located in any folder." 
+echo
+echo "The contents will be extracted to a new folder under"
+echo "$curr_dir." 
+echo 
+echo "----------------------------------------------------------------------"
+echo 
+echo -n "Proceed (y/n)? (default: y): "
+
+read proceed
+echo
+
+if [ "$proceed" == "n" ]
+then
+  echo "Cancelled"
+  exit 0
+fi
+
+
+date_str=`date '+%m%d%y_%H%M%S'`
+img_dir="data`echo -n $f`_$date_str"
+img_path=$curr_dir/$img_dir
+
+echo
+echo "Creating folder $img_path ..."
+mkdir $img_dir
+
+echo
+echo "---> Place data.img into the folder mentioned above <--"
+
+scripts/press_enter
+
+if [ ! -e $img_dir/data.img ]
+then
+  echo "Error: data.img not found!"
+  echo
+  echo "Removing $img_dir folder"
+  rm -rf $img_dir
+  exit 1
+fi      
+  
+
+#
+# Check for YAFFS/EXT3
+#
+
+scripts/check_if_img_yaffs $img_dir data.img
+
+is_yaffs=$?
+
+if [ "$is_yaffs" == "1" ]
+then
+
+  if [ `uname | grep CYGWIN` ]
+  then
+    unyaffs_file=unyaffs.exe
+  else
+    unyaffs_file=unyaffs
+  fi
+    
+  scripts/compile_unyaffs
+  if [ "$?" == "1" ]
+  then
+    exit 0
+  fi
+
+  echo
+  echo Extracting contents of data.img ...
+  cd $img_dir
+  ../tools/unyaffs_files/$unyaffs_file data.img 2>/dev/null
+  cd ..
+
+else
+
+  cd $img_dir
+
+  # Get full path
+  imgr_dir=`pwd`
+
+  cd ..
+  scripts/extract_ext3_img $img_path data.img
+fi
+
+
+cd $img_dir
+check_dump=`ls unyaffs*stackdump* 2>/dev/null`
+rm -f data.img
+cd ..
+
+if [ "$check_dump" != "" ]
+then
+  echo
+  echo "Error:  stackdump file found under $img_dir due to incompatibility"
+  echo "        with unyaffs."
+  exit 1
+fi
+
+if [ "`ls $img_dir`" == "" ]
+then
+  echo 
+  echo "Error:  $img_path is empty!"
+  echo
+  exit 1
+fi
+
+echo
+echo "Listing of $img_path:"
+echo
+ls -l $img_dir
+
+

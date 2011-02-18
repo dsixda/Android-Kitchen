@@ -1,0 +1,9 @@
+
+#
+# Remove blank lines
+#
+cd WORKING_*
+cd META-INF/com/google/android
+`sed -i -e '/^$/d' update-script`
+cd ../../../../..
+

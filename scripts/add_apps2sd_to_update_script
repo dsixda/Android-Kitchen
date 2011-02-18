@@ -1,0 +1,79 @@
+
+cd WORKING_*
+cd META-INF/com/google/android
+
+if [ -e update-script ]
+then
+
+  if [ "`grep -om 1 a2sd update-script`" == "a2sd" ]
+  then
+    echo "update-script already has a2sd content"
+
+  else
+
+    echo
+    echo "Updating update-script with apps2sd entries ..."
+
+    if [ `grep -c "copy_dir PACKAGE:data DATA:" update-script` == 0 ]
+    then
+
+      if [ `grep -c "format .*DATA:" update-script` == 0 ] 
+      then
+        sed -i -e 's/format\(.*\)SYSTEM:[ ]*[\n]*/format\1SYSTEM:\n\ncopy_dir PACKAGE:data DATA:\n/' update-script
+      else
+        sed -i -e 's/format\(.*\)DATA:[ ]*[\n]*/format\1DATA:\n\ncopy_dir PACKAGE:data DATA:\n/' update-script
+      fi
+
+    fi
+
+    #
+    # Remove symlink to /data/app from previous install of apps2sd
+    #
+    if [ `grep -c "delete DATA:app" update-script` == 0 ]
+    then
+      sed -i -e 's/copy_dir PACKAGE:data DATA:/delete DATA:app\ncopy_dir PACKAGE:data DATA:/' update-script
+    fi
+
+    # Insert file before a certain line
+    #cp ../../../../../tools/apps2sd_files/apps2sd_delete .
+    #line_num=`grep -n -m 1 "copy_dir PACKAGE:data DATA:" update-script | sed 's/:.*//g'`
+    #line_num=$(($line_num-1))
+    #sed -i -e ''$line_num' r apps2sd_delete' update-script
+    #rm apps2sd_delete
+
+    # Insert file after a certain pattern
+    #cp ../../../../../tools/apps2sd_files/apps2sd_perm_data .
+    #sed -i -e '/copy_dir PACKAGE:data DATA:/r apps2sd_perm_data' update-script
+    #rm apps2sd_perm_data
+
+    # Insert file after a certain pattern
+    cp ../../../../../tools/apps2sd_files/apps2sd_system .
+    sed -i -e '/etc\/init.goldfish.sh/r apps2sd_system' update-script
+    rm apps2sd_system
+
+    # Insert file before a certain line
+    cp ../../../../../tools/apps2sd_files/apps2sd_run_program .
+    line_num=`grep -n -m 1 "write_raw_image .*:boot.img BOOT:" update-script | sed 's/:.*//g'`
+    if [ "$line_num" != "" ]
+    then
+      line_num=$(($line_num-1))
+      sed -i -e ''$line_num' r apps2sd_run_program' update-script
+    else
+      echo "Error: could not find write_raw_image for boot partition"
+    fi
+
+    rm apps2sd_run_program
+
+    if [ "`grep -om 1 a2sd update-script`" != "a2sd" ]
+    then
+      echo "Error: Could not update update-script with a2sd"
+    fi
+
+  fi
+
+else
+  echo "Error: No update-script found!"
+fi
+
+cd ../../../../..
+

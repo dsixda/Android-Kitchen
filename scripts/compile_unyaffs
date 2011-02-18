@@ -1,0 +1,27 @@
+
+if [ `uname | grep CYGWIN` ]
+then
+  unyaffs_file=unyaffs.exe
+else
+  unyaffs_file=unyaffs
+fi
+  
+if [ -e tools/unyaffs_files/$unyaffs_file ]
+then
+  echo Found $unyaffs_file
+else
+  echo "Compiling unyaffs ..."
+  cd tools/unyaffs_files
+  gcc -o unyaffs unyaffs.c
+  cd ../..
+
+  if [ -e tools/unyaffs_files/$unyaffs_file ]
+  then
+    echo unyaffs successfully compiled
+  else
+    echo "Error: unyaffs not successfully compiled!"
+    exit 1
+  fi
+fi
+
+exit 0

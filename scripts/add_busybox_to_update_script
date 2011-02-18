@@ -1,0 +1,50 @@
+
+cd WORKING_*
+cd META-INF/com/google/android
+
+echo
+
+if [ -e update-script ]
+then
+
+  if [ "`grep -c \"symlink busybox\" update-script`" != "0" ]
+  then
+    echo "update-script already has BusyBox content"
+
+  else
+
+    if [ "`grep -m 1 \"busybox ln\" ../../../../*`" != "" ] || [ "`grep -m 1 \"busybox --install\" ../../../../*`" != "" ] 
+    then
+      echo "A script containing BusyBox symlinks was detected"
+      echo "No changes to update-script required"
+    
+    else
+
+      echo "Updating update-script with BusyBox entries"
+      perl -pi -e 's/format\(.*\)SYSTEM:/format\1SYSTEM:\n\ndelete SYSTEM:xbin\/busybox\ndelete_recursive SYSTEM:xbin\n/' update-script
+
+      echo "Adding installbusybox to working folder"
+      cp ../../../../../tools/busybox_files/installbusybox ../../../../
+
+      echo "Adding installbusybox to update-script"
+      if [ `grep -c "write_raw_image .*:boot.img BOOT:" update-script` != 0 ]
+      then
+        sed -i -e 's/write_raw_image \(.*:boot.img\) BOOT:/set_perm 0 1000 0755 SYSTEM:xbin\/busybox\nrun_program PACKAGE:installbusybox\nwrite_raw_image \1 BOOT:/' update-script
+      else
+        echo "set_perm 0 1000 0755 SYSTEM:xbin/busybox" >> update-script      
+        echo "run_program PACKAGE:installbusybox" >> update-script
+      fi
+
+      if [ `grep -c installbusybox update-script` == 0 ]
+      then
+        echo "Error: installbusybox not added to update-script!"
+      fi
+    fi
+  fi
+
+else
+  echo "Error: No update-script found!"
+fi
+
+cd ../../../../..
+echo

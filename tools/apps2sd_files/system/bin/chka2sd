@@ -1,0 +1,400 @@
+#!/system/bin/bash
+# Darktremor Apps2SD 2.7.5 Check Setup Program
+# By: Robert Travis Kirton
+# Date:  September 30, 2010
+# Based on code from Darktremor A2SD 2.6.1-R2"
+
+$bbcmd echo "[ ] Starting Program: chka2sd" >> $a2sdlf;
+
+if [ -d /sd-ext ];
+  then
+    export mntpoint="/sd-ext";
+  else
+    export mntpoint="/system/sd";
+fi;
+
+export a2sdfix=`$bbcmd grep -q -e cm.filesystem.ready /init.rc;echo -e $?;`
+export a2sdcachefix=0;
+export a2sdfroyo=`$gpcmd ro.build.version.release | $bbcmd grep -q -e 2.2; echo $?`;
+export a2sdcmnt=`$bbcmd cat /proc/mounts | $bbcmd grep -q -e /data/dalvik-cache;echo $?;`;
+export a2sdmnt=`$bbcmd cat /proc/mounts | $bbcmd grep -q -e $mntpoint;echo $?;`;
+export dcpath="/cache/dc";
+
+if [ -e /dev/block/mmcblk1p2 ];
+  then
+    export a2sdblkdev=1;
+    export a2sdblk1=1;
+    export a2sdblk0=1;
+  else
+    if [ -e /dev/block/mmcblk0p2 ];
+      then
+        export a2sdblkdev=1;
+        export a2sdblk1=0;
+        export a2sdblk0=1;
+      else
+        export a2sdblkdev=0;
+        export a2sdblk1=0;
+        export a2sdblk0=0;
+    fi;
+fi;
+
+export a2sdswap=`$gpcmd a2sd.swap;`;
+if [ ! $a2sdswap ];
+  then
+    export a2sdswap=0;
+fi;
+
+if [ $a2sdswap == 1 ];
+  then
+    export a2sdswappart=`$gpcmd a2sd.swappart;`;
+fi;
+
+export a2sdlaunch=`$bbcmd grep -q -e "run-parts /system/etc/init.d" /init.rc;echo $?;`;
+if [ $a2sdlaunch == 1 ];
+  then
+    export a2sdlaunch=`$bbcmd grep -q -e "/system/bin/a2sd" /init.rc;echo $?;`;
+    if [ $a2sdlaunch == 1 ];
+      then
+        export a2sdlaunch=`$bbcmd grep -q -e "exec /system/bin/sysinit" /init.rc;echo $?;`;
+        if [ $a2sdlaunch == 0 ];
+          then
+            export a2sdlaunch=`$bbcmd grep -q -e "run-parts /system/etc/init.d" /system/bin/sysinit;echo $?;`;
+          else
+            export a2sdlaunch=1;
+        fi;
+    fi;
+fi;
+    
+
+if [ $a2sdfroyo != 0 ];
+  then
+    export ck="[\xe2\x9c\x94]";
+    export er="[\xe2\x9c\x96]";
+    export sp="[ ]";
+    export wn="[\xe2\x80\xbc]";
+  else
+    export ck="[*]";
+    export er="[X]";
+    export sp="[ ]";
+    export wn="[!]";
+fi;
+
+echo -e "$sp Checking for ext partition" | $tee;
+if [ -e /dev/block/mmcblk0p2 ] || [ -e /dev/block/mmcblk1p2 ];
+  then
+    if [ $a2sdmnt == 1 ];    
+      then
+        echo -e "$er Ext partition found, but not mounted." | $tee;
+        echo -e "    Your rom may not be setup to run Apps2SD." | $tee;
+        echo -e "    Check with your rom developer if the boot image" | $tee;
+        echo -e "    is programmed to run Apps2SD." | $tee;
+        echo -e "" | $tee;
+        echo -e "    Your partition may be using an EXT4 partition," | $tee;
+        echo -e "    but your rom may not support EXT4.  Repartition" | $tee;
+        echo -e "    your SD card to use EXT2 or EXT3." | $tee;
+        echo -e "" | $tee;
+        $bbcmd echo "[ ] Ending program: chka2sd" >> $a2sdlf;
+        exit;
+    fi;
+  else
+    echo -e "$er No ext partition or block device not at either" | $tee;
+    echo -e "    /dev/block/mmcblk0p2 nor /dev/block/mmcblk1p2." | $tee;
+    echo -e "" | $tee;
+    echo -e "    An ext2, ext3, or ext4 partition must" | $tee;
+    echo -e "    exists on /dev/block/mmcblk0p2 or /dev/block/mmcblk1p2." | $tee;
+    echo -e "" | $tee;
+    echo -e "    Reboot phone into recovery and create" | $tee;
+    echo -e "    an ext2, ext3, or ext4 partition." | $tee;
+    echo -e "" | $tee;
+    echo -e "    NOTE: Before setting up an EXT4 " | $tee;
+    echo -e "    partition, make sure your ROM supports" | $tee;
+    echo -e "    EXT4 partitions." | $tee;
+    $bbcmd echo "[ ] Ending program: chka2sd" >> $a2sdlf;
+    exit;
+fi;
+
+echo -e "" | $tee;
+        echo -e "Darktremor $a2sdver Apps2SD Status Report" | $tee;
+        echo -e "===================================================================================" | $tee;
+        echo -e "Legend: $ck=Setting is correct" | $tee;
+        echo -e "        $wn=Setting is correct, but not optimal." | $tee;
+        echo -e "        $er=Setting is incorrect and needs to be fixed or option is not available." | $tee;
+        echo -e "===================================================================================" | $tee;
+
+if [ $a2sdblkdev == 1 ];
+  then
+        echo -e "Block Device            - $ck Found" | $tee;
+    if [ $a2sdblk0 == 1 ];
+      then
+        echo -e "                        - $ck /dev/block/mmcblk0p2" | $tee;
+    fi;
+    if [ $a2sdblk1 == 1 ];
+      then
+        echo -e "                        - $ck /dev/block/mmcblk1p2" | $tee;
+    fi;
+  else
+        echo -e "Block Device            - $er Not Found" | $tee;
+        echo -e "                        - $er SD card cannot mount" | $tee;
+        exit;
+fi;
+
+if [ $a2sdmnt == 0 ];
+  then
+        echo -e "EXT Partition           - $ck Mounted" | $tee;
+        echo -e "Mount Point             - $sp $mntpoint" | $tee;
+fi;
+        
+$bbcmd cat /proc/mounts | $bbcmd grep -e $mntpoint > /data/a2sdmnt.tmp
+$bbcmd grep -q -e ext2 /data/a2sdmnt.tmp;
+if [ $? == 0 ];
+  then
+    export a2sdparttype=2;
+fi;
+$bbcmd grep -q -e ext3 /data/a2sdmnt.tmp;
+if [ $? == 0 ];
+  then
+    export a2sdparttype=3;
+fi;
+$bbcmd grep -q -e ext4 /data/a2sdmnt.tmp;
+if [ $? == 0 ];
+  then
+    export a2sdparttype=4;
+fi;    
+        echo -e "Partition Type          - $ck EXT$a2sdparttype" | $tee;
+if [ $a2sdparttype == 4 ];
+  then
+        echo -e "                        - $wn May be incompatible w/ ROMS" | $tee;
+fi;
+
+export a2sdplist=`$bbcmd grep -q -e ext2 /proc/filesystems;echo $?;`;
+if [ $a2sdplist == 0 ];
+  then
+        echo -e "Support EXT2?           - $ck Yes" | $tee;
+  else
+        echo -e "Support EXT2?           - $er No" | $tee;
+fi;
+export a2sdplist=`$bbcmd grep -q -e ext3 /proc/filesystems;echo $?;`;
+if [ $a2sdplist == 0 ];
+  then
+        echo -e "Support EXT3?           - $ck Yes" | $tee;
+  else
+        echo -e "Support EXT3?           - $er No" | $tee;
+fi;
+export a2sdplist=`$bbcmd grep -q -e ext4 /proc/filesystems;echo $?;`;
+if [ $a2sdplist == 0 ];
+  then
+        echo -e "Support EXT4?           - $ck Yes" | $tee;
+  else
+        echo -e "Support EXT4?           - $er No" | $tee;
+fi;
+
+echo -e "" | $tee;
+if [ -h /data/app ];
+  then
+    if [ -e /data/.noa2sd ];
+      then
+        echo -e "Apps                    - $sp Linked to SD Card." | $tee;
+        echo -e "                          $sp No Apps2SD Flag File found." | $tee;
+        echo -e "                          $er Programs run from SD card" | $tee;
+        echo -e "                              Setup issue.  Run a2sd repair to fix" | $tee;
+        echo -e "" | $tee;
+      else
+        echo -e "Apps                    - $sp Linked to SD Card." | $tee;
+        echo -e "                          $sp No Apps2SD Flag File not found." | $tee;
+        echo -e "                          $ck Programs run from SD card" | $tee;
+        echo -e "                              To run from internal storage, type a2sd remove" | $tee;
+        echo -e "" | $tee;
+    fi;
+  else
+    if [ -e /data/.noa2sd ];
+      then
+        echo -e "Apps                    - $sp Regular directory." | $tee;
+        echo -e "                          $sp No Apps2SD Flag File found." | $tee;
+        echo -e "                          $wn Programs run from Int. Storage." | $tee;
+        echo -e "                              To run from SD card, type a2sd reinstall." | $tee;
+        echo -e "" | $tee;
+      else
+        echo -e "Apps                    - $sp Regular directory." | $tee;
+        echo -e "                          $sp No Apps2SD Flag File not found." | $tee;
+        echo -e "                          $er Programs runs from Int. Storage." | $tee;
+        echo -e "                              Setup issue.  Run a2sd repair to fix." | $tee;
+        echo -e "" | $tee;
+    fi;
+fi;
+
+if [ -h /data/app-private ];
+  then
+    if [ -e /data/.noa2sd ];
+      then
+        echo -e "Private Apps            - $sp Linked to SD Card." | $tee;
+        echo -e "                          $sp No Apps2SD Flag File found." | $tee;
+        echo -e "                          $er Private Programs run from SD card" | $tee;
+        echo -e "                              Setup issue.  Run a2sd repair to fix." | $tee;
+        echo -e "" | $tee;
+      else
+        echo -e "Private Apps            - $sp Linked to SD Card." | $tee;
+        echo -e "                          $sp No Apps2SD Flag File not found." | $tee;
+        echo -e "                          $ck Private Programs run from SD card" | $tee;
+        echo -e "                              To run from internal storage, type a2sd remove" | $tee;
+        echo -e "" | $tee;
+    fi;
+  else
+    if [ -e /data/.noa2sd ];
+      then
+        echo -e "Private Apps            - $sp Regular directory." | $tee;
+        echo -e "                          $sp No Apps2SD Flag File found." | $tee;
+        echo -e "                          $wn Private Programs run from Int. Storage." | $tee;
+        echo -e "                              To run from SD card, type a2sd reinstall" | $tee;
+        echo -e "" | $tee;
+      else
+        echo -e "Private Apps            - $sp Regular directory." | $tee;
+        echo -e "                          $sp No Apps2SD Flag File not found." | $tee;
+        echo -e "                          $er Private Programs runs from Int. Storage." | $tee;
+        echo -e "                              Setup issue.  Run a2sd repair to fix." | $tee;
+        echo -e "" | $tee;
+    fi;
+fi;
+
+if [ -h /data/dalvik-cache ];
+  then
+    if [ ! -e /data/.dalvikcache ] && [ ! -e /data/.dcpartition ];
+      then
+        echo -e "Dalvik Cache            - $sp Symbolically Linked." | $tee;
+        echo -e "                          $sp Dalvik to SD flag file not found." | $tee;
+        echo -e "                          $sp Dalvik to /cache flag file not found." | $tee;
+        echo -e "                          $er Dalvik runs from either SD card or /cache." | $tee;
+        echo -e "                              Setup issue.  Run a2sd repair to fix." | $tee;
+        echo -e "" | $tee;
+      else
+        if [ -e /data/.dcpartition ];
+          then
+            if [ $a2sdcmnt == 0 ];
+              then
+        echo -e "Dalvik Cache            - $er Bound to /data/dalvik-cache via mount command." | $tee;
+        echo -e "                          $er Symbolically Linked." | $tee; 
+        echo -e "                          $sp Dalvik to /cache flag file found." | $tee;
+        echo -e "                          $er Dalvik has a completely invalid configuration." | $tee;
+        echo -e "                          $er Contact Technical Support for resolution" | $tee;
+        echo -e "" | $tee;
+              else
+        echo -e "Dalvik Cache            - $sp Symbolically Linked." | $tee;
+        echo -e "                          $sp Dalvik to /cache flag file found." | $tee;
+        echo -e "                          $ck Dalvik runs from /cache partition." | $tee;
+        echo -e "                              To run from internal storage, type a2sd nocache" | $tee;
+        echo -e "                              To run from SD card, type a2sd cachesd" | $tee;
+        echo -e "" | $tee;
+            fi;
+          else
+        echo -e "Dalvik Cache            - $sp Symbolically Linked." | $tee;
+        echo -e "                          $sp Dalvik to SD flag file found." | $tee;
+        echo -e "                          $ck Dalvik runs from SD card" | $tee;
+        echo -e "                              To run from internal storage, type a2sd nocache" | $tee;
+        echo -e "                              To run from /cache partition, type a2sd cachepart" | $tee;
+        echo -e "" | $tee;
+        fi;
+    fi;
+  else
+    if [ ! -e /data/.dalvikcache ] && [ ! -e /data/.dcpartition ];
+      then
+        echo -e "Dalvik Cache            - $sp Regular directory." | $tee;
+        echo -e "                          $sp Dalvik to /cache flag file not found." | $tee;
+        echo -e "                          $sp Dalvik to SD flag file not found." | $tee;
+        echo -e "                          $ck Dalvik runs from Int. Storage." | $tee;
+        echo -e "                              To run from SD card, type a2sd cachesd." | $tee;
+        echo -e "                              To run from /cache partition, type a2sd cachepart." | $tee;
+        echo -e "" | $tee;
+      else
+        if [ -e /data/.dcpartition ];
+          then
+            if [ $a2sdcmnt == 0 ];
+              then
+        echo -e "Dalvik Cache            - $sp Regular directory." | $tee;
+        echo -e "                          $sp Bound to /data/dalvik-cache via mount." | $tee;
+        echo -e "                          $sp Dalvik to /cache flag file found." | $tee;
+        echo -e "                          $ck Dalvik runs from /cache partition" | $tee;
+        echo -e "                               To run from SD card, type a2sd cachesd." | $tee;
+        echo -e "                               To run from internal storage, type a2sd nocache." | $tee;
+        echo -e "" | $tee;
+              else
+        echo -e "Dalvik Cache            - $sp Regular directory." | $tee;
+        echo -e "                          $sp Dalvik to /cache flag file found." | $tee;
+        echo -e "                          $er Dalvik runs from Int. Storage." | $tee;
+        echo -e "                          Setup Issue.  Run a2sd repair to fix." | $tee;
+        echo -e "" | $tee;
+             fi;
+           else
+        echo -e "Dalvik Cache            - $sp Regular directory." | $tee;
+        echo -e "                          $sp Dalvik to SD flag file found." | $tee;
+        echo -e "                          $er Dalvik runs from Int. Storage." | $tee;
+        echo -e "                              Setup issue.  Run a2sd repair to fix." | $tee;
+        echo -e "" | $tee;
+      fi;
+    fi;
+fi;
+
+if [ $a2sdswap == 1 ];
+  then
+    if [ -e /data/.noswap ];
+      then
+        echo -e "Swap                    - $sp Partition present." | $tee;
+        echo -e "                          $ap Swap partition: $a2sdswappart" | $tee;
+        echo -e "                          $sp No Swap flag file found." | $tee;
+        echo -e "                          $wn Swap does not start." | $tee;
+        echo -e "                              To activate swap, type a2sd reswap" | $tee;
+        echo -e "" | $tee;
+      else
+        echo -e "Swap                    - $sp Partition present." | $tee;
+        echo -e "                          $sp Swap partition: $a2sdswappart" | $tee;
+        echo -e "                          $sp No Swap flag file not found." | $tee;
+        echo -e "                          $ck Swap starts." | $tee;
+        echo -e "                              To deactivate swap, type a2sd noswap" | $tee;
+        echo -e "                          $sp Note: Not all ROMS activate swap." | $tee;
+        echo -e "" | $tee;
+    fi;
+  else
+        echo -e "Swap                    - $sp Partition not present or no swap support." | $tee;
+        echo -e "                          $ck Swap does not start." | $tee;
+        echo -e "" | $tee;
+fi; 
+
+if [ ! -e /data/.zipalign ];
+  then
+        echo -e "ZipAlign                - $ck Not running at boot." | $tee;
+        echo -e "                          To activate it, type a2sd zipalign" | $tee;
+        echo -e "" | $tee;  
+  else
+        echo -e "ZipAlign                - $ck Running at boot." | $tee;
+        echo -e "                          To deactivate it, type a2sd nozipalign" | $tee;
+        echo -e "" | $tee;
+fi;
+export a2sdheapsize=`$gpcmd dalvik.vm.heapsize`;
+if [ $a2sdheapsize ];
+  then
+        echo -e "Dalvik Heap(MB)         - $ck `$gpcmd dalvik.vm.heapsize`" | $tee;
+  else
+        echo -e "Dalvik Heap(MB)         - $ck Set to Default." | $tee; 
+fi;
+        echo -e "" | $tee;
+
+        echo -e "Low Memory" | $tee;
+if [ -e /sys/module/lowmemorykiller/parameters/minfree ];
+  then
+        echo -e "Killer Settings         - $ck `cat /sys/module/lowmemorykiller/parameters/minfree`" | $tee;
+        echo -e "                          Note: Values are in pages.";
+        echo -e "                          1 page = 4KB memory.";
+        echo -e "";
+        echo -e "                          Values represent the following:";
+        echo -e "                          1st number = Foreground App";
+        echo -e "                          2nd number = Visible App";
+        echo -e "                          3rd number = Secondary Server";
+        echo -e "                          4th number = Hidden App";
+        echo -e "                          5th number = Content Provider";
+        echo -e "                          6th number = Empty App";
+  else
+        echo -e "Killer Settings         - $ck Set to Default." | $tee;
+fi;
+        echo -e "" | $tee; 
+        echo -e "[\xe2\x81\x87] For a list of commands that you can use with Apps2SD";
+        echo -e "    Type:  a2sd help";
+$bbcmd echo "[ ] Ending program: chka2sd" >> $a2sdlf;
+exit;

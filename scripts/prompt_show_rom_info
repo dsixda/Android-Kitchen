@@ -1,0 +1,10 @@
+
+echo
+echo -n "Would you like to view this ROM's info (y/n)? (default: y): "
+  
+read proceed_show
+if [ "$proceed_show" == "" ] || [ "$proceed_show" == "y" ]
+then
+  scripts/show_rom_info 
+fi
+

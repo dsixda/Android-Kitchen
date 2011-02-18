@@ -1,0 +1,14 @@
+
+echo
+echo "To create your own plugins:"
+echo ""
+echo "  - They need to be shell scripts.  See the files under the 'scripts'"
+echo "    folder for shell scripting examples."
+echo
+echo "  - Your shell script must have a file name that ends with '.plugin'."
+echo "    Ensure the name does not have any spaces in it. "
+echo
+echo "    e.g. HelloWorld.plugin"
+echo
+echo "  - Copy your plugin script to this folder: /scripts/plugins"
+echo 

@@ -1,0 +1,91 @@
+clear
+
+if [ -d WORKING_* ]
+then
+  echo Found working folder
+else
+  echo No working folder found!
+  exit 0
+fi
+
+clear
+cd WORKING_*
+cd META-INF/com/google/android
+
+echo
+
+if [ -e update-script ]
+then
+
+  grep_wipe=`grep -c "format .*DATA:" update-script`
+  
+  if [ "$grep_wipe" == "0" ]
+  then
+
+    echo "Currently the ROM will NOT WIPE your data during a flash"
+    echo -n "Would you like to change this to wipe (y/n)? (default: n): "
+
+    read do_wipe
+    echo
+
+    if [ "$do_wipe" == "y" ]
+    then
+
+      if [ `grep -c "delete DATA" update-script` != 0 ]
+      then
+        #
+        # Check if non-standard line required, e.g. format yaffs2 DATA:
+        #
+        fmt_line=`grep -om 1 "format .*SYSTEM:" update-script | sed -e 's/SYSTEM/DATA/g'`
+
+        #
+        # Change only the first occurrence
+        #
+        sed -i -e '0,/delete DATA/s/delete DATA/'"$fmt_line"'\ndelete DATA/' update-script
+      else
+        sed -i -e 's/format\(.*\)SYSTEM:[ ]*[\n]*/format\1SYSTEM:\nformat\1DATA:\n/' update-script
+      fi
+
+      grep_wipe=`grep -c "format .*DATA:" update-script`
+      if [ "$grep_wipe" == "1" ]
+      then
+        echo "Ok, ROM will now wipe your data"
+      else
+        echo "Error: Unable to modify update-script"
+      fi
+    else
+      echo "Ok, nothing will be changed"
+    fi
+    
+
+  else
+    echo "Currently the ROM will WIPE your data during a flash"
+    echo -n "Would you like to change this to not wipe (y/n)? (default: n): "
+
+    read dont_wipe
+    echo
+
+    if [ "$dont_wipe" == "y" ]
+    then
+      sed -i -e 's/format .*DATA:[ ]*[\n]*//g' update-script
+      
+      grep_wipe=`grep -c "format .*DATA:" update-script`
+      if [ "$grep_wipe" == "0" ]
+      then
+        echo "Ok, ROM will no longer wipe your data"
+      else
+        echo "Error: Unable to modify update-script"
+      fi
+    else
+      echo "Ok, nothing will be changed"
+    fi
+
+  fi
+
+else
+  echo "Error: No update-script found!"
+fi
+
+cd ../../../../..
+echo
+

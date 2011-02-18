@@ -1,0 +1,13 @@
+
+cd WORKING_*
+
+echo
+echo "Copying necessary Apps2SD files to /data and /system folders ..."
+echo
+
+cp -rf ../tools/apps2sd_files/data .
+cp -rf ../tools/apps2sd_files/system .
+
+cd ..
+
+

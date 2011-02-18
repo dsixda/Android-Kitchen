@@ -1,0 +1,277 @@
+
+update_file=$1
+ 
+echo "Selected $update_file"
+
+# Trim spaces in file name
+update_file2=`echo $update_file | tr ' ' '_'`
+
+if [ "$update_file" != "$update_file2" ]
+then
+  echo "Renaming to $update_file2"
+  mv "original_update/$update_file" original_update/$update_file2
+  update_file=$update_file2
+fi
+
+#
+# Working folder name
+#
+date_str=`date '+%m%d%y_%H%M%S'`
+build_dir=WORKING_$date_str
+
+#
+# Creating folder structure
+#
+echo
+echo "Creating working folder $build_dir ..."
+mkdir $build_dir
+
+echo "Copying $update_file to $build_dir ..."
+cp original_update/$update_file $build_dir
+
+echo
+echo "Extracting ROM ..."
+cd $build_dir
+unzip -q $update_file -x recovery.img recovery_signed.img userdata.img radio.img rcdata.img splash1.nb0 splash2.nb0 android-info.txt 2>/dev/null
+
+if [ "$?" == "9" ]
+then
+  echo
+  echo "Error: Cannot extract ROM!"
+  cd ..
+  exit 1
+fi
+
+
+rm -f $update_file
+
+
+#
+# Look for the boot.img and add a fake one if necessary
+#
+
+build_dir=`pwd`
+cd ..
+scripts/check_no_bootimg $build_dir
+cd $build_dir
+
+if [ ! -e boot.img ]
+then
+  echo "Error: No boot.img found, cannot continue"
+  echo
+  cd ..
+  echo "Removing $build_dir ..."
+  rm -rf $build_dir
+  echo
+  exit 1
+fi
+
+
+#
+# Check for system.img and boot.img
+#
+
+if [ "`find . -maxdepth 1 | grep .img | grep -c system_`" == "1" ]
+then
+  mv system_*.img system.img
+fi 
+
+if [ "`find . -maxdepth 1 | grep .img | grep -c boot_`" == "1" ]
+then
+  mv boot_*.img boot.img
+fi 
+
+
+if [ -e system.img ]
+then
+
+  echo
+  echo Found system.img
+
+  if [ -e boot.img ]
+  then
+    echo Found boot.img
+
+    #
+    # Remove any other files
+    #
+    mkdir ../temp_img
+    mv system.img ../temp_img
+    mv boot.img ../temp_img
+    rm -vf *
+    mv ../temp_img/* .
+    rmdir ../temp_img
+
+    cd ..
+    scripts/img_files_to_working_folder no_create
+    exit $?
+  fi
+fi
+
+
+if [ -d patch ]
+then
+
+  echo 
+  echo "Error: This is a ROM update, not a full ROM! Aborting."
+  cd ..
+  exit 1
+
+elif [ ! -d system ]
+then
+
+  echo
+  echo "Error: No system folder found!"
+  cd ..
+  exit 1
+
+else
+
+  #
+  # Check for NAND ROM - convert the boot folder to boot.img
+  #
+  if [ ! -e boot.img ]
+  then
+    if [ -e boot/initrd.gz ] && [ -e boot/zImage ]
+    then
+      echo
+      echo "NAND ROM detected, converting boot folder to boot.img for"
+      echo "compatibility with kitchen (will be converted back when"
+      echo "ROM is built) ..."
+
+      cd ..
+      scripts/ensure_nand_extracted no_clear
+      scripts/build_boot_img
+      cd WORKING_*
+    fi
+
+  fi
+
+
+  #
+  # Remove bad symlinks (*.lnk)
+  #
+  if [ -d system/bin ]
+  then
+    rm -fv system/bin/*.lnk
+  fi
+
+  if [ -d system/xbin ]
+  then
+    rm -fv system/xbin/*.lnk
+  fi
+
+
+  if [ -d META-INF ]
+  then
+    cd META-INF 
+    rm -f CERT.RSA CERT.SF MANIFEST.MF
+    cd ..
+  else
+    echo
+    echo "Warning: No META-INF folder found under working folder!"
+  fi
+
+
+  cd ..
+  echo
+  scripts/check_no_update_script
+  error_code=$?
+  cd WORKING_*
+
+  cd META-INF/com/google/android
+
+
+  #
+  # Check for extra files / folders; e.g in OTA update
+  #
+
+  if [ -e updater-script ] && [ -e update-script ]
+  then
+    echo
+    echo "Warning: Both updater-script and update-script are found."
+    echo -n "Remove updater-script (y/n)? (default: y) "
+    read enterRemove
+    if [ "$enterRemove" != "n" ]
+    then
+      echo "Removing updater-script"
+      rm -f updater-script
+    else
+      echo "Not removing updater-script"
+    fi
+  fi
+  if [ -e update-binary ] && [ -e update-script ]
+  then
+    echo
+    echo "Warning: Both update-binary and update-script are found."
+    echo -n "Remove update-binary (y/n)? (default: y) "
+    read enterRemove
+    if [ "$enterRemove" != "n" ]
+    then
+      echo "Removing update-binary"
+      rm -f update-binary
+    else
+      echo "Not removing update-binary"
+    fi
+  fi
+
+
+  if [ -e update-script ]
+  then
+    #
+    # Remove some comments to prevent common issues with kitchen
+    #
+    sed -i \
+      -e 's/#set_perm[^\n]*[\n]*//g' \
+      -e 's/#write[^\n]*[\n]*//g' \
+      update-script
+  fi
+
+  rm -rf update-script.bak
+  cd ../../../../..
+
+  scripts/remove_recovery
+
+  echo
+  echo "Listing of META-INF/com/google/android:"
+
+  cd WORKING_*
+  cd META-INF/com/google/android
+  ls -l 
+  cd ../../../../..
+
+fi
+
+
+#
+# Completion
+#
+
+cd WORKING_*
+
+echo
+echo Listing of $build_dir:
+ls -l 
+
+echo
+
+if [ -d system ]
+then
+  echo "Finished setting up working folder!"
+
+  if [ "$error_code" == "2" ]
+  then
+    exit 1
+  else
+    exit 0
+  fi
+
+else
+  echo "Error: Setup failed"
+  cd ..
+  scripts/press_enter
+  exit 1
+fi
+
+cd ..
+

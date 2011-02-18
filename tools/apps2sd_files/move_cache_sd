@@ -1,0 +1,9 @@
+#!/system/bin/sh
+
+/system/xbin/busybox mkdir /system/sd/dalvik-cache
+/system/xbin/busybox chmod 777 /system/sd/dalvik-cache
+/system/xbin/busybox cp /data/dalvik-cache/* /system/sd/dalvik-cache
+/system/xbin/busybox rm -rf /data/dalvik-cache
+/system/xbin/busybox ln -s /system/sd/dalvik-cache /data/dalvik-cache
+echo x > /data/.dalvikcache
+

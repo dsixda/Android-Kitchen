@@ -1,0 +1,40 @@
+
+scripts/data_app_exists
+
+if [ "$?" == 1 ]
+then
+
+  echo "update-script already has /data/app content"
+  exit 0
+
+else
+
+  cd WORKING_*
+  cd META-INF/com/google/android
+
+  echo "Updating update-script with /data/app entries"
+
+  if [ `grep -c "delete DATA:app[ ]*" update-script` == 0 ]
+  then
+    if [ `grep -c "format .*DATA:" update-script` == 0 ]
+    then
+      sed -i -e 's/format\(.*\)SYSTEM:[ ]*[\n]*/format\1SYSTEM:\n\ndelete DATA:app\n/' update-script
+    else
+      #
+      # The 'delete DATA:app' command is redundant because you're formatting the DATA partition,
+      # but we'll do that in case the user decides later to remove the format command. 
+      #
+      sed -i -e 's/format\(.*\)DATA:[ ]*[\n]*/format\1DATA:\n\ndelete DATA:app\n/' update-script
+    fi
+  fi    
+
+  if [ `grep -c "copy_dir PACKAGE:data DATA:" update-script` == 0 ]
+  then
+    sed -i -e 's/delete DATA:app[ ]*[\n]*/delete DATA:app\ncopy_dir PACKAGE:data DATA:\n/' update-script
+  fi
+
+  sed -i -e 's/copy_dir PACKAGE:data DATA:[ ]*[\n]*/copy_dir PACKAGE:data DATA:\nset_perm_recursive 1000 1000 0771 0644 DATA:app\n/' update-script
+
+fi
+
+cd ../../../../..

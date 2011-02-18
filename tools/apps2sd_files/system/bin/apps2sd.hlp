@@ -1,0 +1,296 @@
+Syntax: /system/bin/a2sd command
+
+All commands create a logfile: /data/dta2sd.log
+
+Command is one of the following
+
+Standard Apps2SD Commands:
+--------------------------------------------------
+reinstall
+  Moves free and paid apps to the ext2/ext3/ext4
+  partition on your secure digital card.  Removes
+  the No A2SD flag file.
+
+  This is used if you have already executed an
+  a2sd remove command.  Otherwise, this part is
+  automatically performed when Apps2SD is
+  started.
+
+  File removed: /data/.noa2sd
+
+remove
+  Moves free and paid apps to the internal phone
+  storage.  Creates the No A2SD flag file.
+
+  File created: /data/.noa2sd
+
+
+Swap Partition Commands:
+-------------------------------------------------- 
+reswap
+  Removes the No Swap flag.  Allows A2SD to 
+  activate the swap partition.
+
+  This is used if you have already executed an
+  a2sd noswap command.  Otherwise, this part is
+  automatically performed when Apps2SD is
+  started.
+
+  File removed: /data/.noswap
+ 
+noswap
+  Creates the No Swap flag.  Prevents A2SD from
+  activating the swap partition.
+
+  File created: /data/.noswap
+
+swappyxx
+  Sets swap partition swappiness value to xx.  
+  Example:  To set the swappiness of the swap
+            partition to 30%, type:
+            a2sd swappy30
+            To set at 75%, type:
+            a2sd swappy75
+ 
+ File created: /data/dtswap
+
+Dalvik Cache Commands:
+-------------------------------------------------- 
+cachesd
+  Moves Dalvik cache files to the ext2/ext3/ext4
+  partition on your secure digital card. Creates
+  Dalvik Cache to SD flag.
+
+  File created: /data/.dalvikcacahe
+  File removed: /data/.dcpartition
+
+cachesdreset
+  Performs the same function as cachesd, plus 
+  erases the contents of Dalvik-Cache, forcing
+  a rebuild on reboot.
+
+  File created: /data/.dalvikcache
+  File removed: /data/.dcpartition
+
+cachepart
+  Moves Dalvik cache files to the /cache partition
+  in your phone.  Creates Dalvik Cache to Cache
+  Partition flag.
+
+  File created: /data/.dcpartition
+  File removed: /data/.dalvikcache
+
+cachepartreset
+  Performs the same function as cachepart, plus
+  erases the contents of Dalvik-Cache, forcing
+  a rebuild on reboot.
+
+  File created: /data/.dcpartition
+  File removed: /data/.dalvikcache
+
+nocache
+  Moves Dalvik cache files to the internal phone
+  storage.  Removes all Dalvik Cache flags.
+
+  File removed: /data/.dcpartition
+                /data/.dalvikcache
+
+nocachereset
+  Performs the same function as nocache, plus
+  erases the contents of Dalvik-Cache, forcing
+  a rebuild on reboot.
+
+  File removed: /data/.dcpartition
+                /data/.dalvikcache
+
+resetcache
+  Clears the dalvik cache and restarts phone.
+
+
+Apps2SD Diagnostic Commands:
+--------------------------------------------------
+check
+  Performs a symlink and flag file check on your
+  setup.  Outputs a report that shows you if 
+  there are issues with your Apps2SD setup.
+
+repair
+  Performs a repair of all symlinks based on 
+  flag file activation.
+
+diskspace
+  Shows disk space statistics for the ext
+  partition.
+
+sysinfo
+  Displays information about your phone,
+  partitions, swap, and more.
+
+  Also writes a dump file that has an
+  entire profile of your phone.  This
+  is for troubleshooting only.
+
+  File Created:  /data/dtsysdump.txt
+
+swapspace
+  Shows swap space statistics for all
+  swap space active on the phone.
+
+partlist
+  Shows the supported EXT partitions 
+  available for your particular ROM.
+
+ZipAlign Commands:
+--------------------------------------------------
+align
+  Performs a one-time zipalign on all APK files 
+  in /data/app, /data/app-private and /system/app.
+
+zipalign
+  Allows ZipAlign to execute during the boot 
+  process. Creates the ZipAlign flag file.
+
+  File Created: /data/.zipalign
+
+nozipalign
+  Prevents ZipAlign from executing during the 
+  boot process. Removes the ZipAlign flag file.
+
+  File Removed: /data/.zipalign
+
+Dalvik Setting Commands:
+--------------------------------------------------
+jit
+  Installs DalvikVM JIT.
+  WARNING:  Do not run this command if your phone
+            has NAND protection active.
+
+nojit
+  Removes DalvikVM JIT.
+  WARNING:  Do not run this command if your phone
+            has NAND protection active.
+
+heapsizexx
+  Sets Dalvik Heap Size to xx, or heapsize0 resets
+  heap size to default settings.
+
+  Ex: If you want to set the Dalvik Heap Size to
+      24mb, type a2sd heapsize24
+
+  File Created: /data/a2sdheapsize (value > 0)
+  File Removed: /data/a2sdheapsize (value = 0)
+
+Low Memory Killer Commands:
+----------------------------------------------------
+lowmem-moderate
+  Sets the internal memory killer to the following
+  settings:
+  Foreground Apps:    1536 pages /   6 MB
+  Visible Apps:       3072 pages /  12 MB
+  Secondary Server:   4096 pages /  16 MB
+  Hidden Apps:        7680 pages /  30 MB
+  Content Provider:   8960 pages /  35 MB
+  Empty App:         10240 pages /  40 MB
+
+  Create File: /data/.lmmoderate
+  Remove File: /data/.lmoptimum
+               /data/.lmstrict
+               /data/.lmaggressive
+               /data/.lmultimate
+               /data/.lmextreme
+
+lowmem-optimum
+  Sets the internal memory killer to the following
+  settings:
+  Foreground Apps:    1536 pages /   6 MB
+  Visible Apps:       2048 pages /   8 MB
+  Secondary Server:   4096 pages /  16 MB
+  Hidden Apps:       10240 pages /  40 MB
+  Content Provider:  12800 pages /  50 MB
+  Empty App:         15360 pages /  60 MB
+
+  Create File: /data/.lmoptimum
+  Remove File: /data/.lmmoderate
+               /data/.lmstrict
+               /data/.lmaggressive
+               /data/.lmultimate
+               /data/.lmextreme
+
+lowmem-strict
+  Sets the internal memory killer to the following
+  settings:
+  Foreground Apps:    1536 pages /   6 MB
+  Visible Apps:       2048 pages /   8 MB
+  Secondary Server:   4096 pages /  16 MB
+  Hidden Apps:       15360 pages /  60 MB
+  Content Provider:  17920 pages /  70 MB
+  Empty App:         20480 pages /  80 MB
+
+  Create File: /data/.lmstrict
+  Remove File: /data/.lmmoderate
+               /data/.lmoptimum
+               /data/.lmaggressive
+               /data/.lmultimate
+               /data/.lmextreme
+
+lowmem-aggressive
+  Sets the internal memory killer to the following
+  settings:
+  Foreground Apps:    1536 pages /   6 MB
+  Visible Apps:       3072 pages /  12 MB
+  Secondary Server:   4096 pages /  16 MB
+  Hidden Apps:       21000 pages /  82 MB
+  Content Provider:  23000 pages /  90 MB
+  Empty App:         25000 pages /  98 MB
+  
+  Create File: /data/.lmaggressive
+  Remove File: /data/.lmmoderate
+               /data/.lmoptimum
+               /data/.lmstrict
+               /data/.lmextreme
+               /data/.lmultimate
+
+lowmem-extreme
+  Sets the internal memory killer to the following
+  settings:
+  Foreground Apps:    1536 pages /   6 MB
+  Visible Apps:       3072 pages /  12 MB
+  Secondary Server:   4096 pages /  16 MB
+  Hidden Apps:       38400 pages / 150 MB
+  Content Provider:  40960 pages / 160 MB
+  Empty App:         43520 pages / 170 MB
+
+  Create File: /data/.lmextreme
+  Remove File: /data/.lmmoderate
+               /data/.lmoptimum
+               /data/.lmstrict
+               /data/.lmaggressive
+               /data/.lmultimate
+
+lowmem-ultimate
+  Sets the internal memory killer to the following
+  settings:
+  Foreground Apps:    1536 pages /   6 MB
+  Visible Apps:       3072 pages /  12 MB
+  Secondary Server:   4096 pages /  16 MB
+  Hidden Apps:       51200 pages / 200 MB
+  Content Provider:  57600 pages / 225 MB
+  Empty App:         64000 pages / 250 MB
+
+  Create File: /data/.lmultimate
+  Remove File: /data/.lmmoderate
+               /data/.lmoptimum
+               /data/.lmstrict
+               /data/.lmaggressive
+               /data/.lmextreme
+
+lowmem-default
+  Sets the internal memory killer back to phone default
+  settings.
+
+  Remove File: /data/.lmmoderate
+               /data/.lmoptimum
+               /data/.lmstrict
+               /data/.lmaggressive
+               /data/.lmextreme
+               /data/.lmultimate

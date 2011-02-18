@@ -1,0 +1,33 @@
+
+dest_dir=$1
+kitchen_dir=`pwd`
+
+cd $dest_dir
+
+if [ ! -e boot.img ]
+then
+
+  echo
+  echo  "Warning: A boot.img is not found.  You have the option to add a 'fake'"
+  echo  "         boot.img so that the kitchen can still function."
+  echo 
+  echo  "         This boot.img will be automatically removed from your ROM's"
+  echo  "         ZIP file when it is built."
+  echo 
+  echo -n \
+        "Add boot.img (y/n)? (default: y): "
+
+  read add_it
+  echo
+
+  if [ "$add_it" != "n" ]
+  then
+    echo "Copying ..."
+    cp $kitchen_dir/tools/nullBoot.img $dest_dir/boot.img
+  else
+    echo "Cancelled"
+  fi
+
+  cd $kitchen_dir
+  echo
+fi

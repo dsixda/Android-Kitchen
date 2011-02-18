@@ -1,0 +1,267 @@
+
+clear
+echo
+echo "-----------------------------------------------------------------"
+echo 
+echo "The Wireless Tethering option adds an app that allows your device"
+echo "to act as a wireless router.  Devices with Android 2.2 (Froyo) or"
+echo "later usually have this feature built into the operating system."
+echo ""
+echo "The app will be added under the folder /data/app.  If /data/app"
+echo "functionality was not already enabled then the script will do it"
+echo "automatically."
+echo
+echo "-----------------------------------------------------------------"
+echo
+
+scripts/pre_froyo_check
+is_old=$?
+
+if [ "$is_old" == "1" ] 
+then
+  echo -n "Proceed with Wireless Tethering (y/n)? (default: y): "
+  read do_tether
+
+  if [ "$do_tether" == "n" ]
+  then
+    exit 0
+  fi
+else
+  echo -n "ROM is newer than Android 2.1, add app anyway (y/n)? (default: n): "
+  read do_tether
+
+  if [ "$do_tether" != "y" ]
+  then
+    exit 0
+  fi
+fi
+
+
+scripts/ensure_boot_extracted
+
+if [ ! -d WORKING_* ]
+then
+  exit 0
+fi
+
+
+
+if [ -d BOOT-EXTRACTED ] 
+then
+  echo
+else
+  echo "BOOT-EXTRACTED folder not found"
+  exit 0
+fi
+
+
+#
+# Check for root (just look at default.prop in boot.img)
+#
+
+echo "Wireless tethering requires a rooted ROM"
+
+if [ -d BOOT-EXTRACTED/boot.img-ramdisk ]
+then
+  cd BOOT-EXTRACTED/boot.img-ramdisk
+else
+  echo "Error: BOOT-EXTRACTED/boot.img-ramdisk folder not found!"
+  exit 0
+fi
+
+if [ "`grep -m 1 ro.secure default.prop`" == "ro.secure=1" ] 
+then
+  echo "ROM is not fully rooted, because ro.secure=1 in default.prop."
+  echo "We will root it now ..."
+  echo
+  echo "Press Enter when you are ready"
+  read enterKey
+  cd ../..
+  scripts/do_root
+
+else
+  echo "ROM is already rooted"
+  cd ../..
+  rm -rf BOOT-EXTRACTED
+fi
+
+
+if [ -d WORKING_* ]
+then
+  echo
+else
+  exit 0
+fi
+
+
+#
+# Copy APK
+#
+
+tether_file=wireless_tether*
+
+cd WORKING_*
+
+tether_list=( wireless_tether* android.tether* )
+tether_found=0
+
+for find_tether in ${tether_list[@]}
+do
+  
+  res=`find . -name $find_tether`
+  if [ "$res" != "" ]
+  then
+    echo "$res already found"
+    tether_found=1
+  fi
+
+done
+
+
+if [ $tether_found == 1 ]
+then
+  cd ..
+  exit 0
+
+else
+  cd ..
+  scripts/add_data_app dont_ask
+  cd WORKING_*
+
+  echo "Copying app ..."
+  cp -v ../tools/apps/$tether_file data/app/
+fi
+
+echo
+echo "Press Enter to continue"
+read enterKey
+
+
+#
+# Check for Nexus One or Dream
+#
+
+cd ..
+
+scripts/set_device
+device=`cat device.cfg`
+rm device.cfg
+
+
+if [ "$device" == "passion" ]
+then
+
+  cd WORKING_*
+  cd system
+
+  if [ "`grep -c ro.build.version.release=2.1 build.prop`" != "1" ]
+  then
+    echo 
+    echo "This Nexus One ROM does not appear to be using Android OS 2.1;"
+    echo "not taking any action on the kernel"
+    echo 
+    cd ../..
+  else
+
+    cd ../..
+
+    echo 
+    echo "WARNING: This operation will overwrite your current kernel (Nexus One)"
+    echo -n "Proceed with update (y/n)? (default: y): "
+    
+    read proceed_update
+    if [ "$proceed_update" == "" ] || [ "$proceed_update" == "y" ]
+    then
+
+      scripts/ensure_boot_extracted
+      cd WORKING_*
+      cd system
+
+      echo "Adding new bcm4329.ko to /system/lib/modules"
+      cp -f ../../tools/nexus_one_2_1_update/bcm4329.ko lib/modules/
+      
+      echo "Overwriting kernel with modified version"
+      cp ../../tools/nexus_one_2_1_update/nexusone-zimage ../../BOOT-EXTRACTED/
+      mv ../../BOOT-EXTRACTED/nexusone-zimage ../../BOOT-EXTRACTED/zImage
+
+      echo
+      cd ../..
+      scripts/build_boot_img
+    
+    else
+      echo "Kernel not updated"
+      echo
+    fi
+  fi
+
+elif [ "$device" == "dream" ]
+then
+
+  cd WORKING_*
+  cd system
+
+  if [ "`grep -c ro.build.version.release=1 build.prop`" != "1" ]
+  then
+    echo 
+    echo "This Dream ROM does not appear to be using Android OS 1.5 or 1.6;"
+    echo "not taking any action on the kernel"
+    echo 
+    cd ../..
+
+  else
+
+    update_flag=0
+
+    if [ "`grep -c ro.build.version.release=1.5 build.prop`" == "1" ]
+    then	
+      rom_ver=1.5
+      rom_dir=dream_1_5_update
+      update_flag=1
+  
+    elif [ "`grep -c ro.build.version.release=1.6 build.prop`" == "1" ]
+    then
+      rom_ver=1.6
+      rom_dir=dream_1_6_update
+      update_flag=1
+    fi
+
+    cd ../..
+
+    if [ $update_flag == "1" ]
+    then
+
+      echo
+      echo "WARNING: This operation will overwrite your current kernel (Dream)"
+      echo -n "Proceed with update (y/n)? (default: y): "
+  
+      read proceed_update
+      if [ "$proceed_update" == "" ] || [ "$proceed_update" == "y" ]
+      then
+
+        scripts/ensure_boot_extracted
+        cd WORKING_*
+        cd system
+
+        echo "Adding new $rom_ver modules to /system"
+        cp -f -r ../../tools/$rom_dir/system/* . 
+    
+        echo "Overwriting kernel with modified version"
+        cp ../../tools/$rom_dir/zImage ../../BOOT-EXTRACTED/
+        
+        echo
+        cd ../..
+        scripts/build_boot_img
+
+      else
+        echo "Kernel not updated"
+        echo
+      fi
+    fi
+  fi
+
+else
+  echo 
+  echo "Kernel does not need to be modified for this device"
+fi
+
+

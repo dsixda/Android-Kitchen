@@ -1,0 +1,46 @@
+
+clear
+
+while :
+do
+
+  clear
+
+  echo
+  echo "Porting"
+  echo "--------"
+  echo
+  echo "Enter a choice:"
+  echo 
+
+  echo "  a = Port ROM from another device"
+  echo "  e = Extract kernel and modules from another ROM"
+  echo "  x = Exit"
+  echo
+  echo -n "? "
+
+  read enterLetter
+
+  if [ "$enterLetter" == "a" ]
+  then
+    scripts/port_rom
+    
+    if [ "$?" == "1" ]
+    then
+      continue
+    fi
+
+  elif [ "$enterLetter" == "e" ]
+  then
+    scripts/call_extract_kernel_and_modules
+  elif [ "$enterLetter" == "x" ]
+  then
+    exit 0
+  else 
+    echo "Invalid option"
+    continue
+  fi
+
+  scripts/press_enter
+
+done

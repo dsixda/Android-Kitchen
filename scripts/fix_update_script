@@ -1,0 +1,170 @@
+
+cd WORKING_*
+
+if [ ! -d system ]
+then
+  echo
+  echo "Error: No /system folder found!"
+  cd ..
+  exit 0
+fi
+
+
+if [ -e META-INF/com/google/android/update-script ]
+then
+
+  #
+  # Check for symbolic links in /system/bin and add symlinks to update-script
+  #
+
+  # Don't go all the way into system/bin, because some of the binaries in
+  # there may collide with your operating system's file operation commands
+  # (e.g. ls, rm)!
+  cd system
+
+  echo
+  echo "Looking for symbolic links under /system/bin ..."
+  
+  symlinks=`find bin -type l -exec ls -l {} \; | sed 's/.* bin\/\([^ ]*\).*/\1/g'`
+  source_files=`find bin -type l -exec ls -l {} \; | sed 's/.*-> //g'`
+
+  symlinks=( $symlinks )
+  source_files=( $source_files )
+
+  if [ "$symlinks" == "" ]
+  then
+
+    echo "None detected"
+
+    #
+    # Build a set of default symlinks in update-script if none found in /system/bin
+    #
+
+    if [ "`grep "symlink toolbox" ../META-INF/com/google/android/update-script`" == ""  ] && [ -e bin/toolbox ]
+    then
+      echo "Adding a default set of toolbox symlinks to update-script ..."
+
+      cp ../../tools/update_files/default_symlinks .
+      sed -i -e '/copy_dir PACKAGE:system SYSTEM:/r default_symlinks' ../META-INF/com/google/android/update-script
+      rm default_symlinks
+
+      file_list=`ls bin`
+
+      # 
+      # If binary already exists, then remove symlink in update-script
+      #
+      for curr_file in $file_list
+      do
+        check_line="symlink toolbox SYSTEM:bin\\/$curr_file"
+        if [ `grep -c "$check_line" ../META-INF/com/google/android/update-script` != 0 ]
+        then
+          sed -i -e '/'"$check_line"'[ ]*$/d' ../META-INF/com/google/android/update-script
+        fi
+      done
+    fi
+
+    if [ "`grep "symlink dumpstate" ../META-INF/com/google/android/update-script`" == "" ] && [ -e bin/dumpstate ]
+    then
+
+      if [ ! -e bin/bugreport ]
+      then
+        echo "Adding bugreport symlink ..."
+        sed -i -e 's/copy_dir PACKAGE:system SYSTEM:/copy_dir PACKAGE:system SYSTEM:\nsymlink dumpstate SYSTEM:bin\/bugreport\n/' ../META-INF/com/google/android/update-script 
+      fi
+
+      if [ ! -e bin/dumpcrash ]
+      then
+      echo "Adding dumpcrash symlink ..."
+        sed -i -e 's/copy_dir PACKAGE:system SYSTEM:/copy_dir PACKAGE:system SYSTEM:\nsymlink dumpstate SYSTEM:bin\/dumpcrash\n/' ../META-INF/com/google/android/update-script 
+      fi
+    fi
+
+
+  #
+  # If symlinks exist then add them to update-script
+  #
+
+  else
+
+    echo "They will now be added to the update-script and removed from system/bin"
+
+    for (( i=0 ; i < ${#symlinks[@]} ; i++ ))
+    do
+
+      link=${symlinks[$i]}
+      src=${source_files[$i]}
+
+      # Deleting the symbolic link
+      rm -f bin/$link
+
+      #
+      #  Remove full paths for some binaries
+      #
+      if [ `echo $src | grep -c /busybox$` == 1 ]
+      then
+        src=busybox
+      elif [ `echo $src | grep -c /toolbox$` == 1 ]
+      then
+        src=toolbox
+      elif [ `echo $src | grep -c /dumpstate$` == 1 ]
+      then
+        src=dumpstate
+      elif [ `echo $src | grep -c /iwmulticall$` == 1 ]
+      then
+        src=iwmulticall
+      fi
+
+      export LINK=$link
+      export SRC=$src
+
+      perl -pi -e 's/set_perm_recursive 0 0 0755 0644 SYSTEM:/symlink $ENV{"SRC"} SYSTEM:bin\/$ENV{"LINK"}\nset_perm_recursive 0 0 0755 0644 SYSTEM:/' ../META-INF/com/google/android/update-script 
+    done
+
+  fi
+
+
+  cd ..
+
+
+
+  #
+  # Modify the update-script if certain files are missing under /system
+  #
+
+  if [ ! -e system/bin/ip ] 
+  then
+    perl -pi -e 's/set_perm 0 3003 06755 SYSTEM:bin\/ip\n//g' META-INF/com/google/android/update-script
+  fi
+
+  if [ ! -d system/etc/ppp ] 
+  then
+    perl -pi -e 's/set_perm_recursive 0 0 0755 0555 SYSTEM:etc\/ppp[ ]*\n//g' META-INF/com/google/android/update-script
+  fi
+
+  if [ -d system/etc/bluetooth ]
+  then
+   perl -pi -e 's/set_perm_recursive 1002 1002 0755 0440 SYSTEM:etc\/bluez\n//g' META-INF/com/google/android/update-script
+   perl -pi -e 's/set_perm 0 0 0755 SYSTEM:etc\/bluez\n//g' META-INF/com/google/android/update-script
+   
+  else
+    perl -pi -e 's/set_perm_recursive 1002 1002 0755 0440 SYSTEM:etc\/bluetooth\n//g' META-INF/com/google/android/update-script
+    perl -pi -e 's/set_perm 0 0 0755 SYSTEM:etc\/bluetooth\n//g' META-INF/com/google/android/update-script
+    perl -pi -e 's/set_perm 1000 1000 0640 SYSTEM:etc\/bluetooth\/auto_pairing.conf\n//g' META-INF/com/google/android/update-script
+    perl -pi -e 's/set_perm 3002 3002 0444 SYSTEM:etc\/bluetooth\/blacklist.conf\n//g' META-INF/com/google/android/update-script
+
+  fi
+
+  if [ ! -e system/bin/run-as ]
+  then
+    perl -pi -e 's/set_perm 0 2000 06750 SYSTEM:bin\/run-as\n//g' META-INF/com/google/android/update-script
+  fi
+
+ 
+  cd ..
+  scripts/fix_update_script_blanks
+
+
+else
+  cd ..
+fi  
+

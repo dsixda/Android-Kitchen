@@ -1,0 +1,33 @@
+
+clear
+
+if [ -d WORKING_* ]
+then
+  echo
+  echo Working folder found
+  cd WORKING_*
+else
+  echo
+  echo Working folder not found, you will need to create one!
+  exit 0
+fi
+
+echo
+
+if [ -d data/local ]
+then
+  echo /data/local already exists
+else
+  echo Creating /data/local
+  mkdir -p data/local
+fi
+
+if [ ! -e data/local/placeholder ]
+then
+  touch data/local/placeholder
+fi
+
+cd ..
+scripts/add_data_local_to_update_script
+echo
+
