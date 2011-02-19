@@ -33,7 +33,7 @@ then
     exit 0
 
   else
-    echo "Error kernel offset not found in boot.img!"
+    echo "Error: kernel offset not found in boot.img!"
     cd ..
     exit 1
   fi
