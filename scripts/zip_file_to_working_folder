@@ -52,26 +52,6 @@ fi
 rm -f $update_file
 
 
-#
-# Look for the boot.img and add a fake one if necessary
-#
-
-build_dir=`pwd`
-cd ..
-scripts/check_no_bootimg $build_dir
-cd $build_dir
-
-if [ ! -e boot.img ]
-then
-  echo "Error: No boot.img found, cannot continue"
-  echo
-  cd ..
-  echo "Removing $build_dir ..."
-  rm -rf $build_dir
-  echo
-  exit 1
-fi
-
 
 #
 # Check for system.img and boot.img
@@ -111,6 +91,11 @@ then
     cd ..
     scripts/img_files_to_working_folder no_create
     exit $?
+  else
+    echo "Error: No boot.img found"
+    echo
+    cd ..
+    exit 1
   fi
 fi
 
@@ -149,8 +134,29 @@ else
       scripts/ensure_nand_extracted no_clear
       scripts/build_boot_img
       cd WORKING_*
-    fi
 
+    else
+
+      #
+      # Check if ROM has no boot.img inside
+      #
+
+      build_dir=`pwd`
+      cd ..
+      scripts/check_no_bootimg $build_dir
+      cd $build_dir
+
+      if [ ! -e boot.img ]
+      then
+        echo "Error: No boot.img found, cannot continue"
+        echo
+        cd ..
+        echo "Removing $build_dir ..."
+        rm -rf $build_dir
+        echo
+        exit 1
+      fi
+    fi
   fi
 
 
