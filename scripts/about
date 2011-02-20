@@ -28,32 +28,11 @@ fi
 echo 
 echo "Searching for updates ..."
 
+notes=`scripts/get_latest_notes`
+latest_ver=`echo $notes | sed 's/Version \([0-9]*.[0-9]*\) .*/\1/g'`
+
 curr_major=`echo $current_ver | sed 's/\([0-9]*\).[0-9]*/\1/'`
 curr_minor=`echo $current_ver | sed 's/[0-9]*.//'`
-
-check_filename=latest
-
-url_prefix=http://android.grdlock.net/index.php?action=download\&filename=
-url_suffix=\&directory=ROM%20Kitchens/dsixda%20Android%20Kitchen\&
-
-url=$url_prefix$check_filename$url_suffix
-
-wget -q $url -O $check_filename
-
-if [ -e $check_filename ]
-then
-  # Parse out any spaces or carriage returns
-  latest_ver=`grep -o '[0-9.]*' $check_filename`
-
-  # Condition if downloading from Grdlock site
-  if [ `grep -c "object not found" $check_filename` == 1 ]
-  then
-    latest_ver=
-  fi
-else
-  latest_ver=
-fi
-
 
 if [ "$latest_ver" == "" ]
 then
@@ -63,7 +42,9 @@ else
 
   latest_major=`echo $latest_ver | sed 's/\([0-9]*\).[0-9]*/\1/'`
   latest_minor=`echo $latest_ver | sed 's/[0-9]*.//'`
- 
+
+  url_prefix=http://android.grdlock.net/index.php?action=download\&filename=
+  url_suffix=\&directory=ROM%20Kitchens/dsixda%20Android%20Kitchen\&
   update=1
 
   #
@@ -91,8 +72,8 @@ else
 
     echo "An update was found ($latest_ver)."
    
-    scripts/get_latest_notes
-    
+    echo "$notes"
+
     echo 
     echo -n "Download (y/n)? (default: y): "
     read proceed_download
