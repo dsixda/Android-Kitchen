@@ -11,7 +11,8 @@ if [ "$check_header" != "4e415244494f2144" ]
 then
   echo "Android header not found at start of boot.img"
 
-  hex_offset=`od -x -A x boot.img | grep -m 1 "4e41 5244 494f 2144" | sed -e 's/ .*//'`
+  # Mac OS X adds extra spaces between the numbers!
+  hex_offset=`od -x -A x boot.img | grep -m 1 "4e41 [ ]*5244 [ ]*494f [ ]*2144" | sed -e 's/ .*//'`
 
   if [ "$hex_offset" != "" ]
   then
