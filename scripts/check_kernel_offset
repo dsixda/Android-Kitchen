@@ -11,7 +11,8 @@ echo
 if [ -e boot.img ] 
 then
 
-  hex_offset=`od -x -A x boot.img | grep -m 1 "0000 e1a0" | sed -e 's/ .*//'`
+  # Mac OS X adds extra spaces between the numbers!
+  hex_offset=`od -x -A x boot.img | grep -m 1 "0000 [ ]*e1a0" | sed -e 's/ .*//'`
 
   if [ "$hex_offset" != "" ]
   then
