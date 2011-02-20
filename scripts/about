@@ -43,8 +43,6 @@ else
   latest_major=`echo $latest_ver | sed 's/\([0-9]*\).[0-9]*/\1/'`
   latest_minor=`echo $latest_ver | sed 's/[0-9]*.//'`
 
-  url_prefix=http://android.grdlock.net/index.php?action=download\&filename=
-  url_suffix=\&directory=ROM%20Kitchens/dsixda%20Android%20Kitchen\&
   update=1
 
   #
@@ -88,9 +86,9 @@ else
     echo "Downloading $new_file ..."
     echo
 
-    url=$url_prefix$new_file$url_suffix
+    url=https://github.com/dsixda/Android-Kitchen/zipball/$latest_ver
 
-    wget $url -O $new_file
+    wget --no-check-certificate $url -O $new_file
 
     if [ -e $new_file ]
     then
