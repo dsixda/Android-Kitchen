@@ -38,320 +38,377 @@ done
 ignore_errors=no
 
 
-#
-# There may be .odex files that require classes in addition to those
-# included by default.  Many of them are defined below.
-#
-# These definitions may not cover every single case, so the parent 
-# script 'do_deodex' will utilize a brute-force method if the 
-# problematic .odex file is not covered here.
-#
-
-if [ "$odex_file" == "Bluetooth.odex" ]
-then
-  classfile=javax.obex.jar
-
-elif [ "$odex_file" == "HtcFootprints.odex" ] || \
-     [ "$odex_file" == "HtcLocationPicker.odex" ] || \
-     [ "$odex_file" == "Weather.odex" ]
-then
-  classfile=com.google.android.maps.jar
-
-elif [ "$odex_file" == "GmailProvider.odex" ] || \
-     [ "$odex_file" == "gtalkservice.odex" ] || \
-     [ "$odex_file" == "Talk.odex" ] ||
-     [ "$odex_file" == "Vending.odex" ]
-then
-  classfile=com.google.android.gtalkservice.jar
-
-elif [ "$odex_file" == "QuickLookup.odex" ]
-then
-  classfile=com.google.translate.jar
-  
-elif [ "$odex_file" == "services.odex" ] || \
-     [ "$odex_file" == "android.policy.odex" ]
-then
-  classfile=com.htc.framework.jar
-
-elif [ "$odex_file" == "Faves.odex" ]
-then
-  classfile=com.tmobile.pluto.jar:com.tmobile.widget.jar
-
-  elif [ "$odex_file" == "FavesWidget.odex" ]
-then
-  classfile=com.tmobile.pluto.jar
-
-elif [ "$odex_file" == "ProfileManager.odex" ]
-then
-  classfile=com.tmobile.widget.jar
-
-elif [ "$odex_file" == "Clicker.odex" ]
-then
-  classfile=android.test.runner.jar
-
-
-elif [ "$odex_file" == "RSS.odex" ]
-then
-  classfile=com.htc.rss.jar
-  ignore_errors=yes
-
-elif [ "$odex_file" == "com.htc.rss.odex" ]
-then
-  ignore_errors=yes
-fi
-
-
-
-#
-# HTC Ace / Thunderbolt
-#
-
-if [ -e ../framework/com.orange.authentication.simcard.jar ]
+if [ "$classfile" == "" ]
 then
 
-  if [ -e ../framework/evernote.jar ]
+  #
+  # There may be .odex files that require classes in addition to those
+  # included by default.  Many of them are defined below.
+  #
+  # These definitions may not cover every single case, so the parent 
+  # script 'do_deodex' will utilize a brute-force method if the 
+  # problematic .odex file is not covered here.
+  #
+
+  if [ "$odex_file" == "Bluetooth.odex" ]
   then
-    evernote=:evernote.jar
-  else
-    evernote=
-  fi
+    classfile=javax.obex.jar
 
-  if [ "$odex_file" == "android.policy.odex" ] || \
-      [ "$odex_file" == "services.odex" ]
+  elif [ "$odex_file" == "HtcFootprints.odex" ] || \
+       [ "$odex_file" == "HtcLocationPicker.odex" ] || \
+       [ "$odex_file" == "Weather.odex" ]
   then
-    classfile=com.htc.framework.jar:com.orange.authentication.simcard.jar$evernote
+    classfile=com.google.android.maps.jar
 
-  elif [ "$odex_file" == "com.htc.android.easopen.odex" ] || \
-      [ "$odex_file" == "com.htc.android.pimlib.odex" ] || \
-      [ "$odex_file" == "com.htc.framework.odex" ] || \
-      [ "$odex_file" == "com.scalado.util.ScaladoUtil.odex" ] || \
-      [ "$odex_file" == "framework.odex" ]
+  elif [ "$odex_file" == "GmailProvider.odex" ] || \
+       [ "$odex_file" == "gtalkservice.odex" ] || \
+       [ "$odex_file" == "Talk.odex" ] ||
+       [ "$odex_file" == "Vending.odex" ]
   then
-    classfile=com.orange.authentication.simcard.jar$evernote
+    classfile=com.google.android.gtalkservice.jar
 
-  elif [ "$odex_file" == "evernote.odex" ]
-  then
-    classfile=com.orange.authentication.simcard.jar
-
-  elif [ "$odex_file" == "ext.odex" ]
+  elif [ "$odex_file" == "QuickLookup.odex" ]
   then
     classfile=com.google.translate.jar
-  fi
-fi
-
-
-
-#
-# LG Shine Plus
-# 
-
-if [ -e ../framework/lge-res.apk ]
-then
-  if [ "$odex_file" == "qcnvitems.odex" ]
+    
+  elif [ "$odex_file" == "services.odex" ] || \
+       [ "$odex_file" == "android.policy.odex" ]
   then
-    classfile=qcrilhook.jar
+    classfile=com.htc.framework.jar
 
-  elif [ "$odex_file" == "MoviePlayer.odex" ]
+  elif [ "$odex_file" == "Faves.odex" ]
   then
-    classfile=com.nextreaming.NexSubtitle.jar
+    classfile=com.tmobile.pluto.jar:com.tmobile.widget.jar
 
-  elif [ "$odex_file" == "OPP.odex" ]
+    elif [ "$odex_file" == "FavesWidget.odex" ]
   then
-    classfile=javax.obex.jar
-  fi
-fi
+    classfile=com.tmobile.pluto.jar
 
-#
-# Motorola CLIQ / Motoblur entries follow - thanks to miharkula at modmymobile.com
-#
-
-if [ -e ../framework/com.motorola.blur.library.utilities.jar ]
-then
-
-  if [ "$odex_file" == "com.motorola.blur.library.friendfeed.odex" ] || \
-     [ "$odex_file" == "com.motorola.blur.library.home.odex" ] || \
-     [ "$odex_file" == "com.motorola.blur.library.service.odex" ] || \
-     [ "$odex_file" == "com.motorola.blur.library.friendfeed.odex" ] || \
-     [ "$odex_file" == "com.motorola.blur.library.home.odex" ] || \
-     [ "$odex_file" == "com.motorola.blur.library.service.odex" ] || \
-     [ "$odex_file" == "BlurContacts.odex" ]
+  elif [ "$odex_file" == "ProfileManager.odex" ]
   then
-    classfile=com.motorola.blur.library.utilities.jar
+    classfile=com.tmobile.widget.jar
 
-  elif [ "$odex_file" == "AdminFeedNotifier.odex" ]
+  elif [ "$odex_file" == "Clicker.odex" ]
   then
-    classfile=com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
+    classfile=android.test.runner.jar
 
-  elif [ "$odex_file" == "AdService.odex" ]
-  then
-    classfile=com.motorola.android.mobad.jar
 
-  elif [ "$odex_file" == "BlurAlarmClock.odex" ]
+  elif [ "$odex_file" == "RSS.odex" ]
   then
-    classfile=com.motorola.android.widget.jar
+    classfile=com.htc.rss.jar
+    ignore_errors=yes
 
-  elif [ "$odex_file" == "BlurCalendar.odex" ]
+  elif [ "$odex_file" == "com.htc.rss.odex" ]
   then
-    classfile=com.motorola.blur.library.utilities.jar:com.motorola.blur.library.messaging.jar
-
-  elif [ "$odex_file" == "BlurCalendarProvider.odex" ]
-  then
-    classfile=com.motorola.android.widget.jar:com.motorola.blur.library.home.jar:com.motorola.blur.library.utilities.jar
-
-  elif [ "$odex_file" == "BlurContactsSync.odex" ]
-  then
-    classfile=com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
-
-  elif [ "$odex_file" == "BlurEmailEngine.odex" ]
-  then
-    classfile=com.motorola.blur.library.messaging.jar:com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
-
-  elif [ "$odex_file" == "BlurEmail.odex" ]
-  then
-    classfile=com.motorola.blur.library.messaging.jar:com.motorola.blur.library.utilities.jar
-
-  elif [ "$odex_file" == "BlurHome.odex" ]
-  then
-    classfile=com.motorola.blur.library.home.jar:com.motorola.blur.library.utilities.jar
-
-  elif [ "$odex_file" == "BlurPhone.odex" ]
-  then
-    classfile=com.motorola.android.widget.jar:com.motorola.blur.library.utilities.jar
-
-  elif [ "$odex_file" == "BlurSNMessagingEngine.odex" ]
-  then
-    classfile=com.motorola.blur.library.messaging.jar:com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
-
-  elif [ "$odex_file" == "BlurUpdater.odex" ]
-  then
-    classfile=com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
-
-  elif [ "$odex_file" == "CalendarSync.odex" ]
-  then
-    classfile=com.motorola.blur.library.messaging.jar:com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
-
-  elif [ "$odex_file" == "ClockWidget.odex" ]
-  then
-    classfile=com.motorola.blur.library.home.jar:com.motorola.blur.library.utilities.jar
-
-  elif [ "$odex_file" == "ContactsData.odex" ]
-  then
-    classfile=com.motorola.blur.library.messaging.jar:com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
-
-  elif [ "$odex_file" == "ContactsUnconnected.odex" ]
-  then
-    classfile=com.motorola.blur.library.messaging.jar:com.motorola.blur.library.utilities.jar
-
-  elif [ "$odex_file" == "FirewallService.odex" ]
-  then
-    classfile=com.motorola.android.Firewall.jar
-
-  elif [ "$odex_file" == "megamaid.odex" ]
-  then
-    classfile=com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
-
-  elif [ "$odex_file" == "MessagesWidget.odex" ]
-  then
-    classfile=com.motorola.blur.library.home.jar:com.motorola.blur.library.utilities.jar
-
-  elif [ "$odex_file" == "Messaging.odex" ]
-  then
-    classfile=com.motorola.blur.library.messaging.jar:com.motorola.blur.library.utilities.jar
-
-  elif [ "$odex_file" == "NewsWidget.odex" ]
-  then
-    classfile=com.motorola.blur.library.home.jar:com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
-
-  elif [ "$odex_file" == "oma1motService.odex" ]
-  then
-    classfile=com.motorola.android.drm1.jar
-
-  elif [ "$odex_file" == "OMADownload.odex" ]
-  then
-    classfile=com.motorola.android.mime.jar
-
-  elif [ "$odex_file" == "PhoneAddons.odex" ]
-  then
-    classfile=com.motorola.android.telephony.jar
-
-  elif [ "$odex_file" == "QuickContactWidget.odex" ]
-  then
-    classfile=com.motorola.blur.library.home.jar:com.motorola.blur.library.utilities.jar
-
-  elif [ "$odex_file" == "SetupProvider.odex" ]
-  then
-    classfile=com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
-
-  elif [ "$odex_file" == "SocialShare.odex" ]
-  then
-    classfile=com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
-
-  elif [ "$odex_file" == "StatusWidget.odex" ]
-  then
-    classfile=com.motorola.blur.library.friendfeed.jar:com.motorola.blur.library.home.jar:com.motorola.blur.library.utilities.jar
-
-  elif [ "$odex_file" == "StickyNoteWidget.odex" ]
-  then
-    classfile=com.motorola.blur.library.home.jar:com.motorola.blur.library.utilities.jar
-
-  elif [ "$odex_file" == "UniversalInbox.odex" ]
-  then
-    classfile=com.motorola.blur.library.utilities.jar:com.motorola.blur.library.messaging.jar
-
-  elif [ "$odex_file" == "WeatherWidget.odex" ]
-  then
-    classfile=com.motorola.android.widget.jar:com.motorola.blur.library.home.jar:com.motorola.blur.library.utilities.jar
-
-  elif [ "$odex_file" == "WmdrmDla.odex" ]
-  then
-    classfile=com.motorola.android.wmdrm.jar
-
-  elif [ "$odex_file" == "WorkContacts.odex" ]
-  then
-    classfile=com.motorola.blur.library.messaging.jar:com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
+    ignore_errors=yes
   fi
 
-fi
 
 
-#
-# Samsung TouchWiz
-#
+  #
+  # HTC Ace / Thunderbolt
+  #
 
-if [ -e ../framework/twframework.jar ]
-then
-
-  if [ "$odex_file" == "BluetoothOPP.odex" ]
+  if [ -e ../framework/com.orange.authentication.simcard.jar ]
   then
-    classfile=javax.obex.jar
 
-  elif [ "$odex_file" == "TouchWizCalendar.odex" ]
-  then
-    classfile=twframework.jar:javax.obex.jar:com.google.android.maps.jar
+    if [ -e ../framework/evernote.jar ]
+    then
+      evernote=:evernote.jar
+    else
+      evernote=
+    fi
 
-  elif [ "$odex_file" == "BuddiesNow.odex" ] || \
-       [ "$odex_file" == "ClockPackage.odex" ] ||
-       [ "$odex_file" == "Contacts.odex" ] || \
-       [ "$odex_file" == "DialerTabActivity.odex" ] || \
-       [ "$odex_file" == "Dlna.odex" ] || \
-       [ "$odex_file" == "Email.odex" ] ||
-       [ "$odex_file" == "InfoAlarm.odex" ] || \
-       [ "$odex_file" == "MusicPlayer.odex" ] || \
-       [ `echo $odex_file | grep -c SamsungWidget_` == 1 ] || \
-       [ "$odex_file" == "SoundPlayer.odex" ] || \
-       [ "$odex_file" == "VideoPlayer.odex" ] || \
-       [ "$odex_file" == "VoiceRecorder.odex" ] 
-  then
-    classfile=twframework.jar
+    if [ "$odex_file" == "android.policy.odex" ] || \
+        [ "$odex_file" == "services.odex" ]
+    then
+      classfile=com.htc.framework.jar:com.orange.authentication.simcard.jar$evernote
 
-  elif [ "$odex_file" == "Camera.odex" ] || \
-       [ "$odex_file" == "FactoryTest.odex" ]
-  then
-    classfile=seccamera.jar
+    elif [ "$odex_file" == "com.htc.android.easopen.odex" ] || \
+        [ "$odex_file" == "com.htc.android.pimlib.odex" ] || \
+        [ "$odex_file" == "com.htc.framework.odex" ] || \
+        [ "$odex_file" == "com.scalado.util.ScaladoUtil.odex" ] || \
+        [ "$odex_file" == "framework.odex" ]
+    then
+      classfile=com.orange.authentication.simcard.jar$evernote
+
+    elif [ "$odex_file" == "evernote.odex" ]
+    then
+      classfile=com.orange.authentication.simcard.jar
+
+    elif [ "$odex_file" == "ext.odex" ]
+    then
+      classfile=com.google.translate.jar
+    fi
   fi
 
-fi
 
+
+  #
+  # LG Shine Plus
+  # 
+
+  if [ -e ../framework/lge-res.apk ]
+  then
+    if [ "$odex_file" == "qcnvitems.odex" ]
+    then
+      classfile=qcrilhook.jar
+
+    elif [ "$odex_file" == "MoviePlayer.odex" ]
+    then
+      classfile=com.nextreaming.NexSubtitle.jar
+
+    elif [ "$odex_file" == "OPP.odex" ]
+    then
+      classfile=javax.obex.jar
+    fi
+  fi
+
+  #
+  # Motorola / Motoblur entries follow
+  # Thanks to miharkula at modmymobile.com for CLIQ entries
+  #
+
+  if [ -e ../framework/com.motorola.blur.library.utilities.jar ]
+  then
+
+    if [ "$odex_file" == "com.motorola.blur.library.friendfeed.odex" ] || \
+       [ "$odex_file" == "com.motorola.blur.library.home.odex" ] || \
+       [ "$odex_file" == "com.motorola.blur.library.service.odex" ] || \
+       [ "$odex_file" == "com.motorola.blur.library.friendfeed.odex" ] || \
+       [ "$odex_file" == "com.motorola.blur.library.home.odex" ] || \
+       [ "$odex_file" == "com.motorola.blur.library.service.odex" ] || \
+       [ "$odex_file" == "BlurContacts.odex" ]
+    then
+      classfile=com.motorola.blur.library.utilities.jar
+
+    elif [ "$odex_file" == "AdminFeedNotifier.odex" ]
+    then
+      classfile=com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
+
+    elif [ "$odex_file" == "AdService.odex" ]
+    then
+      classfile=com.motorola.android.mobad.jar
+
+    elif [ "$odex_file" == "BlurAlarmClock.odex" ]
+    then
+      classfile=com.motorola.android.widget.jar
+
+    elif [ "$odex_file" == "BlurCalendar.odex" ]
+    then
+      classfile=com.motorola.blur.library.utilities.jar:com.motorola.blur.library.messaging.jar
+
+    elif [ "$odex_file" == "BlurCalendarProvider.odex" ]
+    then
+      classfile=com.motorola.android.widget.jar:com.motorola.blur.library.home.jar:com.motorola.blur.library.utilities.jar
+
+    elif [ "$odex_file" == "BlurContactsSync.odex" ]
+    then
+      classfile=com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
+
+    elif [ "$odex_file" == "BlurEmailEngine.odex" ]
+    then
+      classfile=com.motorola.blur.library.messaging.jar:com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
+
+    elif [ "$odex_file" == "BlurEmail.odex" ]
+    then
+      classfile=com.motorola.blur.library.messaging.jar:com.motorola.blur.library.utilities.jar
+
+    elif [ "$odex_file" == "BlurHome.odex" ]
+    then
+      classfile=com.motorola.blur.library.home.jar:com.motorola.blur.library.utilities.jar
+
+    elif [ "$odex_file" == "BlurPhone.odex" ]
+    then
+      classfile=com.motorola.android.widget.jar:com.motorola.blur.library.utilities.jar
+
+    elif [ "$odex_file" == "BlurSNMessagingEngine.odex" ]
+    then
+      classfile=com.motorola.blur.library.messaging.jar:com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
+
+    elif [ "$odex_file" == "BlurUpdater.odex" ]
+    then
+      classfile=com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
+
+    elif [ "$odex_file" == "CalendarSync.odex" ]
+    then
+      classfile=com.motorola.blur.library.messaging.jar:com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
+
+    elif [ "$odex_file" == "ClockWidget.odex" ]
+    then
+      classfile=com.motorola.blur.library.home.jar:com.motorola.blur.library.utilities.jar
+
+    elif [ "$odex_file" == "ContactsData.odex" ]
+    then
+      classfile=com.motorola.blur.library.messaging.jar:com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
+
+    elif [ "$odex_file" == "ContactsUnconnected.odex" ]
+    then
+      classfile=com.motorola.blur.library.messaging.jar:com.motorola.blur.library.utilities.jar
+
+    elif [ "$odex_file" == "FirewallService.odex" ]
+    then
+      classfile=com.motorola.android.Firewall.jar
+
+    elif [ "$odex_file" == "megamaid.odex" ]
+    then
+      classfile=com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
+
+    elif [ "$odex_file" == "MessagesWidget.odex" ]
+    then
+      classfile=com.motorola.blur.library.home.jar:com.motorola.blur.library.utilities.jar
+
+    elif [ "$odex_file" == "Messaging.odex" ]
+    then
+      classfile=com.motorola.blur.library.messaging.jar:com.motorola.blur.library.utilities.jar
+
+    elif [ "$odex_file" == "NewsWidget.odex" ]
+    then
+      classfile=com.motorola.blur.library.home.jar:com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
+
+    elif [ "$odex_file" == "oma1motService.odex" ]
+    then
+      classfile=com.motorola.android.drm1.jar
+
+    elif [ "$odex_file" == "OMADownload.odex" ]
+    then
+      classfile=com.motorola.android.mime.jar
+
+    elif [ "$odex_file" == "PhoneAddons.odex" ]
+    then
+      classfile=com.motorola.android.telephony.jar
+
+    elif [ "$odex_file" == "QuickContactWidget.odex" ]
+    then
+      classfile=com.motorola.blur.library.home.jar:com.motorola.blur.library.utilities.jar
+
+    elif [ "$odex_file" == "SetupProvider.odex" ]
+    then
+      classfile=com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
+
+    elif [ "$odex_file" == "SocialShare.odex" ]
+    then
+      classfile=com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
+
+    elif [ "$odex_file" == "StatusWidget.odex" ]
+    then
+      classfile=com.motorola.blur.library.friendfeed.jar:com.motorola.blur.library.home.jar:com.motorola.blur.library.utilities.jar
+
+    elif [ "$odex_file" == "StickyNoteWidget.odex" ]
+    then
+      classfile=com.motorola.blur.library.home.jar:com.motorola.blur.library.utilities.jar
+
+    elif [ "$odex_file" == "UniversalInbox.odex" ]
+    then
+      classfile=com.motorola.blur.library.utilities.jar:com.motorola.blur.library.messaging.jar
+
+    elif [ "$odex_file" == "WeatherWidget.odex" ]
+    then
+      classfile=com.motorola.android.widget.jar:com.motorola.blur.library.home.jar:com.motorola.blur.library.utilities.jar
+
+    elif [ "$odex_file" == "WmdrmDla.odex" ]
+    then
+      classfile=com.motorola.android.wmdrm.jar
+
+    elif [ "$odex_file" == "WorkContacts.odex" ]
+    then
+      classfile=com.motorola.blur.library.messaging.jar:com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar
+
+    # 
+    # Atrix and possibly other Moto devices
+    #
+
+    elif [ "$odex_file" == "android.policy.odex" ] || \
+         [ "$odex_file" == "com.motorola.android.frameworks.odex" ] || \
+         [ "$odex_file" == "services.odex" ]
+    then
+      classfile=com.motorola.android.widget.jar
+    elif [ "$odex_file" == "com.motorola.atcmd.base.odex" ]
+    then
+      classfile=com.motorola.android.telephony.jar
+    elif [ "$odex_file" == "com.motorola.blur.library.messaging.odex" ]
+    then
+      classfile=com.motorola.blur.library.utilities.jar
+    elif [ "$odex_file" == "CarDock.odex" ]
+    then
+      classfile=com.google.android.maps.jar      
+    elif [ "$odex_file" == "MotoAtCmdPlugin.odex" ] || \
+         [ "$odex_file" == "AtCmd.odex" ] || \
+         [ "$odex_file" == "MotoAttAtCmdPlugin.odex" ] || \
+         [ "$odex_file" == "blur-services.odex" ] || \
+         [ "$odex_file" == "Conversations.odex" ]
+    then
+      classfile=com.motorola.blur.library.home.jar:com.motorola.blur.library.service.jar:com.motorola.blur.library.messaging.jar:com.motorola.android.telephony.jar:com.motorola.atcmd.base.jar:com.motorola.atcmd.pluginMgr.jar:com.motorola.blur.library.utilities.jar
+    elif [ "$odex_file" == "ExtDispService.odex" ] || \
+         [ "$odex_file" == "MediaCenter.odex" ]
+    then
+      classfile=com.motorola.android.iextdispservice.jar
+    elif [ "$odex_file" == "FileManager.odex" ]
+    then
+      classfile=jcifs-krb5-1.3.12.jar
+    elif [ "$odex_file" == "DLNA.odex" ]
+    then
+      classfile=com.motorola.android.dlna.jar
+    fi
+
+    #
+    # The following were untried from the Atrix and will use the brute-force method:
+    #
+
+    #DatamanagerApp.odex
+    #DataManagerService.odex
+    #FriendFeed.odex
+    #MediaGallery.odex
+    #MSExchangeService.odex
+    #OlympusCamera.odex
+    #phoneportal.odex
+    #PhotoEditor.odex
+    #PhotoWidget.odex
+    #PortalApp.odex
+    #Setup.odex
+    #SocialMessaging.odex
+    #SyncML.odex
+    #SyncMLApp.odex
+  fi
+
+
+  #
+  # Samsung TouchWiz
+  #
+
+  if [ -e ../framework/twframework.jar ]
+  then
+
+    if [ "$odex_file" == "BluetoothOPP.odex" ]
+    then
+      classfile=javax.obex.jar
+
+    elif [ "$odex_file" == "TouchWizCalendar.odex" ]
+    then
+      classfile=twframework.jar:javax.obex.jar:com.google.android.maps.jar
+
+    elif [ "$odex_file" == "BuddiesNow.odex" ] || \
+         [ "$odex_file" == "ClockPackage.odex" ] ||
+         [ "$odex_file" == "Contacts.odex" ] || \
+         [ "$odex_file" == "DialerTabActivity.odex" ] || \
+         [ "$odex_file" == "Dlna.odex" ] || \
+         [ "$odex_file" == "Email.odex" ] ||
+         [ "$odex_file" == "InfoAlarm.odex" ] || \
+         [ "$odex_file" == "MusicPlayer.odex" ] || \
+         [ `echo $odex_file | grep -c SamsungWidget_` == 1 ] || \
+         [ "$odex_file" == "SoundPlayer.odex" ] || \
+         [ "$odex_file" == "VideoPlayer.odex" ] || \
+         [ "$odex_file" == "VoiceRecorder.odex" ] 
+    then
+      classfile=twframework.jar
+
+    elif [ "$odex_file" == "Camera.odex" ] || \
+         [ "$odex_file" == "FactoryTest.odex" ]
+    then
+      classfile=seccamera.jar
+    fi
+  fi
+fi
 
 
 
