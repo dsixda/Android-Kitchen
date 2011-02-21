@@ -108,27 +108,34 @@ do
     echo
     echo -n "? "
 
-    read enterNumber
+    read enterChoice
+
+    #
+    # Read number of *.odex again in case the user added more
+    # after prompted 
+    #
+    num_odex_fr=`find system/framework | grep -c "\.odex$"`
+    num_odex_app=`find system/app | grep -c "\.odex$"`
 
     list1=( app )
     list2=( framework )
     list3=( framework app )
 
-    if [ "$enterNumber" == "a" ]
+    if [ "$enterChoice" == "a" ]
     then
       dir_list=( app )
-    elif [ "$enterNumber" == "f" ] 
+    elif [ "$enterChoice" == "f" ] 
     then
       dir_list=( framework )
-    elif [ "$enterNumber" == "b" ] 
+    elif [ "$enterChoice" == "b" ] 
     then
       dir_list=( framework app )
-    elif [ "$enterNumber" == "s" ]
+    elif [ "$enterChoice" == "s" ]
     then
       cd ..
       scripts/choose_single_deodex
       continue
-    elif [ "$enterNumber" == "bb" ]
+    elif [ "$enterChoice" == "bb" ]
     then
 
       #
@@ -157,7 +164,7 @@ do
       scripts/press_enter
       continue
 
-    elif [ "$enterNumber" == "x" ]
+    elif [ "$enterChoice" == "x" ]
     then
       cd ..
       exit 0
@@ -232,6 +239,9 @@ do
           fr_jar_list=`find . | grep "\.jar$" | sed 's/.\///g' | sort -f`
           fr_jar_list=`echo $fr_jar_list | sed 's/baksmali.jar//' | sed 's/smali.jar//'`
 
+          all_fr_jars=`echo $fr_jar_list | sed -e 's/ /:/g'`
+          fr_jar_list="$all_fr_jars $fr_jar_list"
+        
           cd $current_dir
 
           echo
@@ -251,11 +261,11 @@ do
               echo
               echo
               echo "-> Trying another class file for $odex_file:"
-              echo
             fi
 
             echo
             echo "Trying dependency with $classfile ..."
+            echo
             ../../../scripts/do_deodex_file $odex_file ../framework $classfile
             
             result=$?
