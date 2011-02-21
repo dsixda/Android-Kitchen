@@ -48,16 +48,34 @@ then
     exit 0
   fi
 
-  echo
-  echo "Enter any JAR file dependencies separated by colon (Enter=none):"
-  echo -n "$file_chosen > "
-  read classfiles
-  echo
-
   cp ../tools/deodex_files/baksmali*.jar baksmali.jar
   cp ../tools/deodex_files/smali*.jar smali.jar
 
-  ../scripts/do_deodex_file $file_chosen system/framework $classfiles 
+  try_again=y
+
+  while [ "$try_again" != "n" ]
+  do
+    echo
+    echo "Enter any JAR file dependencies separated by colon (Enter=none):"
+    echo -n "$file_chosen > "
+    read classfiles
+    echo
+
+    ../scripts/do_deodex_file $file_chosen system/framework $classfiles 
+
+    result=$?
+
+    if [ "$result" == 1 ]
+    then
+      echo
+      echo -n "Try $file_chosen again (y/n)? (default: y): "
+      read try_again
+      echo
+    else
+      break
+    fi
+
+  done
 
   rm -f *smali.jar
 
