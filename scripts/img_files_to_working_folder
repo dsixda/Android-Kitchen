@@ -110,7 +110,7 @@ then
 else
 
   echo
-  echo "'EXT3' FILE FORMAT DETECTED IN ROM"
+  echo "NON-YAFFS FILE FORMAT DETECTED IN ROM"
   echo
 
   cd $system_dir
