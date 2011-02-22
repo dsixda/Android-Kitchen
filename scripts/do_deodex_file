@@ -317,7 +317,15 @@ then
     # 
     # Atrix and possibly other Moto devices
     #
-
+    # Notes about baksmali errors:
+    # - blur/util/widgets/GridView refers to com.motorola.blur.library.home.jar
+    # - blur/util/widgets/SwiperView refers to com.motorola.blur.library.utilities.jar
+    # - blur/services/blur/IWSRequestCallback$Stub refers to com.motorola.blur.library.service.jar
+    # - blur/home/widget/ChipWidgetProvider$WidgetService refers to com.motorola.blur.library.home.jar
+    # - blur/util/io/HttpConnectionMgr$Request refers to com.motorola.blur.library.utilities.jar
+    # - blur/util/authentication/AuthenticationFactory$AuthenticationObserver refers to com.motorola.blur.library.utilities.jar
+    # - blur/util/BlurApp refers to com.motorola.blur.library.utilities.jar
+    #
     elif [ "$odex_file" == "android.policy.odex" ] || \
          [ "$odex_file" == "com.motorola.android.frameworks.odex" ] || \
          [ "$odex_file" == "services.odex" ]
@@ -326,7 +334,9 @@ then
     elif [ "$odex_file" == "com.motorola.atcmd.base.odex" ]
     then
       classfile=com.motorola.android.telephony.jar
-    elif [ "$odex_file" == "com.motorola.blur.library.messaging.odex" ]
+    elif [ "$odex_file" == "com.motorola.blur.library.messaging.odex" ] || \
+         [ "$odex_file" == "MSExchangeService.odex" ] || \
+         [ "$odex_file" == "phoneportal.odex" ]
     then
       classfile=com.motorola.blur.library.utilities.jar
     elif [ "$odex_file" == "CarDock.odex" ]
@@ -338,9 +348,10 @@ then
          [ "$odex_file" == "blur-services.odex" ] || \
          [ "$odex_file" == "Conversations.odex" ]
     then
-      classfile=com.motorola.blur.library.home.jar:com.motorola.blur.library.service.jar:com.motorola.blur.library.messaging.jar:com.motorola.android.telephony.jar:com.motorola.atcmd.base.jar:com.motorola.atcmd.pluginMgr.jar:com.motorola.blur.library.utilities.jar
+      classfile=com.motorola.blur.library.home.jar:com.motorola.blur.library.service.jar:com.motorola.blur.library.utilities.jar:com.motorola.blur.library.messaging.jar:com.motorola.android.telephony.jar:com.motorola.atcmd.base.jar:com.motorola.atcmd.pluginMgr.jar
     elif [ "$odex_file" == "ExtDispService.odex" ] || \
-         [ "$odex_file" == "MediaCenter.odex" ]
+         [ "$odex_file" == "MediaCenter.odex" ] || \
+         [ "$odex_file" == "PortalApp.odex" ]
     then
       classfile=com.motorola.android.iextdispservice.jar
     elif [ "$odex_file" == "FileManager.odex" ]
@@ -349,26 +360,35 @@ then
     elif [ "$odex_file" == "DLNA.odex" ]
     then
       classfile=com.motorola.android.dlna.jar
+    elif [ "$odex_file" == "DatamanagerApp.odex" ] || \
+         [ "$odex_file" == "DataManagerService.odex" ]
+    then
+      classfile=com.motorola.blur.library.home.jar:com.motorola.blur.library.utilities.jar:com.motorola.android.datamanager.base.jar
+    elif [ "$odex_file" == "FriendFeed.odex" ]
+    then
+      classfile=com.motorola.blur.library.home.jar:com.motorola.blur.library.utilities.jar:com.motorola.blur.library.friendfeed.jar:com.motorola.blur.library.service.jar
+    elif [ "$odex_file" == "MediaGallery.odex" ] || \
+         [ "$odex_file" == "PhotoWidget.odex" ]
+    then
+      classfile=com.motorola.blur.library.home.jar:com.motorola.blur.library.utilities.jar
+    elif [ "$odex_file" == "OlympusCamera.odex" ]
+    then
+      classfile=com.motorola.android.camera.jar
+    echo
+    elif [ "$odex_file" == "PhotoEditor.odex" ]
+    then
+      classfile=com.scalado.android.photoeditor.jar
+    elif [ "$odex_file" == "Setup.odex" ]
+    then
+      classfile=com.motorola.blur.library.utilities.jar:com.motorola.blur.library.service.jar
+    elif [ "$odex_file" == "SocialMessaging.odex" ]
+    then
+      classfile=com.motorola.blur.library.utilities.jar:com.motorola.blur.library.messaging.jar
+    elif [ "$odex_file" == "SyncML.odex" ] || \
+         [ "$odex_file" == "SyncMLApp.odex" ]
+    then
+      classfile=javax.obex.odex:com.motorola.android.syncml.odex
     fi
-
-    #
-    # The following were untried from the Atrix and will use the brute-force method:
-    #
-
-    #DatamanagerApp.odex
-    #DataManagerService.odex
-    #FriendFeed.odex
-    #MediaGallery.odex
-    #MSExchangeService.odex
-    #OlympusCamera.odex
-    #phoneportal.odex
-    #PhotoEditor.odex
-    #PhotoWidget.odex
-    #PortalApp.odex
-    #Setup.odex
-    #SocialMessaging.odex
-    #SyncML.odex
-    #SyncMLApp.odex
   fi
 
 
