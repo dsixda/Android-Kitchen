@@ -79,6 +79,10 @@ then
 
 else
 
+  echo
+  echo "NON-YAFFS FILE FORMAT DETECTED"
+  echo
+
   cd $img_dir
 
   # Get full path
