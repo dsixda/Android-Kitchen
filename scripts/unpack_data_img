@@ -74,7 +74,7 @@ then
   echo
   echo Extracting contents of data.img ...
   cd $img_dir
-  ../tools/unyaffs_files/$unyaffs_file data.img 2>/dev/null
+  result=`../tools/unyaffs_files/$unyaffs_file data.img 2>/dev/null`
   cd ..
 
 else
