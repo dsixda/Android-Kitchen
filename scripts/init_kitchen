@@ -4,6 +4,7 @@ chmod 755 tools/mkboot/*
 chmod 755 tools/unyaffs_files/*
 chmod 755 tools/zipalign_files/*
 rm -f symlinks.log
+rm -f tools/explore2fs_windows/explore*.txt
 
 bin_list=( mkbootfs mkbootfs.exe mkbootimg mkbootimg.exe mkbootimg_4k_offset mkbootimg_4k_offset.exe )
 

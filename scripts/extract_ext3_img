@@ -51,8 +51,6 @@ then
 
   scripts/press_enter
 
-  rm -f tools/explore2fs_windows/explore*.txt
-
   cd $img_dir
   rm -f unyaffs*stackdump
 
