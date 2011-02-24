@@ -211,80 +211,102 @@ do
       #
       # Finally, deodex each file
       #
-
-      cp ../../../tools/deodex_files/baksmali*.jar baksmali.jar
-      cp ../../../tools/deodex_files/smali*.jar smali.jar
-     
+      echo "Trying this version of baksmali/smali:"
+      ls ../../../tools/deodex_files/*.jar | sed -e 's/.*\///g'
+      echo
+      version=newer
+      cp -f ../../../tools/deodex_files/baksmali*.jar baksmali.jar
+      cp -f ../../../tools/deodex_files/smali*.jar smali.jar
 
       for odex_file in $grep_cmd
       do
+
         count=$(($count+1))
         echo
         echo "NOW AT FILE $count OF $num_odex_folder IN $path: $odex_file"
-        ../../../scripts/do_deodex_file $odex_file ../framework
-        
-        result=$?
+        try=1
 
-        #
-        # Use brute-force method if it requires an additional class
-        #
+        while [ -e $odex_file ]
+        do
 
-        if [ "$result" == "1" ]
-        then
-
-          current_dir=`pwd`
-          cd ../framework
-
-          # Get a list of all the framework JARs
-          fr_jar_list=`find . | grep "\.jar$" | sed 's/.\///g' | sort -f`
-          fr_jar_list=`echo $fr_jar_list | sed -e 's/baksmali.jar//' -e 's/smali.jar//'`
-
-          all_fr_jars=`echo $fr_jar_list | sed -e 's/ /:/g'`
-          #fr_jar_list="$all_fr_jars $fr_jar_list"
-          fr_jar_list=$all_fr_jars
-        
-          cd $current_dir
-
-          echo
-          echo 
-          echo "-> Using brute-force method to find the required class for $odex_file:"
-          echo
-
-          first_try=1
-
-          for classfile in $fr_jar_list
-          do
-
-            if [ $first_try == 1 ]
-            then  
-              first_try=0
-            else
-              echo
-              echo
-              echo "-> Trying another class file for $odex_file:"
-            fi
-
-            echo
-            echo "Trying dependency with $classfile ..."
-            echo
-            ../../../scripts/do_deodex_file $odex_file ../framework $classfile
-            
-            result=$?
-
-            if [ "$result" == "1" ]
-            then
-              continue
-            else
-              break
-            fi
-          done
+          ../../../scripts/do_deodex_file $odex_file ../framework
+          
+          #
+          # Use brute-force method if it failed
+          #
 
           if [ -e $odex_file ]
           then
-            found_error=1
-            echo "ERROR: Aborting $odex_file"
+
+            current_dir=`pwd`
+            cd ../framework
+
+            # Get a list of all the framework JARs
+            fr_jar_list=`find . | grep "\.jar$" | sed 's/.\///g' | sort -f`
+            fr_jar_list=`echo $fr_jar_list | \
+                        sed \
+                          -e 's/baksmali.jar//' \
+                          -e 's/smali.jar//' \
+                          -e 's/ /:/g'`
+          
+            cd $current_dir
+
+            echo
+            echo 
+            echo "-> Using brute-force method:"
+            echo
+
+            ../../../scripts/do_deodex_file $odex_file ../framework $fr_jar_list
+             
+            if [ -e $odex_file ] && [ $try == 2 ]
+            then
+
+              if [ $version==older ]
+              then
+                echo
+                echo "Reverting to newer baksmali/smali:"
+                ls ../../../tools/deodex_files/*.jar | sed -e 's/.*\///g'
+                echo
+                version=newer
+                cp -f ../../../tools/deodex_files/baksmali*.jar baksmali.jar
+                cp -f ../../../tools/deodex_files/smali*.jar smali.jar              
+              fi  
+
+              echo "Trying $odex_file but ignoring error ..."
+              ../../../scripts/do_deodex_file $odex_file ../framework $fr_jar_list yes
+
+              if [ -e $odex_file ]
+              then
+                echo "ERROR: Aborting $odex_file"
+                found_error=1
+              fi
+              
+              break
+            fi    
+
+            if [ $version==newer ]
+            then
+              echo
+              echo "Trying older version of baksmali/smali:"
+              ls ../../../tools/deodex_files/old_version/*.jar | sed -e 's/.*\///g'
+              echo
+              version=older
+              cp -f ../../../tools/deodex_files/old_version/baksmali*.jar baksmali.jar
+              cp -f ../../../tools/deodex_files/old_version/smali*.jar smali.jar
+            else 
+              echo
+              echo "Trying newer version of baksmali/smali:"
+              ls ../../../tools/deodex_files/*.jar | sed -e 's/.*\///g'
+              echo
+              version=newer
+              cp -f ../../../tools/deodex_files/baksmali*.jar baksmali.jar
+              cp -f ../../../tools/deodex_files/smali*.jar smali.jar
+            fi
+
+            try=2
+
           fi
-        fi
+        done
 
       done
 
