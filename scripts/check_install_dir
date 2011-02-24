@@ -1,0 +1,22 @@
+
+install_dir="`pwd`"
+grep_result=`echo "$install_dir" | grep ".* [ ]*"`
+
+if [ "$grep_result" != "" ]
+then
+  echo
+  echo "Error:  The folder name \"$install_dir\" contains the space character."
+  echo "        This will cause problems with kitchen functionality and the OS."
+  echo "        Please move the kitchen to a folder without spaces."
+
+  example_dir=`echo $install_dir | sed -e 's/\([^ ]*\) .*/\1\//g' -e 's/\(.*\)\/.*\//\/\1/g' -e 's/\/\//\//g'`
+  echo
+  echo "        For example: $example_dir/kitchen" 
+  echo
+
+  echo
+  exit 1
+else
+  exit 0
+fi
+

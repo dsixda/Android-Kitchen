@@ -3,6 +3,13 @@
 version=0.130
 
 chmod 755 scripts/*
+scripts/check_install_dir
+
+if [ "$?" == "1" ]
+then
+  exit 0
+fi
+
 scripts/init_kitchen
 scripts/check_binaries
 
