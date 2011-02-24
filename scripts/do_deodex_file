@@ -8,7 +8,9 @@ bootclass_dir=$2
 # Optional; just have the file name, not path
 classfile=$3
 
-
+# Optional; this one is specified if classfile is specified
+# can be yes/no
+ignore_me=$4
 
 if [ "$odex_file" == "" ]
 then
@@ -33,10 +35,12 @@ do
   fi
 done
 
-
-
-ignore_errors=no
-
+if [ "$ignore_me" == "yes" ]
+then
+  ignore_errors=yes
+else
+  ignore_errors=no
+fi
 
 if [ "$classfile" == "" ]
 then
@@ -56,7 +60,8 @@ then
 
   elif [ "$odex_file" == "HtcFootprints.odex" ] || \
        [ "$odex_file" == "HtcLocationPicker.odex" ] || \
-       [ "$odex_file" == "Weather.odex" ]
+       [ "$odex_file" == "Weather.odex" ] || \
+       [ "$odex_file" == "twitter.odex" ] 
   then
     classfile=com.google.android.maps.jar
 
@@ -441,7 +446,15 @@ fi
 if [ "$classfile" != "" ] && [ `echo $classfile | grep -c :` -gt 0 ]
 then
 
-  java_cmd="java -Xmx512m -jar baksmali.jar -d $bootclass_dir -c :$classfile -x $odex_file"
+  if [ "$ignore_errors" == "yes" ]
+  then
+    echo
+    echo "-> Ignoring errors for this file!"
+    echo
+    java_cmd="java -Xmx512m -jar baksmali.jar -I -d $bootclass_dir -c :$classfile -x $odex_file"
+  else
+    java_cmd="java -Xmx512m -jar baksmali.jar -d $bootclass_dir -c :$classfile -x $odex_file"
+  fi
 
   echo $java_cmd
   $java_cmd
@@ -559,7 +572,7 @@ then
 
   else
     echo "WARNING: Unable to produce classes.dex, not good!"
-    exit 0
+    exit 1
   fi          
 
 else
