@@ -237,10 +237,11 @@ do
 
           # Get a list of all the framework JARs
           fr_jar_list=`find . | grep "\.jar$" | sed 's/.\///g' | sort -f`
-          fr_jar_list=`echo $fr_jar_list | sed 's/baksmali.jar//' | sed 's/smali.jar//'`
+          fr_jar_list=`echo $fr_jar_list | sed -e 's/baksmali.jar//' -e 's/smali.jar//'`
 
           all_fr_jars=`echo $fr_jar_list | sed -e 's/ /:/g'`
-          fr_jar_list="$all_fr_jars $fr_jar_list"
+          #fr_jar_list="$all_fr_jars $fr_jar_list"
+          fr_jar_list=$all_fr_jars
         
           cd $current_dir
 
