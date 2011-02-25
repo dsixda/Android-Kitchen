@@ -54,6 +54,11 @@ then
   # problematic .odex file is not covered here.
   #
 
+  if [ "$odex_file" == "NetworkLocation.odex" ]
+  then
+    classfile=com.android.location.provider.jar
+  fi
+
   if [ "$odex_file" == "Bluetooth.odex" ]
   then
     classfile=javax.obex.jar
@@ -79,7 +84,11 @@ then
   elif [ "$odex_file" == "services.odex" ] || \
        [ "$odex_file" == "android.policy.odex" ]
   then
-    classfile=com.htc.framework.jar
+
+    if [ -e ../framework/com.htc.framework.jar ]
+    then
+      classfile=com.htc.framework.jar
+    fi      
 
   elif [ "$odex_file" == "Faves.odex" ]
   then
@@ -433,6 +442,31 @@ then
       classfile=seccamera.jar
     fi
   fi
+
+  #
+  # Gingerbread
+  #
+  if [ -e ../framework/core-junit.jar ]
+  then
+    if [ "$odex_file" == "android.policy.odex" ] || \
+       [ "$odex_file" == "services.odex" ] || \
+       [ "$odex_file" == "com.google.android.maps.odex" ] || \
+       [ "$odex_file" == "ext.odex" ] || \
+       [ "$odex_file" == "framework.odex" ]
+    then
+
+      classfile_=core-junit.jar
+
+      if [ "$classfile" != "" ]
+      then
+        classfile="$classfile:"
+      fi
+
+      classfile="$classfile$classfile_"
+
+    fi
+  fi
+
 fi
 
 
