@@ -247,7 +247,8 @@ do
                         sed \
                           -e 's/baksmali.jar//' \
                           -e 's/smali.jar//' \
-                          -e 's/ /:/g'`
+                          -e 's/ /:/g' \
+                          -e 's/::/:/g' `
           
             cd $current_dir
 
@@ -272,17 +273,18 @@ do
                 cp -f ../../../tools/deodex_files/smali*.jar smali.jar              
               fi  
 
-              echo "Trying $odex_file but ignoring error ..."
-              ../../../scripts/do_deodex_file $odex_file ../framework $fr_jar_list yes
+              #echo "Trying $odex_file but ignoring error ..."
+              #../../../scripts/do_deodex_file $odex_file ../framework $fr_jar_list yes
 
-              if [ -e $odex_file ]
-              then
-                echo "ERROR: Aborting $odex_file"
-                found_error=1
-              fi
+              echo "ERROR: Aborting $odex_file"
+              found_error=1
               
               break
-            fi    
+
+            elif [ ! -e $odex_file ]
+            then
+              break
+            fi
 
             if [ $version==newer ]
             then
