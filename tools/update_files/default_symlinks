@@ -20,6 +20,7 @@ symlink toolbox SYSTEM:bin/ln
 symlink toolbox SYSTEM:bin/log
 symlink toolbox SYSTEM:bin/ls
 symlink toolbox SYSTEM:bin/lsmod
+symlink toolbox SYSTEM:bin/lsof
 symlink toolbox SYSTEM:bin/mkdir
 symlink toolbox SYSTEM:bin/mount
 symlink toolbox SYSTEM:bin/mv
@@ -46,6 +47,7 @@ symlink toolbox SYSTEM:bin/stop
 symlink toolbox SYSTEM:bin/sync
 symlink toolbox SYSTEM:bin/top
 symlink toolbox SYSTEM:bin/umount
+symlink toolbox SYSTEM:bin/uptime
 symlink toolbox SYSTEM:bin/vmstat
 symlink toolbox SYSTEM:bin/watchprops
 symlink toolbox SYSTEM:bin/wipe
