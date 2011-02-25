@@ -107,6 +107,28 @@ else
   fi
 fi
 
+#
+# Check for hboot.img in working folder, and then modify the update-script if required
+#
+if [ -e hboot.img ]
+then
+  if [ "`grep -c write_hboot_image META-INF/com/google/android/update-script`" == "0" ] 
+  then
+    echo "hboot.img found."
+    echo "Modifying update-script with syntax for flashing HBOOT ..."
+    echo "write_hboot_image PACKAGE:hboot.img" >> META-INF/com/google/android/update-script
+    echo
+  fi
+
+else
+  if [ "`grep -c write_hboot_image META-INF/com/google/android/update-script`" == "1" ] 
+  then
+    echo "hboot.img not present in ROM."
+    echo "Modifying update-script to remove syntax for flashing HBOOT ..."
+    sed -i -e 's/write_hboot_image PACKAGE:hboot.img[ ]*$//g' META-INF/com/google/android/update-script
+  fi
+fi
+
 
 
 
