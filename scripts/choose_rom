@@ -82,7 +82,7 @@ rm -f ../temp.list
 cd ..
 
 echo
-echo -n "Enter file number (0 = cancel): "
+echo -n "Enter file number (default=1, cancel=0): "
 
 
 read enterNumber
@@ -91,9 +91,15 @@ echo
 if [ "$enterNumber" == "0" ]
 then
   exit 0
+fi
+
+if [ "$enterNumber" == "" ]
+then
+  enterNumber=1
+fi
 
 # Verify input is a number
-elif [ "`echo $enterNumber | sed 's/[0-9]*//'`" == "" ]
+if [ "`echo $enterNumber | sed 's/[0-9]*//'`" == "" ] || [ "enterNumber"=="1" ]
 then
 
   file_chosen=${file_array[$enterNumber]}
