@@ -121,6 +121,15 @@ sed -i -e '/^#/d' updater-script
 #
 sed -i -e 's/write_raw_image PACKAGE:boot.img BOOT:/package_extract_file("boot.img", "\/tmp\/boot.img");\nwrite_raw_image("\/tmp\/boot.img", "boot");\ndelete("\/tmp\/boot.img");/g' updater-script
 
+#
+# radio.img
+#
+sed -i -e 's/write_radio_image PACKAGE:radio.img/package_extract_file("radio.img", "\/tmp\/radio.img");\nwrite_raw_image("\/tmp\/radio.img", "radio");\ndelete("\/tmp\/radio.img");/g' updater-script
+
+#
+# hboot.img
+#
+sed -i -e 's/write_hboot_image PACKAGE:hboot.img/package_extract_file("hboot.img", "\/tmp\/hboot.img");\nwrite_raw_image("\/tmp\/hboot.img", "hboot");\ndelete("\/tmp\/hboot.img");/g' updater-script
 
 
 #
