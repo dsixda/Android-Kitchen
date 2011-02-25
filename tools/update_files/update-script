@@ -24,6 +24,10 @@ set_perm 1002 1002 0440 SYSTEM:etc/dbus.conf
 set_perm 1014 2000 0550 SYSTEM:etc/dhcpcd/dhcpcd-run-hooks
 set_perm 0 2000 0550 SYSTEM:etc/init.goldfish.sh
 set_perm_recursive 0 0 0755 0555 SYSTEM:etc/ppp
+set_perm_recursive 0 2000 0755 0644 SYSTEM:vendor
+set_perm_recursive 0 0 0755 0644 SYSTEM:vendor/firmware
+set_perm 0 2000 0755 SYSTEM:vendor/firmware
+set_perm_recursive 0 2000 0755 0755 SYSTEM:xbin
 show_progress 0.1 10
 
 show_progress 0.2 0
