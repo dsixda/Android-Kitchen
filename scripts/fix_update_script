@@ -117,7 +117,7 @@ then
       export LINK=$link
       export SRC=$src
 
-      perl -pi -e 's/set_perm_recursive 0 0 0755 0644 SYSTEM:/symlink $ENV{"SRC"} SYSTEM:bin\/$ENV{"LINK"}\nset_perm_recursive 0 0 0755 0644 SYSTEM:/' ../META-INF/com/google/android/update-script 
+      perl -pi -e 's/set_perm_recursive 0 0 0755 0644 SYSTEM:[ ]*$/symlink $ENV{"SRC"} SYSTEM:bin\/$ENV{"LINK"}\nset_perm_recursive 0 0 0755 0644 SYSTEM:/' ../META-INF/com/google/android/update-script 
     done
 
   fi
@@ -159,7 +159,18 @@ then
     perl -pi -e 's/set_perm 0 2000 06750 SYSTEM:bin\/run-as\n//g' META-INF/com/google/android/update-script
   fi
 
- 
+  if [ ! -d system/vendor/firmware ]
+  then
+    perl -pi -e 's/set_perm_recursive 0 2000 0755 0644 SYSTEM:vendor//g' META-INF/com/google/android/update-script
+    perl -pi -e 's/set_perm_recursive 0 0 0755 0644 SYSTEM:vendor\/firmware//g' META-INF/com/google/android/update-script
+    perl -pi -e 's/set_perm 0 2000 0755 SYSTEM:vendor\/firmware\//g' META-INF/com/google/android/update-script    
+  fi
+
+  if [ ! -d system/xbin ]
+  then
+    perl -pi -e 's/set_perm_recursive 0 2000 0755 0755 SYSTEM:xbin[ ]*$//g' META-INF/com/google/android/update-script
+  fi
+
   cd ..
   scripts/fix_update_script_blanks
 
