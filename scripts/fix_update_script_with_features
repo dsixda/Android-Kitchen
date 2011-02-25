@@ -58,7 +58,7 @@ then
       export XLINK=$link
       export XSRC=$src
 
-      perl -pi -e 's/set_perm_recursive 0 0 0755 0644 SYSTEM:/symlink $ENV{"XSRC"} SYSTEM:xbin\/$ENV{"XLINK"}\nset_perm_recursive 0 0 0755 0644 SYSTEM:/' ../META-INF/com/google/android/update-script 
+      perl -pi -e 's/set_perm_recursive 0 0 0755 0644 SYSTEM:[ ]*$/symlink $ENV{"XSRC"} SYSTEM:xbin\/$ENV{"XLINK"}\nset_perm_recursive 0 0 0755 0644 SYSTEM:/' ../META-INF/com/google/android/update-script 
     done
 
   fi
