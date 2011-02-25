@@ -1,30 +1,81 @@
 
-if [ `ls | grep -m 1 WORKING_` ]
+found_working=`ls | grep -m 1 WORKING_` 
+
+if [ "$found_working" != "" ]
 then
-  echo "Any existing working folders under the main folder will be automatically"
-  echo "backed up to folder OLD_WORKING."
+
+  echo
+  echo "Before you proceed:"
+  echo "The existing working folders under the main folder can be backed up"
+  echo "to the folder called OLD_WORKING, otherwise they will be deleted."
+
+  echo
+  echo "Found the following:"
+  echo $found_working
+  echo
+  echo -n "Make backup? (default: y): "
+
+  read do_backup
+  echo
+
+  if [ "$do_backup" == "n" ]
+  then
+    echo "Removing ..."
+    rm -rf WORKING_* 2>/dev/null
+
+    if [ "$?" == "1" ]
+    then
+      exit 1
+    fi
+
+    if [ -d OLD_WORKING ]
+    then
+      echo
+      echo -n "Keep folder OLD_WORKING (y/n)? (default: n): "
+
+      read do_keep
+      echo
+
+      if [ "$do_keep" != "y" ]
+      then
+        echo "Removing ..."
+        rm -rf OLD_WORKING 2>/dev/null
+        if [ "$?" == "1" ]
+        then
+          echo "Warning: folder is in use, cannot delete."
+        fi
+      fi
+    fi
+
+
+  else
+
+    # Grab this value again, in case the user manually deleted the
+    # folder after he/she was prompted
+    found_working=`ls | grep -m 1 WORKING_` 
+
+    if [ "$found_working" != "" ]
+    then
+
+      #
+      # Make backup 
+      #
+
+      if [ -d OLD_WORKING ]
+      then
+        echo
+        echo "Found OLD_WORKING" 
+      else
+        echo
+        echo "Making folder OLD_WORKING ..."
+        mkdir OLD_WORKING
+      fi
+
+      echo "Moving old working folders to OLD_WORKING ..."
+      mv WORKING_* OLD_WORKING 2>/dev/null
+    fi
+  fi
+
 fi
 
 scripts/press_enter
-
-#
-# Make backup folder
-#
-
-if [ `ls | grep -m 1 WORKING_` ]
-then
-  if [ -d OLD_WORKING ]
-  then
-    echo
-    echo "Found OLD_WORKING" 
-  else
-    echo
-    echo "Making folder OLD_WORKING ..."
-    mkdir OLD_WORKING
-  fi
-
-  echo "Moving old working folders to OLD_WORKING ..."
-  mv WORKING_* OLD_WORKING 2>/dev/null
-
-fi
-
