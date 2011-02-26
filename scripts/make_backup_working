@@ -1,4 +1,6 @@
 
+scripts/press_enter
+
 found_working=`ls | grep -m 1 WORKING_` 
 
 if [ "$found_working" != "" ]
@@ -7,13 +9,13 @@ then
   echo
   echo "Before you proceed:"
   echo "The existing working folders under the main folder can be backed up"
-  echo "to the folder called OLD_WORKING, otherwise they will be deleted."
+  echo "to the folder OLD_WORKING; otherwise they will be deleted."
 
   echo
   echo "Found the following:"
   echo $found_working
   echo
-  echo -n "Make backup? (default: y): "
+  echo -n "Move to OLD_WORKING? (default: y): "
 
   read do_backup
   echo
@@ -76,6 +78,7 @@ then
     fi
   fi
 
+  echo
+
 fi
 
-scripts/press_enter
