@@ -92,6 +92,8 @@ cd META-INF/com/google/android
 
 cp update-script updater-script
 
+echo "- Initial formatting ..."
+
 sed -i \
 -e ':a;N;$!ba;s/,\n//g' \
 -e 's/copy_dir PACKAGE:system SYSTEM:/mount("MTD", "system", "\/system");\npackage_extract_dir("system", "\/system");/g' \
@@ -124,13 +126,20 @@ sed -i -e 's/write_raw_image PACKAGE:boot.img BOOT:/package_extract_file("boot.i
 #
 # radio.img
 #
-sed -i -e 's/write_radio_image PACKAGE:radio.img/package_extract_file("radio.img", "\/tmp\/radio.img");\nwrite_raw_image("\/tmp\/radio.img", "radio");\ndelete("\/tmp\/radio.img");/g' updater-script
+if [ `grep -c write_radio_image updater-script` -gt 0 ]
+then
+  echo "- Sorry, ignoring radio - unable to convert ..."
+  sed -i -e 's/write_radio_image PACKAGE:radio.img//g' updater-script
+fi
 
 #
 # hboot.img
 #
-sed -i -e 's/write_hboot_image PACKAGE:hboot.img/package_extract_file("hboot.img", "\/tmp\/hboot.img");\nwrite_raw_image("\/tmp\/hboot.img", "hboot");\ndelete("\/tmp\/hboot.img");/g' updater-script
-
+if [ `grep -c write_hboot_image updater-script` -gt 0 ]
+then
+  echo "- Sorry, ignoring hboot - unable to convert ..."
+  sed -i -e 's/write_hboot_image PACKAGE:hboot.img//g' updater-script
+fi
 
 #
 # set_perm_recursive
@@ -492,6 +501,9 @@ do
   fi
 
 done
+
+
+echo "- Final formatting ..."
 
 
 #
