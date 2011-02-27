@@ -1,4 +1,8 @@
- 
+if [ "$1" != "no_clear" ]
+then
+  clear
+fi
+
 temp=`ls WORKING_* 2>/dev/null`
 res=$?
 
@@ -6,6 +10,7 @@ if [ "$res" == "2" ]
 then
   echo
   echo "No working folder found!"
+  scripts/press_enter
   exit 1
 fi
 
@@ -16,6 +21,7 @@ then
   echo
   echo "META-INF/com/google/android/update-script not found!"
   cd ..
+  scripts/press_enter
   exit 1
 fi
 
@@ -26,11 +32,6 @@ scripts/fix_update_script_blanks
 # unexpectedly
 rm -f symlinks.log
 
-
-if [ "$1" != "no_clear" ]
-then
-  clear
-fi
 
 echo
 echo "Verification of META-INF/com/google/android/update-script"
