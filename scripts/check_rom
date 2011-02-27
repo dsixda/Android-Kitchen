@@ -28,12 +28,15 @@ then
   echo
   echo "Error: Old working folder is in use. Ensure its files or folders are not open."
 
-  dir_working=`ls OLD_WORKING`
-  if [ "$dir_working" == "" ]
-  then
-    echo
-    echo "Removing empty folder OLD_WORKING"
-    rmdir OLD_WORKING
+  if [ -d OLD_WORKING ]
+    then
+    dir_working=`ls OLD_WORKING`
+    if [ "$dir_working" == "" ]
+    then
+      echo
+      echo "Removing empty folder OLD_WORKING"
+      rmdir OLD_WORKING
+    fi
   fi
 
   scripts/press_enter
