@@ -29,7 +29,7 @@ echo
 echo "Searching for updates ..."
 
 notes=`scripts/get_latest_notes`
-latest_ver=`echo $notes | sed 's/Version \([0-9]*.[0-9]*\) .*/\1/g'`
+latest_ver=`echo $notes | sed -e 's/.*Version[ ]*\([0-9]*.[0-9]*\) .*/\1/g' -e 's/[ ]*//g'`
 
 curr_major=`echo $current_ver | sed 's/\([0-9]*\).[0-9]*/\1/'`
 curr_minor=`echo $current_ver | sed 's/[0-9]*.//'`
