@@ -171,6 +171,12 @@ then
     perl -pi -e 's/set_perm_recursive 0 2000 0755 0755 SYSTEM:xbin[ ]*$//g' META-INF/com/google/android/update-script
   fi
 
+
+  if [ ! -e system/etc/install-recovery.sh ]
+  then
+    perl -pi -e 's/set_perm 0 0 0544 SYSTEM:etc\/install-recovery.sh\n//g' META-INF/com/google/android/update-script
+  fi
+
   cd ..
   scripts/fix_update_script_blanks
 
