@@ -23,13 +23,33 @@ fi
 
 clear
 
-init_params=(FOREGROUND_APP_MEM VISIBLE_APP_MEM SECONDARY_SERVER_MEM HOME_APP_MEM HIDDEN_APP_MEM CONTENT_PROVIDER_MEM EMPTY_APP_MEM)   
+
+#
+# The memory variables changed in Gingerbread
+#
+
+list_type=old
+init_params=(FOREGROUND_APP_MEM VISIBLE_APP_MEM SECONDARY_SERVER_MEM HIDDEN_APP_MEM CONTENT_PROVIDER_MEM EMPTY_APP_MEM) 
+count_list="0 1 2 3 4 5"
+default_vals=(1536 2048 4096 5120 15360 25600)
+
+if [ `grep -c CONTENT_PROVIDER_MEM init.rc` == 0 ]
+then
+  if [ `grep -c PERCEPTIBLE_APP_MEM init.rc` -gt 0 ]
+  then
+    list_type=new
+    init_params=(FOREGROUND_APP_MEM VISIBLE_APP_MEM PERCEPTIBLE_APP_MEM HEAVY_WEIGHT_APP_MEM SECONDARY_SERVER_MEM HIDDEN_APP_MEM EMPTY_APP_MEM)   
+    count_list="0 1 2 3 4 5 6"
+    default_vals=(2048 3072 4096 4096 6144 7168 8192)
+  fi
+fi
+
 
 echo
 echo Currently:
 echo
 
-for i in 0 1 2 3 4 5 6
+for i in $count_list
 do
 
   init_param=${init_params[${i}]} 
@@ -63,15 +83,13 @@ echo
 echo "You will now be asked to change each of the values above.  If you "
 echo "want to enable the task killer tweak but are unsure of what values"
 echo "to use, then simply press Enter at the prompts and the script" 
-echo "will do it for you."
+echo "will try to do it for you."
 echo
 echo "Type x at any time if you want to cancel and exit.  None of the"
 echo "values will be saved if you cancel."
 echo
 
-default_vals=(1536 2048 4096 4096 5120 15360 25600)
-
-for i in 0 1 2 3 4 5 6
+for i in $count_list
 do
 
   if [ "${init_vals[${i}]}" == "?" ]
@@ -105,7 +123,7 @@ echo
 
 changes_made=0
 
-for i in 0 1 2 3 4 5 6
+for i in $count_list
 do
 
   if [ "${init_vals[${i}]}" == "?" ]
@@ -158,7 +176,7 @@ fi
 # Write to file
 #
 
-for i in 0 1 2 3 4 5 6
+for i in $count_list
 do
 
   if [ "${init_vals[${i}]}" == "?" ]
@@ -175,15 +193,24 @@ do
 
 done
 
-export VAL0=${read_vals[0]}
-export VAL1=${read_vals[1]}
-export VAL2=${read_vals[2]}
-export VAL3=${read_vals[3]}
-export VAL4=${read_vals[4]}
-export VAL5=${read_vals[5]}
-export VAL6=${read_vals[6]}
+if [ $list_type == old ]
+then
+  export VAL0=${read_vals[0]}
+  export VAL1=${read_vals[1]}
+  export VAL2=${read_vals[2]}
+  export VAL3=${read_vals[3]}
+  export VAL4=${read_vals[4]}
+  export VAL5=${read_vals[5]}
+else
+  export VAL0=${read_vals[0]}
+  export VAL1=${read_vals[1]}
+  export VAL2=${read_vals[2]}
+  export VAL3=${read_vals[4]}
+  export VAL4=${read_vals[5]}
+  export VAL5=${read_vals[6]}
+fi
 
-perl -pi -e 's/parameters\/minfree[^\n]*/parameters\/minfree $ENV{"VAL0"},$ENV{"VAL1"},$ENV{"VAL2"},$ENV{"VAL3"},$ENV{"VAL4"},$ENV{"VAL5"},$ENV{"VAL6"}/' init.rc
+  perl -pi -e 's/parameters\/minfree[^\n]*/parameters\/minfree $ENV{"VAL0"},$ENV{"VAL1"},$ENV{"VAL2"},$ENV{"VAL3"},$ENV{"VAL4"},$ENV{"VAL5"}/' init.rc
 
 if [ -e init.rc.bak ]
 then
@@ -196,7 +223,7 @@ echo
 echo Saved to file:
 echo
 
-for i in 0 1 2 3 4 5 6
+for i in $count_list
 do
 
   if [ "${init_vals[${i}]}" == "?" ]
