@@ -29,7 +29,7 @@ mkdir $build_dir
 echo "Copying $update_file to $build_dir ..."
 cp original_update/$update_file $build_dir
 
-echo "Renaming to UPDATA.APP ..."
+echo "Moving to destination folder as UPDATA.APP ..."
 cd $build_dir
 mv -f $update_file UPDATA.APP
 
