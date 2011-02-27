@@ -106,15 +106,29 @@ do
   sed -i \
     -e ''$line_num' s/assert(\(.*\));/\1;/g' \
     -e ''$line_num' s/^.*getprop.*;//g' \
-    -e ''$line_num' s/^.*install_radio.*;//g' \
-    -e ''$line_num' s/^.*install_hboot.*;//g' \
-    -e ''$line_num' s/)[ ]*/);\n/g' \
     temp.log
 
-  sed -i -e 's/^;$//g' temp.log
+  if [ -e ../../../../radio.img ]
+  then
+    sed -i -e ''$line_mum' s/^.*install_radio.*;/write_radio_image PACKAGE:radio.img/g' temp.log
+  else
+    sed -i -e ''$line_num' s/^.*install_radio.*;//g' temp.log
+  fi
+
+  if [ -e ../../../../hboot.img ]
+  then
+    sed -i -e ''$line_mum' s/^.*install_hboot.*;/write_hboot_image PACKAGE:hboot.img/g' temp.log
+  else
+    sed -i -e ''$line_num' s/^.*install_hboot.*;//g' temp.log
+  fi
+
+  sed -i \
+    -e ''$line_num' s/)[ ]*/);\n/g' \
+    -e 's/^;$//g' \
+    temp.log
+
   line_num=`grep -n -m 1 "assert(" temp.log | sed 's/:.*//g'`
 done
-
 
 
 #
