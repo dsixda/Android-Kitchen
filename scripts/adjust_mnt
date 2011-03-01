@@ -1,0 +1,78 @@
+#
+# This file has one mandatory argument:
+# $1 = updater-script/update-script
+#
+
+###############################
+# Device-specific mount points
+###############################
+
+if [ "$1" != "" ]
+then
+
+  device_name=`scripts/get_device_name`
+  cd WORKING_*
+  cd META-INF/com/google/android
+
+  if [ "$device_name" == "ace" ]
+  then
+    change_mnt=yes
+
+    param1=ext3
+    param2=EMMC
+    sys_mnt=\\\/dev\\\/block\\\/mmcblk0p25
+    cache_mnt=\\\/dev\\\/block\\\/mmcblk0p27
+    boot_mnt=\\\/dev\\\/block\\\/mmcblk0p22
+    data_mnt=\\\/dev\\\/block\\\/mmcblk0p26
+    sdcard_mnt=???
+
+  elif [ "$device_name" == "speedy" ]
+  then
+    change_mnt=yes
+
+    param1=ext3
+    param2=EMMC
+    sys_mnt=\\\/dev\\\/block\\\/mmcblk0p26
+    cache_mnt=\\\/dev\\\/block\\\/mmcblk0p28
+    boot_mnt=\\\/dev\\\/block\\\/mmcblk0p22
+    data_mnt=\\\/dev\\\/block\\\/mmcblk0p27
+    sdcard_mnt=\\\/dev\\\/block\\\/mmcblk1p1
+  fi
+
+  if [ "$change_mnt" == "yes" ]
+  then
+
+    if [ "$1" == "updater-script" ]
+    then
+
+      sed -i \
+        -e 's/format("MTD", "system")/format("'"$param1"'", "'"$param2"'", "'"$sys_mnt"'")/g' \
+        -e 's/format("MTD", "cache")/format("'"$param1"'", "'"$param2"'", "'"$cache_mnt"'")/g' \
+        -e 's/format("MTD", "boot")/format("'"$param1"'", "'"$param2"'", "'"$boot_mnt"'")/g' \
+        -e 's/format("MTD", "userdata")/format("'"$param1"'", "'"$param2"'", "'"$data_mnt"'")/g' \
+        -e 's/format("MTD", "sdcard")/format("'"$param1"'", "'"$param2"'", "'"$sdcard_mnt"'")/g' \
+        \
+        -e 's/mount("MTD", "system"/mount("'"$param1"'", "'"$param2"'", "'"$sys_mnt"'"/g' \
+        -e 's/mount("MTD", "cache"/mount("'"$param1"'", "'"$param2"'", "'"$cache_mnt"'"/g' \
+        -e 's/mount("MTD", "boot"/mount("'"$param1"'", "'"$param2"'", "'"$boot_mnt"'"/g' \
+        -e 's/mount("MTD", "userdata"/mount("'"$param1"'", "'"$param2"'", "'"$data_mnt"'"/g' \
+        -e 's/mount("MTD", "sdcard"/mount("'"$param1"'", "'"$param2"'", "'"$sdcard_mnt"'"/g' \
+        updater-script
+
+    elif [ "$1" == "update-script" ]
+    then
+
+      sed -i \
+        -e 's/format '"$param1"' '"$param2"' '"$sys_mnt"'/format SYSTEM:/g' \
+        -e 's/format '"$param1"' '"$param2"' '"$cache_mnt"'/format CACHE:/g' \
+        -e 's/format '"$param1"' '"$param2"' '"$boot_mnt"'/format BOOT:/g' \
+        -e 's/format '"$param1"' '"$param2"' '"$data_mnt"'/format DATA:/g' \
+        -e 's/format '"$param1"' '"$param2"' '"$data_mnt"'/format SDCARD:/g' \
+        update-script
+    fi
+
+  fi
+
+  cd ../../../../..
+
+fi
