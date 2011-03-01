@@ -1,6 +1,6 @@
 #!/bin/bash
  
-version=0.136
+version=0.137
 
 chmod 755 scripts/*
 scripts/check_install_dir
@@ -13,8 +13,7 @@ fi
 scripts/init_kitchen
 scripts/check_binaries
 
-result=$?
-if [ "$result" == "1" ]
+if [ "$?" == "1" ]
 then
   exit 0
 fi
