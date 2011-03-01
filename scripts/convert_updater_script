@@ -89,6 +89,13 @@ more updater-script \
 
 
 #
+# Replace tabs with spaces!
+#
+tr '\011' ' ' <temp.log >temp.log.new
+mv -f temp.log.new temp.log
+
+
+#
 # Remove comments
 #
 sed -i -e '/^#/d' temp.log
@@ -343,7 +350,6 @@ temp.log
 #
 # Patch up conversion issues
 #
-
 sed -i \
   -e 's/\/dataSYSTEM:/DATA:system\//g' \
   -e 's/DATA:SYSTEM:/DATA:system\//g' \
@@ -351,9 +357,11 @@ sed -i \
 temp.log
 
 
-# Remove blank lines
-sed -i -e '/^$/d' temp.log
 
+#
+# Remove blank lines
+#
+sed -i -e '/^$/d' temp.log
 
 
 #
@@ -362,6 +370,17 @@ sed -i -e '/^$/d' temp.log
 
 mv -f temp.log update-script
 rm -f temp.log.old
+
+
+#
+# Device-specific mount points
+#
+cd ../../../../..
+scripts/adjust_mnt update-script
+cd WORKING_*
+cd META-INF/com/google/android
+
+
 
 echo
 
