@@ -13,6 +13,16 @@ then
   exit 1
 else
   cd $base_dir
+
+  device_name=`scripts/get_device_name`
+
+  if [ "$device_name" == "ace" ] || [ "$device_name" == "speedy" ]
+  then
+    echo
+    echo "NOTE: This device ($device_name) requires an updater-script"
+    exit 1
+  fi
+
   exit 0
 fi
 
