@@ -97,18 +97,16 @@ cd META-INF/com/google/android
 
 cp update-script updater-script
 
+
+
+orig_list=( DATA SYSTEM CACHE SDEXT BOOT SDCARD )
+new_list=( userdata system cache sdext boot sdcard )
+new_list_str="0 1 2 3 4 5"
+
 echo "- Initial formatting ..."
 
 sed -i \
 -e ':a;N;$!ba;s/,\n//g' \
--e 's/copy_dir PACKAGE:system SYSTEM:/mount("MTD", "system", "\/system");\npackage_extract_dir("system", "\/system");/g' \
--e 's/copy_dir PACKAGE:data DATA:/mount("MTD", "userdata", "\/data");\npackage_extract_dir("data", "\/data");/g' \
--e 's/copy_dir PACKAGE:data SDCARD:/mount("MTD", "sdcard", "\/sdcard");\npackage_extract_dir("sdcard", "\/sdcard");/g' \
--e 's/copy_dir PACKAGE:\([^ ]*\) SYSTEM:/package_extract_dir("\1", "\/system");/g' \
--e 's/copy_dir PACKAGE:\([^ ]*\) DATA:/package_extract_dir("\1", "\/data");/g' \
--e 's/copy_dir PACKAGE:\([^ ]*\) SDCARD:/package_extract_dir("\1", "\/sdcard");/g' \
--e 's/copy_dir PACKAGE:\([^ ]*\) TMP:/package_extract_dir("\1", "\/tmp");/g' \
--e 's/copy_dir PACKAGE:\([^ ]*\) BOOT:/package_extract_dir("\1", "\/boot");/g' \
 -e 's/assert[^\n]*[\n]*//g' \
 updater-script
 
@@ -145,6 +143,47 @@ then
   echo "- Sorry, ignoring hboot - unable to convert ..."
   sed -i -e 's/write_hboot_image PACKAGE:hboot.img//g' updater-script
 fi
+
+
+#
+# copy_dir 
+#
+echo "- copy_dir ..."
+line_num=`grep -n -m 1 "copy_dir " updater-script | sed -e 's/:.*//g'`
+
+while [ "$line_num" != "" ]
+do
+  sed -i \
+    -e ''$line_num' s/copy_dir \(.*\)/package_extract_dir(\"\1\");/g' \
+    -e ''$line_num' s/ /", "/g' \
+    -e ''$line_num' s/PACKAGE://g' \
+    -e ''$line_num' s/SYSTEM:\([^)]*\))/\/system\/\1)/g' \
+    -e ''$line_num' s/DATA:\([^)]*\))/\/data\/\1)/g' \
+    -e ''$line_num' s/TMP:\([^)]*\))/\/tmp\/\1)/g' \
+    -e ''$line_num' s/SDCARD:\([^)]*\))/\/sdcard\/\1)/g' \
+    -e ''$line_num' s/BOOT:\([^)]*\))/\/boot\/\1)/g' \
+    updater-script
+
+  line_num=`grep -n -m 1 "copy_dir " updater-script | sed -e 's/:.*//g'`
+done
+
+# Add mount before it
+for i in $new_list_str
+do
+  new=${new_list[${i}]}
+
+  if [ "$new" == "userdata" ]
+  then
+    new2=data
+  else
+    new2=$new
+  fi
+
+  sed -i \
+    -e 's/package_extract_dir(\([^,]*\), "\/'"$new2"'\(.*\)")/mount("MTD", "'"$new"'", "\/'"$new2"'");\npackage_extract_dir(\1, "\/'"$new2"'\2")/g' \
+    updater-script
+done
+
 
 #
 # set_perm_recursive
@@ -345,10 +384,8 @@ done
 # format, mount
 #
 echo "- format and mount ..."
-orig_list=( DATA SYSTEM CACHE SDEXT BOOT SDCARD )
-new_list=( userdata system cache sdext boot sdcard )
 
-for i in 0 1 2 3 4 5
+for i in $new_list_str
 do
 
   orig=${orig_list[${i}]}
@@ -487,7 +524,7 @@ fi
 # unmount
 #
 echo "- unmount ..."
-for i in 0 1 2 3 4 5
+for i in $new_list_str
 do
 
   new=${new_list[${i}]}
