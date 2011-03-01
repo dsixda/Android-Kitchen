@@ -1,0 +1,24 @@
+
+cd WORKING_*
+cd system
+
+str=^ro.product.device=
+file_count=`grep -l $str *.prop | grep -c .prop`
+
+if [ $file_count == 0 ]
+then
+  device_name=UNKNOWN
+
+elif [ $file_count -gt 1 ]
+then
+  device_name="DEFINED $file_count TIMES"
+
+else
+  device_name=`grep -m 1 $str *.prop \
+            | sed 's/ro.product.device=//g' \
+            | sed 's/[^:]*://g'`
+fi
+
+cd ../..
+
+echo $device_name
