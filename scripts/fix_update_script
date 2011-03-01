@@ -163,7 +163,7 @@ then
   then
     perl -pi -e 's/set_perm_recursive 0 2000 0755 0644 SYSTEM:vendor//g' META-INF/com/google/android/update-script
     perl -pi -e 's/set_perm_recursive 0 0 0755 0644 SYSTEM:vendor\/firmware//g' META-INF/com/google/android/update-script
-    perl -pi -e 's/set_perm 0 2000 0755 SYSTEM:vendor\/firmware\//g' META-INF/com/google/android/update-script    
+    perl -pi -e 's/set_perm 0 2000 0755 SYSTEM:vendor\/firmware//g' META-INF/com/google/android/update-script    
   fi
 
   if [ ! -d system/xbin ]
