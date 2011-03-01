@@ -14,6 +14,13 @@ then
   cd WORKING_*
   cd META-INF/com/google/android
 
+
+  #
+  # Device definitions go here
+  # Ensure scripts/update_script_should_convert_back is also updated!
+  #
+
+  # Desire HD
   if [ "$device_name" == "ace" ]
   then
     change_mnt=yes
@@ -26,6 +33,7 @@ then
     data_mnt=\\\/dev\\\/block\\\/mmcblk0p26
     sdcard_mnt=???
 
+  # Evo Shift 4G    
   elif [ "$device_name" == "speedy" ]
   then
     change_mnt=yes
