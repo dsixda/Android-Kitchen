@@ -160,7 +160,6 @@ scripts/fix_update_script_with_features
 
 scripts/remove_recovery
 
-echo
 echo Listing of $build_dir:
 echo
 ls -l $build_dir
