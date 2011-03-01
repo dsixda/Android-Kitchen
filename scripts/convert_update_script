@@ -1,3 +1,8 @@
+#
+# This file has one optional argument:
+# $1 = "for_zip"
+#
+
 
 if [ "$1" == "" ]
 then
@@ -340,10 +345,10 @@ done
 # format, mount
 #
 echo "- format and mount ..."
-orig_list=( DATA SYSTEM CACHE SDEXT BOOT )
-new_list=( userdata system cache sdext boot )
+orig_list=( DATA SYSTEM CACHE SDEXT BOOT SDCARD )
+new_list=( userdata system cache sdext boot sdcard )
 
-for i in 0 1 2 3 4
+for i in 0 1 2 3 4 5
 do
 
   orig=${orig_list[${i}]}
@@ -482,35 +487,41 @@ fi
 # unmount
 #
 echo "- unmount ..."
-for i in 0 1 2 3 4
+for i in 0 1 2 3 4 5
 do
 
   new=${new_list[${i}]}
 
-  new2=$new
-  if [ "$new" == "userdata" ]
-  then
-    new2=data
-  fi
-
-  grep_mnt=`grep "mount(.* \"/$new2\");" updater-script`
+  grep_mnt=`grep "mount(.* \"/$new\");" updater-script`
 
   if [ "$grep_mnt" != "" ] 
   then
-    echo "unmount(\"/$new2\");" >> updater-script      
+    echo "unmount(\"/$new\");" >> updater-script      
   fi
 
 done
 
+#
+# Fix for systems with different mounts, e.g. ext3 types
+# e.g. 'userdata' is replaced by /dev/block/whatever
+#
+grep_mnt=`grep "mount(.* \"/data\");" updater-script`
+
+if [ "$grep_mnt" != "" ] 
+then
+  echo "unmount(\"/userdata\");" >> updater-script      
+fi
+
+
+
+
 
 echo "- Final formatting ..."
-
 
 #
 # Clean up any mess left by my script
 #
 sed -i -e 's/\/");/");/g' updater-script
-
 
 #
 # Remove blank lines
@@ -524,6 +535,15 @@ sed -i -e '/^$/d' updater-script
 # First line in a set of duplicate lines is kept, rest are deleted.
 #
 sed -i -e '$!N; /^\(.*\)\n\1$/!P; D' updater-script
+
+
+#
+# Device-specific mount points
+#
+cd ../../../../..
+scripts/adjust_mnt updater-script
+cd WORKING_*
+cd META-INF/com/google/android
 
 
 
