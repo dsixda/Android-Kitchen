@@ -1,10 +1,10 @@
 
 cd WORKING_*
-echo
 
 if [ -e META-INF/com/google/android/update-script ]
 then
 
+  echo
   cd META-INF/com/google/android
 
   #
