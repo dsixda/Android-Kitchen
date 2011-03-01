@@ -62,10 +62,23 @@ else
       echo "NOTE: radio.img was found in the working folder. If you wish to"
       echo "remove it, you may do so at any time before building the ROM."
     else
-      echo
-      echo "NOTE: If you wish to add radio.img, place it under the root of the"
-      echo "working folder.  When you build the ROM, the update-script will be"
-      echo "automatically modified to account for the presence of the radio.img."
+
+      if [ -e META-INF/com/google/android/update-script ]
+      then
+
+        cd ..
+        scripts/update_script_should_convert_back ignore_msg
+        res=$?
+        cd WORKING_*
+
+        if [ "$res" != "1" ]
+        then
+          echo
+          echo "NOTE: If you wish to add radio.img, place it under the root of the"
+          echo "working folder.  When you build the ROM, the update-script will be"
+          echo "automatically modified to account for the presence of the radio.img."
+        fi          
+      fi
     fi
 
     if [ -e boot.img ] 
