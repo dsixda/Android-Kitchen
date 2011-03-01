@@ -1,3 +1,9 @@
+#
+# This script has one optional argument:
+#
+# $1 = ignore_msg
+#
+
 
 base_dir=`pwd`
 cd WORKING_*
@@ -7,8 +13,13 @@ if [ "`grep package_extract_file update-script`" != "" ] || \
     [ "`grep TMP: update-script`" != "" ] || \
     [ "`grep \"format yaffs2\" update-script`" != "" ]
 then
-  echo
-  echo "NOTE: update-script must be converted to an updater-script before flashing"
+
+  if [ "$1" == "" ]
+  then
+    echo
+    echo "NOTE: update-script must be converted to an updater-script before flashing"
+  fi
+
   cd $base_dir
   exit 1
 else
@@ -18,8 +29,13 @@ else
 
   if [ "$device_name" == "ace" ] || [ "$device_name" == "speedy" ]
   then
-    echo
-    echo "NOTE: This device ($device_name) requires an updater-script"
+
+    if [ "$1" == "" ]
+    then
+      echo
+      echo "NOTE: This device ($device_name) requires an updater-script"
+    fi
+
     exit 1
   fi
 
