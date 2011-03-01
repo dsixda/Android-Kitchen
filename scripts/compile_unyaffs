@@ -8,20 +8,27 @@ fi
   
 if [ -e tools/unyaffs_files/$unyaffs_file ]
 then
-  echo Found $unyaffs_file
-else
-  echo "Compiling unyaffs ..."
-  cd tools/unyaffs_files
-  gcc -o unyaffs unyaffs.c
-  cd ../..
+  rm -f tools/unyaffs_files/$unyaffs_file
+fi
 
-  if [ -e tools/unyaffs_files/$unyaffs_file ]
-  then
-    echo unyaffs successfully compiled
-  else
-    echo "Error: unyaffs not successfully compiled!"
-    exit 1
-  fi
+scripts/check_yaffs_sizes
+
+if [ "$?" == "1" ]
+then
+  exit 1
+fi
+
+echo "Compiling unyaffs ..."
+cd tools/unyaffs_files
+gcc -o unyaffs unyaffs.c
+cd ../..
+
+if [ -e tools/unyaffs_files/$unyaffs_file ]
+then
+  echo unyaffs successfully compiled
+else
+  echo "Error: unyaffs not successfully compiled!"
+  exit 1
 fi
 
 exit 0
