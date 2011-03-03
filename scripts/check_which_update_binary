@@ -1,0 +1,22 @@
+
+cd WORKING_*
+cd META-INF/com/google/android
+
+grep_emmc=`grep -c "mount(\"ext3\", \"EMMC\"" updater-script`
+grep_ext3=`grep -c "mount(\"ext3\\"" updater-script`
+grep_mtd=`grep -c "mount(\"MTD\"" updater-script`
+
+echo
+echo "Copying update-binary ..."
+
+if [ $grep_emmc -gt 0 ]
+then
+  cp -vf ../../../../../tools/update_files/emmc-update-binary update-binary
+elif [ $grep_ext3 -gt 0 ]
+then
+  cp -vf ../../../../../tools/update_files/ext3-update-binary update-binary
+else
+  cp -vf ../../../../../tools/update_files/mtd-update-binary update-binary
+fi
+
+echo
