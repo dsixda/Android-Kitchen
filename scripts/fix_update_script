@@ -31,7 +31,10 @@ then
   symlinks=( $symlinks )
   source_files=( $source_files )
 
-  if [ "$symlinks" == "" ]
+  #
+  # Check if no symlinks found in ROM and update-script has no symlink entries
+  #
+  if [ "$symlinks" == "" ] && [ "`grep "symlink toolbox" ../META-INF/com/google/android/update-script`" == "" ]
   then
 
     echo "None detected"
@@ -81,10 +84,11 @@ then
 
 
   #
-  # If symlinks exist then add them to update-script
+  # Check if symlinks found in ROM
   #
 
-  else
+  elif [ "$symlinks" != "" ]
+  then
 
     echo "They will now be added to the update-script and removed from system/bin"
 
@@ -120,8 +124,9 @@ then
       perl -pi -e 's/set_perm_recursive 0 0 0755 0644 SYSTEM:[ ]*$/symlink $ENV{"SRC"} SYSTEM:bin\/$ENV{"LINK"}\nset_perm_recursive 0 0 0755 0644 SYSTEM:/' ../META-INF/com/google/android/update-script 
     done
 
+  else
+    echo "No symbolic links in ROM; they are found in update-script"
   fi
-
 
   cd ..
 
