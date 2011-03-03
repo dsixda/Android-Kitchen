@@ -42,20 +42,6 @@ then
   fi
 
 
-
-
-  #
-  # Remove the assert command for installing radio in OTA update
-  #
-
-  sed -i -e ':a;N;$!ba;s/,\n//g' -e 's/assert(htc.install_radio[^;]*[;]//' update-script
-
-  #
-  # Remove any "delete SYSTEM:bin...." lines in OTA update  
-  #
-
-  sed -i -e 's/delete SYSTEM:bin[^\n]*[\n]*//g' update-script
-
   cd ../../../../..
 
   scripts/fix_update_script_blanks
