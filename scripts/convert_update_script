@@ -124,7 +124,7 @@ sed -i -e '/^#/d' updater-script
 #
 # boot.img
 #
-sed -i -e 's/write_raw_image PACKAGE:boot.img BOOT:/package_extract_file("boot.img", "\/tmp\/boot.img");\nwrite_raw_image("\/tmp\/boot.img", "boot");\ndelete("\/tmp\/boot.img");/g' updater-script
+sed -i -e 's/write_raw_image PACKAGE:boot.img BOOT:/assert(package_extract_file("boot.img", "\/tmp\/boot.img"),\n       write_raw_image("\/tmp\/boot.img", "boot"),\n       delete("\/tmp\/boot.img"));/g' updater-script
 
 #
 # radio.img
@@ -529,24 +529,31 @@ do
 
   new=${new_list[${i}]}
 
+  if [ "$new" == "userdata" ]
+  then
+    new2=data
+  else
+    new2=$new
+  fi
+
   grep_mnt=`grep "mount(.* \"/$new\");" updater-script`
 
   if [ "$grep_mnt" != "" ] 
   then
-    echo "unmount(\"/$new\");" >> updater-script      
+    echo "unmount(\"/$new2\");" >> updater-script      
   fi
 
 done
 
 #
 # Fix for systems with different mounts, e.g. ext3 types
-# e.g. 'userdata' is replaced by /dev/block/whatever
+# e.g. 'userdata' was replaced by /dev/block/whatever
 #
 grep_mnt=`grep "mount(.* \"/data\");" updater-script`
 
 if [ "$grep_mnt" != "" ] 
 then
-  echo "unmount(\"/userdata\");" >> updater-script      
+  echo "unmount(\"/data\");" >> updater-script      
 fi
 
 
