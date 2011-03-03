@@ -3,7 +3,7 @@ cd WORKING_*
 cd META-INF/com/google/android
 
 grep_emmc=`grep -c "mount(\"ext3\", \"EMMC\"" updater-script`
-grep_ext3=`grep -c "mount(\"ext3\\"" updater-script`
+grep_ext3=`grep -c "mount(\"ext3\"" updater-script`
 grep_mtd=`grep -c "mount(\"MTD\"" updater-script`
 
 echo
