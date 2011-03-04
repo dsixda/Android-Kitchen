@@ -58,7 +58,6 @@ then
         -e 's/format("MTD", "cache")/format("'"$param1"'", "'"$param2"'", "'"$cache_mnt"'")/g' \
         -e 's/format("MTD", "boot")/format("'"$param1"'", "'"$param2"'", "'"$boot_mnt"'")/g' \
         -e 's/format("MTD", "userdata")/format("'"$param1"'", "'"$param2"'", "'"$data_mnt"'")/g' \
-        -e 's/format("MTD", "sdcard")/format("'"$param1"'", "'"$param2"'", "'"$sdcard_mnt"'")/g' \
         \
         -e 's/mount("MTD", "system"/mount("'"$param1"'", "'"$param2"'", "'"$sys_mnt"'"/g' \
         -e 's/mount("MTD", "cache"/mount("'"$param1"'", "'"$param2"'", "'"$cache_mnt"'"/g' \
@@ -75,9 +74,41 @@ then
         -e 's/format '"$param1"' '"$param2"' '"$cache_mnt"'/format CACHE:/g' \
         -e 's/format '"$param1"' '"$param2"' '"$boot_mnt"'/format BOOT:/g' \
         -e 's/format '"$param1"' '"$param2"' '"$data_mnt"'/format DATA:/g' \
-        -e 's/format '"$param1"' '"$param2"' '"$data_mnt"'/format SDCARD:/g' \
+        \
+        -e 's/format '"$param1"' '"$sys_mnt"'/format SYSTEM:/g' \
+        -e 's/format '"$param1"' '"$cache_mnt"'/format CACHE:/g' \
+        -e 's/format '"$param1"' '"$boot_mnt"'/format BOOT:/g' \
+        -e 's/format '"$param1"' '"$data_mnt"'/format DATA:/g' \
         update-script
     fi
+  fi
+
+
+  #
+  # Fix cases where a mount hasn't been fixed yet
+  #
+  # e.g.  If updater-script contains: 
+  #         mount("MTD", "userdata", "/data");
+  #       But the other mount entries in file look like:  
+  #         mount("yaffs2", "MTD", ...);
+  #
+  if [ "$1" == "updater-script" ]
+  then
+    
+    grep_list=( yaffs2 ext3 )
+
+    for str in ${grep_list[@]}
+    do
+      grep_result=`grep -c "^mount(\"$str\"" updater-script`
+
+      if [ $grep_result -gt 0 ]
+      then
+        sed -i \
+          -e 's/^mount("MTD"/mount("'"$str"'", "MTD"/g' \
+          updater-script
+        break
+      fi
+    done
 
   fi
 
