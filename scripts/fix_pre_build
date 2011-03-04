@@ -9,9 +9,12 @@ then
 
   cd ..
   exit 0
+
 elif [ -e META-INF/com/google/android/updater-script ]
 then
+
   cd ..
+  scripts/check_which_update_binary
   exit 0
 fi
 
