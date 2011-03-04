@@ -594,24 +594,10 @@ cd META-INF/com/google/android
 if [ -e updater-script ]
 then
 
-  if [ -e update-binary.orig ]
-  then
-    echo
-    echo "Copying original update-binary ..."
-    cp -vf update-binary.orig update-binary
-    echo
-
-  elif [ -e update-binary ]
-  then
-    echo
-    echo "Using existing update-binary"
-    echo
-  else
-    cd ../../../../..
-    scripts/check_which_update_binary
-    cd WORKING_*
-    cd META-INF/com/google/android
-  fi    
+  cd ../../../../..
+  scripts/check_which_update_binary
+  cd WORKING_*
+  cd META-INF/com/google/android
 
   echo
   echo "-------------------------------------------------------------------"
