@@ -2,21 +2,60 @@
 cd WORKING_*
 cd META-INF/com/google/android
 
-grep_emmc=`grep -c "mount(\"ext3\", \"EMMC\"" updater-script`
-grep_ext3=`grep -c "mount(\"ext3\"" updater-script`
-grep_mtd=`grep -c "mount(\"MTD\"" updater-script`
-
-echo
-echo "Copying update-binary ..."
-
-if [ $grep_emmc -gt 0 ]
+if [ -e update-binary.orig ]
 then
-  cp -vf ../../../../../tools/update_files/emmc-update-binary update-binary
-elif [ $grep_ext3 -gt 0 ]
+  echo
+  echo "Copying original update-binary"
+  cp -vf update-binary.orig update-binary
+
+elif [ -e update-binary ]
 then
-  cp -vf ../../../../../tools/update_files/ext3-update-binary update-binary
+  echo
+  echo "Using existing update-binary"
+  echo
+
 else
-  cp -vf ../../../../../tools/update_files/mtd-update-binary update-binary
+
+  grep_emmc=`grep -c "mount(.*,.*,.*,.*)" updater-script`
+  grep_ext3=`grep -c "mount(\"ext3\"" updater-script`
+  grep_mtd=`grep -c "mount(\"MTD\"" updater-script`
+
+  echo
+  echo "Copying update-binary ..."
+
+  if [ $grep_emmc -gt 0 ]
+  then
+
+    #
+    # Four args for mount
+    #
+    # e.g. mount("ext3", "EMMC", "/dev/block/mmcblk0p26", "/data");
+    # e.g. mount("yaffs2", "MTD", "userdata", "/data");
+    #
+    cp -vf ../../../../../tools/update_files/emmc-update-binary update-binary
+
+  elif [ $grep_ext3 -gt 0 ]
+  then
+
+    #
+    # Three args for mount, but no MTD or assert
+    #
+    # mount("ext3", "/dev/block/mmcblk0p25", "/system");
+    #
+    cp -vf ../../../../../tools/update_files/ext3-update-binary update-binary
+
+  else
+
+    #
+    # Three arguments, can use MTD and assert 
+    #
+    # e.g. mount("MTD", "userdata", "/data");
+    #
+    cp -vf ../../../../../tools/update_files/mtd-update-binary update-binary
+  fi
+
+  echo
+
 fi
 
-echo
+cd ../../../../..
