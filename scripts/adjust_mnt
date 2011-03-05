@@ -49,22 +49,55 @@ then
 
   if [ "$change_mnt" == "yes" ]
   then
-
     if [ "$1" == "updater-script" ]
     then
-
       sed -i \
         -e 's/format("MTD", "system")/format("'"$param1"'", "'"$param2"'", "'"$sys_mnt"'")/g' \
         -e 's/format("MTD", "cache")/format("'"$param1"'", "'"$param2"'", "'"$cache_mnt"'")/g' \
         -e 's/format("MTD", "boot")/format("'"$param1"'", "'"$param2"'", "'"$boot_mnt"'")/g' \
         -e 's/format("MTD", "userdata")/format("'"$param1"'", "'"$param2"'", "'"$data_mnt"'")/g' \
         \
+        -e 's/format("'"$param1"'", "MTD", "system")/format("'"$param1"'", "'"$sys_mnt"'")/g' \
+        -e 's/format("'"$param1"'", "MTD", "cache")/format("'"$param1"'", "'"$cache_mnt"'")/g' \
+        -e 's/format("'"$param1"'", "MTD", "boot")/format("'"$param1"'", "'"$boot_mnt"'")/g' \
+        -e 's/format("'"$param1"'", "MTD", "userdata")/format("'"$param1"'", "'"$data_mnt"'")/g' \
+        \
         -e 's/mount("MTD", "system"/mount("'"$param1"'", "'"$param2"'", "'"$sys_mnt"'"/g' \
         -e 's/mount("MTD", "cache"/mount("'"$param1"'", "'"$param2"'", "'"$cache_mnt"'"/g' \
         -e 's/mount("MTD", "boot"/mount("'"$param1"'", "'"$param2"'", "'"$boot_mnt"'"/g' \
         -e 's/mount("MTD", "userdata"/mount("'"$param1"'", "'"$param2"'", "'"$data_mnt"'"/g' \
         -e 's/mount("MTD", "sdcard"/mount("'"$param1"'", "'"$param2"'", "'"$sdcard_mnt"'"/g' \
+        \
+        -e 's/mount("'"$param1"'", "MTD", "system"/mount("'"$param1"'", "'"$sys_mnt"'"/g' \
+        -e 's/mount("'"$param1"'", "MTD", "cache"/mount("'"$param1"'", "'"$cache_mnt"'"/g' \
+        -e 's/mount("'"$param1"'", "MTD", "boot"/mount("'"$param1"'", "'"$boot_mnt"'"/g' \
+        -e 's/mount("'"$param1"'", "MTD", "userdata"/mount("'"$param1"'", "'"$data_mnt"'"/g' \
+        -e 's/mount("'"$param1"'", "MTD", "sdcard"/mount("'"$param1"'", "'"$sdcard_mnt"'"/g' \
         updater-script
+
+      #
+      # Fix cases where some formats/mounts have different numbers of args in the same file
+      #
+      # e.g.  format ext3 SYSTEM:
+      #       format DATA:
+      #
+
+      mount_four_args=`grep "^mount" updater-script | grep -c $param2`
+      mount_all=`grep -c "^mount" updater-script`
+
+      if [ $mount_all -gt $mount_four_args ] && [ $mount_four_args -gt 0 ]
+      then
+        sed -i -e 's/mount("'"$param1"'", "'"$param2"'",/mount("'"$param1"'",/g' updater-script
+      fi
+
+      fmt_three_args=`grep "^format" updater-script | grep -c $param2`
+      fmt_all=`grep -c "^format" updater-script`
+
+      if [ $fmt_all -gt $fmt_three_args ] && [ $fmt_three_args -gt 0 ]
+      then
+        sed -i -e 's/format("'"$param1"'", "'"$param2"'",/format("'"$param1"'",/g' updater-script
+      fi
+
 
     elif [ "$1" == "update-script" ]
     then
@@ -75,10 +108,10 @@ then
         -e 's/format '"$param1"' '"$param2"' '"$boot_mnt"'/format BOOT:/g' \
         -e 's/format '"$param1"' '"$param2"' '"$data_mnt"'/format DATA:/g' \
         \
-        -e 's/format '"$param1"' '"$sys_mnt"'/format SYSTEM:/g' \
-        -e 's/format '"$param1"' '"$cache_mnt"'/format CACHE:/g' \
-        -e 's/format '"$param1"' '"$boot_mnt"'/format BOOT:/g' \
-        -e 's/format '"$param1"' '"$data_mnt"'/format DATA:/g' \
+        -e 's/format '"$param1"' '"$sys_mnt"'/format '"$param1"' SYSTEM:/g' \
+        -e 's/format '"$param1"' '"$cache_mnt"'/format '"$param1"' CACHE:/g' \
+        -e 's/format '"$param1"' '"$boot_mnt"'/format '"$param1"' BOOT:/g' \
+        -e 's/format '"$param1"' '"$data_mnt"'/format '"$param1"' DATA:/g' \
         update-script
     fi
   fi
