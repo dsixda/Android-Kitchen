@@ -1,22 +1,49 @@
-cd WORKING_*
-cd system
+#
+# This script has two optional arguments:
+#
+# $1 = folder where the image is located
+# $2 = image name (e.g. data.img or system.img)
+#
+# If not specified, then script assumes system.img in working folder
+#
+
+base_dir=`pwd`
+
+if [ "$1" == "" ]
+then
+  cd WORKING_*
+  cd system
+
+  image_file=system.img 
+
+else
+
+  if [ "$2" == "" ]
+  then
+    echo "Error: Image file not specified"
+    exit 1
+  fi
+
+  cd $1
+  image_file=$2
+fi
 
 #
 # Check for chunk size and then calculate spare size
 #
 
-hex_chunk=`od -x -A x system.img | grep -m 1 "1000 [ ]*0000 [ ]*0001 [ ]*0000 [ ]*0000 [ ]*0000 [ ]*ffff [ ]*0000" | sed -e 's/ .*//'`
+hex_chunk=`od -x -A x $image_file | grep -m 1 "1000 [ ]*0000 [ ]*0001 [ ]*0000 [ ]*0000 [ ]*0000 [ ]*ffff [ ]*0000" | sed -e 's/ .*//'`
+
+cd $base_dir
 
 if [ "$hex_chunk" != "" ]
 then
   dec_chunk=`printf "%d" 0x$hex_chunk`
-  echo "Chunk size is $dec_chunk bytes in system.img"
+  echo "Chunk size is $dec_chunk bytes in $image_file"
 
   # Spare size
   dec_spare=$(($dec_chunk/32))
   echo "Spare size calculated to be $dec_spare bytes"
-
-  cd ../..
 
   echo "Setting unyaffs.c line 20"
   sed -i -e '20s/.*/#define CHUNK_SIZE '$dec_chunk'/' tools/unyaffs_files/unyaffs.c
@@ -26,7 +53,7 @@ then
   exit 0
 
 else
-  echo "Error: Cannot detect chunk size in system.img"
+  echo "Error: Cannot detect chunk size in $image_file"
   cd ../..
   exit 1
 fi

@@ -65,7 +65,7 @@ then
     unyaffs_file=unyaffs
   fi
     
-  scripts/compile_unyaffs
+  scripts/compile_unyaffs $img_dir data.img
   if [ "$?" == "1" ]
   then
     exit 0

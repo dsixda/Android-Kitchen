@@ -1,3 +1,11 @@
+#
+# This script has two optional arguments:
+#
+# $1 = folder where the image is located
+# $2 = image name (e.g. data.img or system.img)
+#
+# If not specified, then script assumes system.img in working folder
+#
 
 if [ `uname | grep CYGWIN` ]
 then
@@ -11,7 +19,7 @@ then
   rm -f tools/unyaffs_files/$unyaffs_file
 fi
 
-scripts/check_yaffs_sizes
+scripts/check_yaffs_sizes $1 $2
 
 if [ "$?" == "1" ]
 then
