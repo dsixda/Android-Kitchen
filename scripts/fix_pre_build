@@ -216,7 +216,7 @@ then
 
 else
 
-  if [ "`grep -c "symlink toolbox SYSTEM:bin/reboot" META-INF/com/google/android/update-script`" == "0" ] 
+  if [ "`grep -c "symlink toolbox SYSTEM:bin/reboot" META-INF/com/google/android/update-script`" == "0" ] && [ -e system/bin/toolbox ]
   then
     echo "/system/bin/reboot not present in ROM."  
     echo "Modifying update-script so that the symlink is created ..."
