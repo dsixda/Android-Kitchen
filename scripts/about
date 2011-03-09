@@ -89,13 +89,21 @@ else
     url=https://github.com/dsixda/Android-Kitchen/zipball/$latest_ver
 
     wget --no-check-certificate $url -O $new_file
+    echo
 
-    if [ -e $new_file ]
+    #Not supported on Mac?
+    #zip_size=`stat -c %s $new_file`
+
+    ls_size=`ls -l $new_file`
+    grep_empty=`echo $ls_size | grep -c " 0 "`
+    
+    if [ -e $new_file ] && [ $grep_empty == 0 ]
     then
       echo "$new_file successfully downloaded"
       echo "You must unzip this file to use the new kitchen"
     else
       echo "Error: $new_file was not downloaded"
+      rm -f $new_file
     fi
   fi
 fi
