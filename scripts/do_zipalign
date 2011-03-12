@@ -1,14 +1,24 @@
-clear
-echo
+#
+# This file has two optional arguments:
+#
+# $1 = "for_build"
+# $2 = yes/no (ignore prompt) - relies on $1 being present
+#
 
-if [ -d WORKING_* ]
+
+if [ "$1" != "for_build" ]
 then
-  echo Found working folder
-else
-  echo No working folder found!
-  exit 0
-fi
+  clear
+  echo
 
+  if [ -d WORKING_* ]
+  then
+    echo Found working folder
+  else
+    echo No working folder found!
+    exit 0
+  fi
+fi
 
 if [ `uname | grep CYGWIN` ]
 then
@@ -28,21 +38,35 @@ else
 fi
 
 
-clear
+if [ "$1" == "for_build" ]
+then
 
-echo
-echo "---------------------------------------------------------------"
-echo  
-echo "Zipalign is a procedure that will optimize all of the *.apk"
-echo "files under your working folder for better RAM utilization."
-echo
-echo "Use this as the *final step* before building your ROM."
-echo 
-echo "---------------------------------------------------------------"
-echo
+  if [ "$2" == "no" ]
+  then
+    echo
+    echo -n "Do you wish to zipalign all APK files (y/n)? (default: y): "
+    read do_zipalign
+  fi    
 
-echo -n "Proceed with zipalign (y/n)? (default: y): "
-read do_zipalign
+else
+  clear
+
+  echo
+  echo "---------------------------------------------------------------"
+  echo  
+  echo "Zipalign is a procedure that will optimize all of the *.apk"
+  echo "files under your working folder for better RAM utilization."
+  echo
+  echo "The option to zipalign all *.apk files will also be asked when"
+  echo "you build your ROM, so it is not necessary to zipalign now."
+  echo 
+  echo "---------------------------------------------------------------"
+  echo
+
+  echo -n "Proceed with zipalign (y/n)? (default: y): "
+  read do_zipalign
+fi
+
 
 if [ "$do_zipalign" == "n" ]
 then
@@ -72,6 +96,6 @@ done
 
 cd ..
 echo
-echo "Finished"
+echo "Finished zipaligning"
 
 
