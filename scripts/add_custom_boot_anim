@@ -1,6 +1,28 @@
 
 clear
 
+echo
+echo "----------------------------------------------------------------"
+echo  
+echo "This option allows you to use a custom boot animation in place"
+echo "of the default one."
+echo 
+echo "After enabling this option, your boot animation should be copied"
+echo "under the /data/local folder as 'bootanimation.zip'."
+echo
+echo "----------------------------------------------------------------"
+echo
+
+echo -n "Proceed (y/n)? (default: y): "
+read do_install
+
+if [ "$do_install" == "n" ]
+then
+  exit 0
+fi
+
+echo 
+
 if [ -d WORKING_* ]
 then
   echo
