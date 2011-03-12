@@ -54,8 +54,6 @@ else
     cp -vf ../../../../../tools/update_files/mtd-update-binary update-binary
   fi
 
-  echo
-
 fi
 
 cd ../../../../..
