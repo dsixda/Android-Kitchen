@@ -1,6 +1,7 @@
 #
-# This file has one optional argument:
+# This file has two optional arguments:
 # $1 = "for_zip"
+# $2 = yes/no (express build mode) - relies on $1 being present
 #
 
 
@@ -602,10 +603,14 @@ then
   echo
   echo "-------------------------------------------------------------------"
   echo
-  echo "An updater-script has been created under META-INF/com/google/android of"
-  echo "your working folder.  Please review it and make any necessary changes."
-  echo "An update-binary has also been added."
-  echo ""
+
+  if [ "$2" != "yes" ]
+  then
+    echo "An updater-script has been created under META-INF/com/google/android of"
+    echo "your working folder.  Please review it and make any necessary changes."
+    echo "An update-binary has also been added."
+    echo ""
+  fi      
 
   if [ "$1" != "for_zip" ]
   then
@@ -613,8 +618,12 @@ then
     echo "The original update-script has been renamed to update-script.orig -"
     echo "it will not be included in your completed ROM's ZIP file."
   else
-    echo "DO NOT delete any of the files under META-INF/com/google/android."
-    echo
+
+    if [ "$2" == "no" ]
+    then
+      echo "DO NOT delete any of the files under META-INF/com/google/android."
+      echo
+    fi      
   fi
 
   grep_fmt=`grep -n "^format(" updater-script`
