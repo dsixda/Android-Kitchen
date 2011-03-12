@@ -41,6 +41,11 @@ rm -f sh.exe.stackdump
 #
 find . -name '*.DS_Store' -type f -delete
 
+#
+# Cleanup stackdump files
+#
+find . -name sh.exe.stackdump -type f -delete
+
 
 #
 # Clean up strange temp file issue in root of working folder
@@ -97,6 +102,35 @@ echo
 
 scripts/fix_pre_build
 
+
+echo
+echo "======================================================="
+echo
+echo "Select a build option:"
+echo
+echo "  1 = Interactive Mode"
+echo "      (Guide me through the build)"
+echo
+echo "  2 = Express Mode - Advanced users only!"
+echo "      (Automatically zipalign, Edify, don't sign ROM)"
+echo
+echo "======================================================="
+echo
+echo -n "Number (default: 1): "
+
+read build_mode
+
+if [ "$build_mode" == "2" ]
+then
+  express=yes
+else
+  express=no
+fi
+
+
+scripts/do_zipalign for_build $express
+
+
 cd WORKING_*
 
 #
@@ -114,10 +148,17 @@ else
   zip -r -y -q update * -x *.cvs* *.git* *.svn* \
       *updater-script.orig* *update-binary.orig* *update-script.orig*
 fi      
-echo
-echo update.zip created 
+
 echo
 
+if [ -e update.zip ]
+then
+  echo update.zip created 
+  echo
+else
+  echo "Error: update.zip not created!"
+  exit 0
+fi
 
 
 #
@@ -132,7 +173,7 @@ then
   auto_convert="$?"
   cd WORKING_*
   
-  if [ "$auto_convert" == "1" ]
+  if [ "$auto_convert" == "1" ] || [ "$express" == "yes" ]
   then 
     convert_it=y
   else
@@ -156,24 +197,30 @@ then
   then
 
     cd ..
-    scripts/convert_update_script for_zip
+    scripts/convert_update_script for_zip $express
 
     if [ "$?" != "1" ]
     then
 
       cd WORKING_*
 
-      echo "Proceed with the change (y/n)?"
-      echo 
-      echo "  y = Proceed; updater-script and update-binary will be moved to the ZIP"
-      echo "      file; update-script in ZIP file will be removed but will remain in"
-      echo "      working folder."
-      echo "  n = Cancel; updater-script and update-binary will be deleted and not"
-      echo "      used."
-      echo
-       
-      echo -n "? (default: y): "
-      read proceed_change 
+      if [ "$express" == "yes" ]
+      then
+        proceed_change=y
+      else
+        echo "Proceed with the change (y/n)?"
+        echo 
+        echo "  y = Proceed; updater-script and update-binary will be moved to the ZIP"
+        echo "      file; update-script in ZIP file will be removed but will remain in"
+        echo "      working folder."
+        echo "  n = Cancel; updater-script and update-binary will be deleted and not"
+        echo "      used."
+        echo
+         
+        echo -n "? (default: y): "
+        read proceed_change 
+      fi
+
       echo
 
       if [ "$proceed_change" != "n" ]
@@ -223,25 +270,34 @@ fi
 
 
 #
-# Sign update.zip
+# Sign update.zip if necessary
 #
 
 date_str=`date '+%m%d%y_%H%M%S'`
-signed_file=signed_$date_str.zip
 
-echo Signing update.zip as $signed_file ...
+if [ "$express" == "yes" ]
+then
+  final_file=unsigned_$date_str.zip
+  mv -v update.zip $final_file
+  echo
 
-cp ../tools/signapk_files/testkey.* .
-cp ../tools/signapk_files/signapk.jar .
+else
 
-java -jar signapk.jar testkey.x509.pem testkey.pk8 update.zip $signed_file
+  final_file=signed_$date_str.zip
 
-rm -f testkey.*
-rm -f signapk.jar
-rm -f update.zip
+  echo Signing update.zip as $final_file ...
 
+  cp ../tools/signapk_files/testkey.* .
+  cp ../tools/signapk_files/signapk.jar .
 
-if [ -e $signed_file ] && [ "$?" == "0" ]
+  java -jar signapk.jar testkey.x509.pem testkey.pk8 update.zip $final_file
+
+  rm -f testkey.*
+  rm -f signapk.jar
+  rm -f update.zip
+fi
+
+if [ -e $final_file ] && [ "$?" == "0" ]
 then
 
   #
@@ -255,47 +311,56 @@ then
     mkdir ../OUTPUT_ZIP
   fi
 
-  mv $signed_file ../OUTPUT_ZIP/
+  mv $final_file ../OUTPUT_ZIP/
 
   echo
   echo
   echo "==========================================================="
   echo
   echo "Congratulations, your ROM is here:"
-  echo "OUTPUT_ZIP/$signed_file" 
+  echo "OUTPUT_ZIP/$final_file" 
   echo
   echo "Copy this to your device and flash from recovery menu."
   echo 
   echo "Remember to do a wipe if necessary!"
 
+  if [ "$express" == "yes" ]
+  then
+    echo
+    echo "PLEASE NOTE: You will need to disable signature checks in"
+    echo "the recovery menu to flash this ROM!"
+  fi
+
 else 
 
   echo
-  echo "Was not able to create $signed_file!"
+  echo "Was not able to create $final_file!"
   echo
 
-  if [ `uname | grep Linux` ] 
+  if [ "$express" == "no" ]
   then
-    echo "Ensure you have a recent version of the Sun Java JDK"
-  
-  elif [ `uname | grep CYGWIN` ]
-  then
-    echo "Ensure you have the Sun Java JDK installed on your PC." 
-    echo
-    echo "If you already have the JDK, then perhaps the path to java.exe was"
-    echo "not defined properly:"
-    echo 
-    echo "e.g.  In $HOME/.bash_profile, add to the end:"
-    echo "      PATH=/cygdrive/c/Program\ Files/Java/jdk1.6.0_18/bin:\${PATH}" 
-    echo 
-    echo "      The above is an example. Your path may be different."
+    if [ `uname | grep Linux` ] 
+    then
+      echo "Ensure you have a recent version of the Sun Java JDK"
+    
+    elif [ `uname | grep CYGWIN` ]
+    then
+      echo "Ensure you have the Sun Java JDK installed on your PC." 
+      echo
+      echo "If you already have the JDK, then perhaps the path to java.exe was"
+      echo "not defined properly:"
+      echo 
+      echo "e.g.  In $HOME/.bash_profile, add to the end:"
+      echo "      PATH=/cygdrive/c/Program\ Files/Java/jdk1.6.0_18/bin:\${PATH}" 
+      echo 
+      echo "      The above is an example. Your path may be different."
 
-  elif [ `sw_vers | grep -o Mac` ]
-  then
-    echo "You may need to install SoyLatte for Mac OS X (to replace the standard "
-    echo "Java JDK)"
+    elif [ `sw_vers | grep -o Mac` ]
+    then
+      echo "You may need to install SoyLatte for Mac OS X (to replace the standard "
+      echo "Java JDK)"
+    fi
   fi
-
 fi
 
 cd ..
