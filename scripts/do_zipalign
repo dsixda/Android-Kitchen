@@ -2,7 +2,7 @@
 # This file has two optional arguments:
 #
 # $1 = "for_build"
-# $2 = yes/no (ignore prompt) - relies on $1 being present
+# $2 = yes/no (ignore prompt) - relies on $1 being present, default=yes
 #
 
 
@@ -44,7 +44,7 @@ then
   if [ "$2" == "no" ]
   then
     echo
-    echo -n "Do you wish to zipalign all APK files (y/n)? (default: y): "
+    echo -n "Would you like to optimize the APK files by zipaligning them (y/n)? (default: y): "
     read do_zipalign
   fi    
 
@@ -79,18 +79,62 @@ cd WORKING_*
 
 grep_cmd=`find . | grep .apk$ | sort -f`
 
+name1=
+
 for filename in $grep_cmd
 do
-  echo "Zipaligning $filename ..."
+
+  #
+  # Handle spaces in file names
+  #
+  if [ "`echo $filename | grep .apk$`" == "" ]
+  then
+
+    if [ "$name1" == "" ]
+    then
+      name1=$filename
+    else
+      name1="$name1 $filename"
+    fi
+
+    continue
+
+  elif [ "$name1" != "" ]
+  then
+
+    # Replace space with underscore temporarily
+    name2=$filename
+    original_name="$name1 $name2"
+    filename=`echo $original_name | tr ' ' '_'`
+    mv "$name1 $name2" $filename
+    found_space=yes
+    echo "Zipaligning $original_name ..."
+
+  else
+    found_space=no
+    echo "Zipaligning $filename ..."
+  fi
+
   new_file=$filename\_new
   ../tools/zipalign_files/$zipalign_file 4 $filename $new_file
 
   if [ -e $new_file ]
   then
-    mv -f $new_file $filename 
+
+    if [ "$found_space" == "yes" ]
+    then
+      mv -f $new_file "$name1 $name2"
+      rm -f $filename
+
+    else
+      mv -f $new_file $filename 
+    fi
+
   else
     echo "Error: Unable to zipalign"
   fi
+
+  name1=
 
 done
 
