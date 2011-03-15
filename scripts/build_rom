@@ -157,6 +157,7 @@ then
   echo
 else
   echo "Error: update.zip not created!"
+  cd ..
   exit 0
 fi
 
