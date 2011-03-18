@@ -113,6 +113,8 @@ echo "      (Guide me through the build)"
 echo
 echo "  2 = Express Mode - Advanced users only!"
 echo "      (Automatically zipalign, Edify, don't sign ROM)"
+echo 
+echo "  3 = Cancel - Don't build now"
 echo
 echo "======================================================="
 echo
@@ -120,11 +122,15 @@ echo -n "Number (default: 1): "
 
 read build_mode
 
-if [ "$build_mode" == "2" ]
+if [ "$build_mode" == "1" ]
 then
-  express=yes
-else
   express=no
+elif [ "$build_mode" == "2" ]
+then
+  express=yes 
+else
+  echo "Cancelled"
+  exit 0
 fi
 
 
