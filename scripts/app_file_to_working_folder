@@ -31,7 +31,11 @@ cp original_update/$update_file $build_dir
 
 echo "Moving to destination folder as UPDATA.APP ..."
 cd $build_dir
-mv -f $update_file UPDATA.APP
+
+if [ "$update_file" != "UPDATA.APP" ]
+then
+  mv -f $update_file UPDATA.APP
+fi  
 
 echo
 echo "Extracting system.img and boot.img using ZeBadger's script ..."
