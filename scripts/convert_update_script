@@ -201,6 +201,7 @@ do
     -e ''$line_num' s/SYSTEM:\([^)]*\))/\"\/system\/\1\")/g' \
     -e ''$line_num' s/DATA:\([^)]*\))/\"\/data\/\1\")/g' \
     -e ''$line_num' s/TMP:\([^)]*\))/\"\/tmp\/\1\")/g' \
+    -e ''$line_num' s/CACHE:\([^)]*\))/\"\/cache\/\1\")/g' \
     updater-script
 
   line_num=`grep -n -m 1 "set_perm_recursive " updater-script | sed -e 's/:.*//g'`
@@ -221,6 +222,7 @@ do
     -e ''$line_num' s/SYSTEM:\([^)]*\))/\"\/system\/\1\")/g' \
     -e ''$line_num' s/DATA:\([^)]*\))/\"\/data\/\1\")/g' \
     -e ''$line_num' s/TMP:\([^)]*\))/\"\/tmp\/\1\")/g' \
+    -e ''$line_num' s/CACHE:\([^)]*\))/\"\/cache\/\1\")/g' \
     updater-script
 
   line_num=`grep -n -m 1 "set_perm " updater-script | sed -e 's/:.*//g'`
