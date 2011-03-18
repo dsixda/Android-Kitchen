@@ -4,6 +4,12 @@ if [ "`find . -name a2sd`" != "" ] || [ "`find . -type d -name sd`" != "" ]
 then
   cd ..
   exit 1
+
+elif [ -d system/etc/init.d ] && [ "`find system/etc/init.d -name *apps2sd*`" != "" ]
+then
+  cd ..
+  exit 1
+  
 else
   cd ..
   exit 0
