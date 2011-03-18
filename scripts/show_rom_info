@@ -392,7 +392,7 @@ echo " Rooted (unsecured boot.img)    : $unsecure_status"
 echo " Rooted (Superuser.apk + su)    : $su_status"
 echo " BusyBox installed              : $bb_status"
 echo " BusyBox run-parts support      : $runparts_status"
-echo " Apps2SD enabled                : $apps2sd_status" 
+echo " Apps2SD (Apps to EXT) enabled  : $apps2sd_status" 
 
 if [ "$is_old" == "1" ]; then
 echo " Wireless tethering installed   : $tether_status"
