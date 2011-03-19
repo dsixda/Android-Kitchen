@@ -1,12 +1,5 @@
 
 clear
-if [ ! -d WORKING_* ]
-then
-  echo No working folder found!
-  scripts/press_enter
-  exit 0
-fi
-
 
 while :
 do
@@ -20,29 +13,34 @@ do
   echo "Enter a choice:"
   echo 
 
-  if [ -d BOOT-EXTRACTED ] 
+  if [ -d WORKING_* ]
   then
-    echo "  b = Build boot.img from BOOT-EXTRACTED folder (for working folder)"
-    echo "  n = Build NAND's boot folder from BOOT-EXTRACTED (for working folder)"
-    echo "  r = Remove BOOT-EXTRACTED folder (don't build anything)"
-  else
-    
-    cd WORKING_*
 
-    if [ -e boot.img ]
+    if [ -d BOOT-EXTRACTED ] 
     then
-      echo "  w = Extract kernel+ramdisk from boot.img"
-      echo "  c = Convert boot.img into NAND boot folder"
+      echo "  b = Build boot.img from BOOT-EXTRACTED folder (for working folder)"
+      echo "  n = Build NAND's boot folder from BOOT-EXTRACTED (for working folder)"
+      echo "  r = Remove BOOT-EXTRACTED folder (don't build anything)"
+    else
+      
+      cd WORKING_*
 
-    elif [ -d boot ]
-    then
-      echo "  y = Convert NAND boot folder into boot.img"
-      echo "  z = Extract kernel+ramdisk (regular format) from NAND boot folder"
+      if [ -e boot.img ]
+      then
+        echo "  w = Extract kernel+ramdisk from boot.img"
+        echo "  c = Convert boot.img into NAND boot folder"
+
+      elif [ -d boot ]
+      then
+        echo "  y = Convert NAND boot folder into boot.img"
+        echo "  z = Extract kernel+ramdisk (regular format) from NAND boot folder"
+      fi
+
+      cd ..
+
     fi
-
-    cd ..
-
   fi
+
   echo "  a = Extract kernel+ramdisk (regular format) from boot.img in any folder"
   echo "  x = Exit"
   echo
