@@ -18,7 +18,8 @@ if [ -e boot.img ]
 then
 
   cd ..
-  scripts/check_kernel_offset
+  scripts/check_bootimg_header $boot_dir
+  scripts/check_kernel_offset $boot_dir
   res=$?
 
   if [ "$res" == "0" ]
