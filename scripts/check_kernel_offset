@@ -1,10 +1,26 @@
-if [ ! -d WORKING_* ]
+#
+# This script has one optional parameter:
+#
+# $1 = folder name
+#
+
+
+base_dir=`pwd`
+
+if [ "$1" == "" ]
 then
-  echo Working folder not found!
-  exit 0
+  if [ ! -d WORKING_* ]
+  then
+    echo Working folder not found!
+    exit 0
+  fi
+
+  cd WORKING_*
+
+else
+  cd $1
 fi
 
-cd WORKING_*
 
 echo
 
@@ -20,28 +36,28 @@ then
     echo "Kernel found at offset $dec_offset in boot.img"
 
     echo "Setting mkbootimg.c line 74"
-    sed -i -e '74s/.*/static unsigned char padding\['$dec_offset'\] = { 0, };/' ../tools/mkboot/mkbootimg.c
+    sed -i -e '74s/.*/static unsigned char padding\['$dec_offset'\] = { 0, };/' $base_dir/tools/mkboot/mkbootimg.c
     echo "Setting mkbootimg.c line 107"
-    sed -i -e '107s/.*/    unsigned pagesize = '$dec_offset';/' ../tools/mkboot/mkbootimg.c
+    sed -i -e '107s/.*/    unsigned pagesize = '$dec_offset';/' $base_dir/tools/mkboot/mkbootimg.c
 
     echo "Setting extract-kernel.pl line 23"
-    sed -i -e '23s/.*/$pageSize = '$dec_offset';/' ../tools/extract_boot_files/extract-kernel.pl
+    sed -i -e '23s/.*/$pageSize = '$dec_offset';/' $base_dir/tools/extract_boot_files/extract-kernel.pl
 
     echo "Setting extract-ramdisk.pl line 23"
-    sed -i -e '23s/.*/$pageSize = '$dec_offset';/' ../tools/extract_boot_files/extract-ramdisk.pl
+    sed -i -e '23s/.*/$pageSize = '$dec_offset';/' $base_dir/tools/extract_boot_files/extract-ramdisk.pl
 
-    cd ..
+    cd $base_dir
     exit 0
 
   else
     echo "Error: kernel offset not found in boot.img!"
-    cd ..
+    cd $base_dir
     exit 1
   fi
 
 else
-  echo "boot.img not found under working folder!"
-  cd ..
+  echo "boot.img not found!"
+  cd $base_dir
   exit 1
 fi
 
