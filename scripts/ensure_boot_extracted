@@ -27,12 +27,8 @@ then
     if [ -e boot.img ]
     then
 
-      echo Making folder 'BOOT-EXTRACTED' ...
-      mkdir ../BOOT-EXTRACTED
-
-      cp boot.img ../BOOT-EXTRACTED/
-      
       cd ..
+      scripts/check_bootimg_header
       scripts/check_kernel_offset
       res=$?
 
@@ -41,10 +37,15 @@ then
         kernel_file=extract-kernel.pl
         ramdisk_file=extract-ramdisk.pl
       else
-        rm -rf BOOT-EXTRACTED
         exit 0
       fi
 
+      echo Making folder 'BOOT-EXTRACTED' ...
+      cd WORKING_*
+      mkdir ../BOOT-EXTRACTED
+      cp boot.img ../BOOT-EXTRACTED/
+      
+      cd ..
       cp tools/extract_boot_files/$kernel_file BOOT-EXTRACTED/extract-kernel.pl
       cp tools/extract_boot_files/$ramdisk_file BOOT-EXTRACTED/extract-ramdisk.pl
       cd BOOT-EXTRACTED
