@@ -57,14 +57,18 @@ rm -f $update_file
 # Check for system.img and boot.img
 #
 
-if [ "`find . -maxdepth 1 | grep .img | grep -c system_*.img`" == "1" ]
+echo
+
+if [ "`find . -maxdepth 1 | grep .img | grep -c system_`" == "1" ]
 then
-  mv system_*.img system.img
+  mv -v system_*.img system.img
 fi 
 
-if [ "`find . -maxdepth 1 | grep .img | grep -c boot_*.img`" == "1" ]
+rm -vf hboot*.img
+
+if [ "`find . -maxdepth 1 | grep .img | grep -c boot_`" == "1" ]
 then
-  mv boot_*.img boot.img
+  mv -v boot_*.img boot.img
 fi 
 
 
