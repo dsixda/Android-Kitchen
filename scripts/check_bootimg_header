@@ -1,5 +1,17 @@
-cd WORKING_*
-echo
+#
+# This script has one optional parameter:
+#
+# $1 = folder name
+#
+
+base_dir=`pwd`
+
+if [ "$1" == "" ]
+then
+  cd WORKING_*
+else
+  cd $1
+fi
 
 #
 # Check for strange boot.img header
@@ -9,6 +21,8 @@ check_header=`od -A n -h -j 0 -N 8 boot.img | sed 's/ //g'`
 
 if [ "$check_header" != "4e415244494f2144" ]
 then
+
+  echo
   echo "Android header not found at start of boot.img"
 
   # Mac OS X adds extra spaces between the numbers!
@@ -38,4 +52,5 @@ then
 fi
 
 
-cd ..
+cd $base_dir
+
