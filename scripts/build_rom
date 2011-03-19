@@ -122,15 +122,16 @@ echo -n "Number (default: 1): "
 
 read build_mode
 
-if [ "$build_mode" == "1" ]
+# Default is 1, so remember to account for Enter key
+if [ "$build_mode" == "3" ]
 then
-  express=no
+  echo "Cancelled"
+  exit 0
 elif [ "$build_mode" == "2" ]
 then
   express=yes 
 else
-  echo "Cancelled"
-  exit 0
+  express=no
 fi
 
 
