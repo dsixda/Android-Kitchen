@@ -30,9 +30,10 @@ then
   echo 
   echo " PLEASE FOLLOW INSTRUCTIONS BELOW TO EXTRACT FILES FROM $img_file:"
   echo 
-  echo " 1) Ignore the 'Cannot Read Disk' warning if it appears"
+  echo " 1) Ignore the 'Cannot Read Disk' warning dialog (press 'OK') if it"
+  echo "    appears"
   echo 
-  echo " 2) In Ext2Explore, use 'File->Open Image' to load this file:"
+  echo " 2) When Ext2Explore appears, use 'File->Open Image' to open:"
   echo "    $dos_path\\$img_file"
   echo
   echo " 3) After it loads, right-click on the new icon displayed in the left"
