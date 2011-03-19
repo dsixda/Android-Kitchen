@@ -26,24 +26,26 @@ then
 
   dos_path=`cygpath -wp $img_dir`
 
-  echo "####################################################################"
+  echo "#####################################################################"
   echo 
   echo " PLEASE FOLLOW INSTRUCTIONS BELOW TO EXTRACT FILES FROM $img_file:"
   echo 
-  echo " 1) In Explore2fs, use 'File->Open Image File' to load $img_file"
-  echo "    under $dos_path"
-  echo
-  echo " 2) After it loads, right-click on the hard disk icon on the left"
-  echo "    frame, and select Export Directory"
-  echo
-  echo " 3) Select $dos_path"
-  echo
-  echo " 4) Wait for extraction to finish and then close Explore2fs"
+  echo " 1) Ignore the 'Cannot Read Disk' warning if it appears"
   echo 
-  echo "####################################################################"
+  echo " 2) In Ext2Explore, use 'File->Open Image' to load this file:"
+  echo "    $dos_path\\$img_file"
+  echo
+  echo " 3) After it loads, right-click on the new icon displayed in the left"
+  echo "    frame, and select Save"
+  echo
+  echo " 4) Select $dos_path"
+  echo
+  echo " 5) Wait for extraction to finish and then close Ext2Explore"
+  echo 
+  echo "#####################################################################"
   echo
 
-  tools/explore2fs_windows/explore2fs.exe &
+  tools/ext2read_windows/ext2explore.exe &
 
   echo 
   echo ">>>> PERFORM THE STEPS ABOVE BEFORE PRESSING ENTER! <<<<"
