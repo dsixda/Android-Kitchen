@@ -1,4 +1,4 @@
-scripts/ensure_boot_extracted dont_clear
+scripts/ensure_boot_extracted no_clear
 
 if [ -d BOOT-EXTRACTED ]
 then

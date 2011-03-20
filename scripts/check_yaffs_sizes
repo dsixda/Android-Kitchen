@@ -1,5 +1,5 @@
 #
-# This script has two optional arguments:
+# This script has two optional parameters:
 #
 # $1 = folder where the image is located
 # $2 = image name (e.g. data.img or system.img) - required if $1 defined
