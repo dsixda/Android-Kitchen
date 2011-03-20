@@ -2,7 +2,7 @@
 # This script has two optional arguments:
 #
 # $1 = folder where the image is located
-# $2 = image name (e.g. data.img or system.img)
+# $2 = image name (e.g. data.img or system.img) - required if $1 defined
 #
 # If not specified, then script assumes system.img in working folder
 #
@@ -12,6 +12,14 @@ base_dir=`pwd`
 if [ "$1" == "" ]
 then
   cd WORKING_*
+
+  if [ ! -e system/system.img ]
+  then
+    echo "Error: system.img not found in working folder"
+    cd ..
+    exit 1
+  fi
+
   cd system
 
   image_file=system.img 
@@ -26,6 +34,7 @@ else
 
   cd $1
   image_file=$2
+  
 fi
 
 #
@@ -45,10 +54,19 @@ then
   dec_spare=$(($dec_chunk/32))
   echo "Spare size calculated to be $dec_spare bytes"
 
-  echo "Setting unyaffs.c line 20"
-  sed -i -e '20s/.*/#define CHUNK_SIZE '$dec_chunk'/' tools/unyaffs_files/unyaffs.c
-  echo "Setting unyaffs.c line 21"
-  sed -i -e '21s/.*/#define SPARE_SIZE '$dec_spare'/' tools/unyaffs_files/unyaffs.c
+  str=`sed '20q;d' tools/unyaffs_files/unyaffs.c`
+  if [ "$str" != "#define CHUNK_SIZE $dec_chunk" ]
+  then
+    echo "Setting chunk size = $dec_chunk in unyaffs.c, line 20"
+    sed -i -e '20s/.*/#define CHUNK_SIZE '$dec_chunk'/' tools/unyaffs_files/unyaffs.c
+  fi
+
+  str=`sed '21q;d' tools/unyaffs_files/unyaffs.c`
+  if [ "$str" != "#define SPARE_SIZE $dec_spare" ]
+  then
+    echo "Setting spare size = $dec_spare in unyaffs.c, line 21"
+    sed -i -e '21s/.*/#define SPARE_SIZE '$dec_spare'/' tools/unyaffs_files/unyaffs.c
+  fi
 
   exit 0
 
