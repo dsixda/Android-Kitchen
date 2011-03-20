@@ -1,3 +1,8 @@
+#
+# This script has one optional parameter:
+#
+# $1 = if set to 'no_clear' then it won't clear at start
+#
 
 if [ "$1" == "" ]
 then
@@ -68,7 +73,7 @@ then
       if [ -e boot/initrd.gz ] && [ -e boot/zImage ]
       then
         cd ..
-        scripts/ensure_nand_extracted
+        scripts/ensure_nand_extracted $1
 
       else
         echo "Error: boot.img not found!"
