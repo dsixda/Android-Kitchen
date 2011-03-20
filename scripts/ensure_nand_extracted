@@ -1,3 +1,8 @@
+#
+# This script has one optional parameter:
+#
+# $1 = if set to 'no_clear' then it won't clear at start
+#
 
 if [ "$1" == "" ]
 then
@@ -9,11 +14,8 @@ scripts/prompt_remove_boot_extracted
 if [ ! -d BOOT-EXTRACTED ]
 then
 
-  if [ -d WORKING_* ]
+  if [ ! -d WORKING_* ]
   then
-    echo
-    echo "Working folder found"
-  else
     echo
     echo "Working folder not found, you will need to create one!"
     exit 0
