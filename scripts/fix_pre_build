@@ -194,6 +194,12 @@ else
     echo "Modifying update-script to remove syntax for flashing boot.img ..."
     sed -i -e '/ BOOT:[ ]*$/d' META-INF/com/google/android/update-script
   fi
+
+  if [ "`grep -c "copy_dir PACKAGE:boot BOOT:" META-INF/com/google/android/update-script`" != "0" ] && [ ! -d boot ]
+  then
+    echo "Removing entry in update-script for /boot folder ..."
+    sed -i -e '/copy_dir PACKAGE:boot BOOT:/d' META-INF/com/google/android/update-script
+  fi   
 fi
 
 
