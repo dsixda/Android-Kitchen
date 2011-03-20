@@ -1,0 +1,27 @@
+
+model=`scripts/get_product_model`
+
+echo
+echo "ro.product.model=$model"
+echo
+
+if [ "$model" == "HTC HD2" ]
+then
+  kernel_offset=2048
+  kernel_base=0x11800000
+  cmd_line="no_console_suspend=0"
+
+else
+  echo "Warning: Model not defined in kitchen. Using default values!"
+  kernel_offset=2048
+  kernel_base=0x11800000
+  cmd_line="no_console_suspend=0"
+fi
+
+echo "Hard-coding:"
+echo "- kernel offset in boot.img = $kernel_offset"
+echo "- kernel base address       = $kernel_base"
+echo "- command line parameter    = $cmd_line"
+
+scripts/build_boot_img $kernel_offset $kernel_base $cmd_line
+

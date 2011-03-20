@@ -1,0 +1,73 @@
+
+nand=false
+
+cd WORKING_*
+if [ -e boot.img ]
+then
+
+  cd ..
+  cmd_line=`scripts/get_cmdline`
+
+  if [ "$cmd_line" == "dsixda NAND" ]
+  then
+    nand=true
+    original_type=boot.img
+  fi
+
+elif [ -d boot ] && [ -e boot/initrd.gz ] && [ -e boot/zImage ]
+then
+  nand=true
+  original_type="boot folder"
+  cd ..
+
+else
+  cd ..
+fi
+
+
+if [ "$nand" == "true" ]
+then
+
+  echo
+  echo "NAND ROM detected (checked $original_type).  Choose a number:"
+  echo
+  echo "  1 = Build ROM with /boot folder (e.g. for MAGLDR bootloader)"
+  echo "  2 = Build ROM with boot.img     (e.g. For cLK bootloader)"
+  echo
+  echo -n "? (default=1) "
+
+  read enter_option
+  echo
+
+  #
+  # Use /boot folder in ROM
+  #
+  if [ "$enter_option" != "2" ]
+  then
+
+    if [ "$original_type" == "boot.img" ]
+    then
+      echo "Converting boot.img to a boot folder ..."
+      scripts/ensure_boot_extracted no_clear
+      scripts/build_nand_boot
+    else
+      echo "The /boot folder already exists, no changes required"
+    fi
+
+  #
+  # Use boot.img in ROM
+  #
+  else
+    echo "Converting boot.img to a proper boot.img for flashing ..."
+    scripts/ensure_boot_extracted no_clear
+    scripts/build_boot_img_for_nand
+  fi
+
+fi
+
+
+
+
+
+
+
