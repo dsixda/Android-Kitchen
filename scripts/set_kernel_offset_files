@@ -1,0 +1,45 @@
+#
+# This script has one mandatory parameter:
+#
+# $1 = kernel offset (in decimal format)
+#
+
+dec_offset=$1
+
+if [ "$dec_offset" == "" ]
+then
+  echo "Error: No offset specified"
+  exit 1
+fi
+
+str=`sed '74q;d' tools/mkboot/mkbootimg.c`
+if [ "$str" != "static unsigned char padding[$dec_offset] = { 0, };" ]
+then
+  echo "Setting offset=$dec_offset in mkbootimg.c, line 74"
+  sed -i -e '74s/.*/static unsigned char padding\['$dec_offset'\] = { 0, };/' tools/mkboot/mkbootimg.c
+fi  
+
+str=`sed '107q;d' tools/mkboot/mkbootimg.c`
+if [ "$str" != "    unsigned pagesize = $dec_offset;" ]
+then
+  echo "Setting offset=$dec_offset in mkbootimg.c, line 107"
+  sed -i -e '107s/.*/    unsigned pagesize = '$dec_offset';/' tools/mkboot/mkbootimg.c
+fi
+
+str=`sed '23q;d' tools/extract_boot_files/extract-kernel.pl`
+if [ "$str" != "\$pageSize = $dec_offset;" ]
+then
+  echo "Setting offset=$dec_offset in extract-kernel.pl, line 23"
+  sed -i -e '23s/.*/$pageSize = '$dec_offset';/' tools/extract_boot_files/extract-kernel.pl
+fi
+
+str=`sed '23q;d' tools/extract_boot_files/extract-ramdisk.pl`
+if [ "$str" != "\$pageSize = $dec_offset;" ]
+then
+  echo "Setting offset=$dec_offset in extract-ramdisk.pl, line 23"
+  sed -i -e '23s/.*/$pageSize = '$dec_offset';/' tools/extract_boot_files/extract-ramdisk.pl
+fi
+
+exit 0
+
+
