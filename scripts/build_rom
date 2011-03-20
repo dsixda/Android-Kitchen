@@ -75,21 +75,9 @@ do
 done
 
 
-if [ -e boot.img ]
-then
-  cd ..
-  cmd_line=`scripts/get_cmdline`
-
-  if [ "$cmd_line" == "dsixda NAND" ]
-  then
-    echo
-    echo "NAND ROM detected, converting boot.img back to boot folder ..."
-    scripts/ensure_boot_extracted no_clear
-    scripts/build_nand_boot
-  fi
-
-  cd WORKING_*
-fi
+cd ..
+scripts/prompt_nand_type
+cd WORKING_*
 
 
 echo
