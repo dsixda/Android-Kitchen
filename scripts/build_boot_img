@@ -1,3 +1,11 @@
+#
+# This script has three optional parameters:
+#
+# $1 = kernel offset in boot.img (in decimal)
+# $2 = kernel base offset (in hexadecimal, e.g. 0x200000; needs $1 defined)
+# $3 = command line (needs $1 and $2 defined)
+#
+
 echo
 
 if [ -d BOOT-EXTRACTED ]
@@ -27,8 +35,6 @@ else
 fi
 
 
-
-
 if [ -d WORKING_* ]
 then
   echo Working folder found
@@ -39,40 +45,67 @@ fi
 
 
 
-
-cd WORKING_*
-
-if [ -e boot.img ] 
+if [ "$1" == "" ]
 then
- 
-  cd ..
-  scripts/check_kernel_offset
-  res=$?
 
-  if [ "$res" != "0" ]
+  #
+  # Determine the kernel offset to be used in the new boot.img, 
+  # based on the current boot.img or /boot folder.
+  #
+
+  cd WORKING_*
+
+  if [ -e boot.img ] 
   then
-    exit 0
+   
+    cd ..
+    scripts/check_kernel_offset
+    res=$?
+
+    if [ "$res" != "0" ]
+    then
+      exit 0
+    fi
+    
+
+  else
+
+    if [ ! -e boot/initrd.gz ] || [ ! -e boot/zImage ]
+    then
+      echo "boot.img not found under working folder!"
+      cd ..
+      exit 0
+    else
+
+      # Using a fake base address and command line to create the boot.img, since
+      # we don't have a boot.img and are using the NAND method; boot.img won't 
+      # be in final NAND ROM.
+
+      base=0x11800000     
+      cmd_line="dsixda NAND"
+
+      cd ..
+    fi
   fi
-  
 
 else
 
-  if [ ! -e boot/initrd.gz ] || [ ! -e boot/zImage ]
+  #
+  # Using hard-coded values 
+  #
+
+  scripts/set_kernel_offset_files $1
+
+  if [ "$2" != "" ]
   then
-    echo "boot.img not found under working folder!"
-    cd ..
-    exit 0
-  else
-
-    # Using a fake base address and command line to create the boot.img, since
-    # we don't have a boot.img and are using the NAND method; boot.img won't 
-    # be in final NAND ROM.
-
-    base=0x200000
-    cmd_line="dsixda NAND"
-
-    cd ..
+    base=$2
+    
+    if [ "$3" != "" ]
+    then
+      cmd_line=$3
+    fi
   fi
+
 fi
 
 
@@ -157,23 +190,31 @@ echo Building ramdisk-boot ...
 #
 
 cd ..
-echo
-
 cd WORKING_*
 
 if [ -e boot.img ]
 then
-  echo "Attempting to determine kernel base address ..."
 
-  base_temp=`od -A n -h -j 34 -N 2 boot.img | sed 's/ //g'`
-  zeros=0000
-  base=0x$base_temp$zeros
+  echo
+
+  if [ "$base" == "" ]
+  then
+    echo "Attempting to determine kernel base address ..."
+
+    base_temp=`od -A n -h -j 34 -N 2 boot.img | sed 's/ //g'`
+    zeros=0000
+    base=0x$base_temp$zeros
+  fi
 
   echo "Using base address of $base"
 
-  echo "Attempting to determine command line parameter ..."
   cd ..
-  cmd_line=`scripts/get_cmdline`
+
+  if [ "$cmd_line" == "" ]
+  then
+    echo "Attempting to determine command line parameter ..."
+    cmd_line=`scripts/get_cmdline`
+  fi
 
   if [ "$cmd_line" == "" ]
   then
