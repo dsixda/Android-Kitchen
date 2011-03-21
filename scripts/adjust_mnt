@@ -45,34 +45,77 @@ then
     boot_mnt=\\\/dev\\\/block\\\/mmcblk0p22
     data_mnt=\\\/dev\\\/block\\\/mmcblk0p27
     sdcard_mnt=\\\/dev\\\/block\\\/mmcblk1p1
+
+  # Samsung Nexus S
+  elif [ "$device_name" == "crespo" ]
+  then
+    change_mnt=yes
+
+    param1=ext4
+    param2=EMMC
+
+    param1_cache=yaffs2
+    param2_cache=MTD
+
+    param1_sdcard=vfat
+    param2_sdcard=MTD
+
+    sys_mnt=\\\/dev\\\/block\\\/platform\\\/s3c-sdhci.0\\\/by-name\\\/system
+    cache_mnt=\\\/dev\\\/block\\\/mtdblock4
+    boot_mnt=???
+    data_mnt=\\\/dev\\\/block\\\/platform\\\/s3c-sdhci.0\\\/by-name\\\/userdata
+    sdcard_mnt=\\\/dev\\\/block\\\/vold\\\/179:3
   fi
 
   if [ "$change_mnt" == "yes" ]
   then
+
+    if [ "$param1_cache" == "" ]
+    then
+      param1_cache=$param1
+    fi
+    if [ "$param2_cache" == "" ]
+    then
+      param2_cache=$param2
+    fi
+    if [ "$param1_sdcard" == "" ]
+    then
+      param1_sdcard=$param1
+    fi
+    if [ "$param2_sdcard" == "" ]
+    then
+      param2_sdcard=$param2
+    fi
+
+
+    #
+    # updater-script
+    #
+
     if [ "$1" == "updater-script" ]
     then
       sed -i \
         -e 's/format("MTD", "system")/format("'"$param1"'", "'"$param2"'", "'"$sys_mnt"'")/g' \
-        -e 's/format("MTD", "cache")/format("'"$param1"'", "'"$param2"'", "'"$cache_mnt"'")/g' \
+        -e 's/format("MTD", "cache")/format("'"$param1_cache"'", "'"$param2_cache"'", "'"$cache_mnt"'")/g' \
         -e 's/format("MTD", "boot")/format("'"$param1"'", "'"$param2"'", "'"$boot_mnt"'")/g' \
         -e 's/format("MTD", "userdata")/format("'"$param1"'", "'"$param2"'", "'"$data_mnt"'")/g' \
         \
         -e 's/format("'"$param1"'", "MTD", "system")/format("'"$param1"'", "'"$sys_mnt"'")/g' \
-        -e 's/format("'"$param1"'", "MTD", "cache")/format("'"$param1"'", "'"$cache_mnt"'")/g' \
+        -e 's/format("'"$param1_cache"'", "MTD", "cache")/format("'"$param1_cache"'", "'"$cache_mnt"'")/g' \
         -e 's/format("'"$param1"'", "MTD", "boot")/format("'"$param1"'", "'"$boot_mnt"'")/g' \
         -e 's/format("'"$param1"'", "MTD", "userdata")/format("'"$param1"'", "'"$data_mnt"'")/g' \
         \
         -e 's/mount("MTD", "system"/mount("'"$param1"'", "'"$param2"'", "'"$sys_mnt"'"/g' \
-        -e 's/mount("MTD", "cache"/mount("'"$param1"'", "'"$param2"'", "'"$cache_mnt"'"/g' \
+        -e 's/mount("MTD", "cache"/mount("'"$param1_cache"'", "'"$param2_cache"'", "'"$cache_mnt"'"/g' \
         -e 's/mount("MTD", "boot"/mount("'"$param1"'", "'"$param2"'", "'"$boot_mnt"'"/g' \
         -e 's/mount("MTD", "userdata"/mount("'"$param1"'", "'"$param2"'", "'"$data_mnt"'"/g' \
-        -e 's/mount("MTD", "sdcard"/mount("'"$param1"'", "'"$param2"'", "'"$sdcard_mnt"'"/g' \
+        -e 's/mount("MTD", "sdcard"/mount("'"$param1_sdcard"'", "'"$param2_sdcard"'", "'"$sdcard_mnt"'"/g' \
         \
         -e 's/mount("'"$param1"'", "MTD", "system"/mount("'"$param1"'", "'"$sys_mnt"'"/g' \
-        -e 's/mount("'"$param1"'", "MTD", "cache"/mount("'"$param1"'", "'"$cache_mnt"'"/g' \
+        -e 's/mount("'"$param1_cache"'", "MTD", "cache"/mount("'"$param1_cache"'", "'"$cache_mnt"'"/g' \
         -e 's/mount("'"$param1"'", "MTD", "boot"/mount("'"$param1"'", "'"$boot_mnt"'"/g' \
         -e 's/mount("'"$param1"'", "MTD", "userdata"/mount("'"$param1"'", "'"$data_mnt"'"/g' \
-        -e 's/mount("'"$param1"'", "MTD", "sdcard"/mount("'"$param1"'", "'"$sdcard_mnt"'"/g' \
+        -e 's/mount("'"$param1_sdcard"'", "MTD", "sdcard"/mount("'"$param1_sdcard"'", "'"$sdcard_mnt"'"/g' \
         updater-script
 
       #
@@ -83,33 +126,64 @@ then
       #
 
       mount_four_args=`grep "^mount" updater-script | grep -c $param2`
+      if [ "$param2_cache" != "$param2" ]
+      then
+        mount_four_args2=`grep "^mount" updater-script | grep -c $param2_cache`
+      else
+        mount_four_args2=0
+      fi
+      if [ "$param2_sdcard" != "$param2" ]
+      then
+        mount_four_args3=`grep "^mount" updater-script | grep -c $param2_sdcard`
+      else
+        mount_four_args3=0
+      fi
+      mount_four_args_total=$(($mount_four_args+$mount_four_args2+$mount_four_args3))
       mount_all=`grep -c "^mount" updater-script`
 
-      if [ $mount_all -gt $mount_four_args ] && [ $mount_four_args -gt 0 ]
+
+      if [ $mount_all -gt $mount_four_args_total ] && [ $mount_four_args_total -gt 0 ]
       then
-        sed -i -e 's/mount("'"$param1"'", "'"$param2"'",/mount("'"$param1"'",/g' updater-script
+        sed -i \
+          -e 's/mount("'"$param1"'", "'"$param2"'",/mount("'"$param1"'",/g' \
+          -e 's/mount("'"$param1_cache"'", "'"$param2_cache"'",/mount("'"$param1_cache"'",/g' \
+          -e 's/mount("'"$param1_sdcard"'", "'"$param2_sdcard"'",/mount("'"$param1_sdcard"'",/g' \
+        updater-script
       fi
 
+
       fmt_three_args=`grep "^format" updater-script | grep -c $param2`
+      if [ "$param2_cache" != "$param2" ]
+      then
+        fmt_three_args2=`grep "^format" updater-script | grep -c $param2_cache`
+      else
+        fmt_three_args2=0
+      fi
+      
+      fmt_three_args_total=$(($fmt_three_args+$fmt_three_args2))
       fmt_all=`grep -c "^format" updater-script`
 
       if [ $fmt_all -gt $fmt_three_args ] && [ $fmt_three_args -gt 0 ]
       then
         sed -i -e 's/format("'"$param1"'", "'"$param2"'",/format("'"$param1"'",/g' updater-script
+        sed -i -e 's/format("'"$param1_cache"'", "'"$param2_cache"'",/format("'"$param1_cache"'",/g' updater-script
       fi
 
 
+    #
+    # update-script
+    #
+
     elif [ "$1" == "update-script" ]
     then
-
       sed -i \
         -e 's/format '"$param1"' '"$param2"' '"$sys_mnt"'/format SYSTEM:/g' \
-        -e 's/format '"$param1"' '"$param2"' '"$cache_mnt"'/format CACHE:/g' \
+        -e 's/format '"$param1_cache"' '"$param2_cache"' '"$cache_mnt"'/format CACHE:/g' \
         -e 's/format '"$param1"' '"$param2"' '"$boot_mnt"'/format BOOT:/g' \
         -e 's/format '"$param1"' '"$param2"' '"$data_mnt"'/format DATA:/g' \
         \
         -e 's/format '"$param1"' '"$sys_mnt"'/format '"$param1"' SYSTEM:/g' \
-        -e 's/format '"$param1"' '"$cache_mnt"'/format '"$param1"' CACHE:/g' \
+        -e 's/format '"$param1_cache"' '"$cache_mnt"'/format '"$param1_cache"' CACHE:/g' \
         -e 's/format '"$param1"' '"$boot_mnt"'/format '"$param1"' BOOT:/g' \
         -e 's/format '"$param1"' '"$data_mnt"'/format '"$param1"' DATA:/g' \
         update-script
