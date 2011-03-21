@@ -353,6 +353,8 @@ temp.log
 sed -i \
   -e 's/\/dataSYSTEM:/DATA:system\//g' \
   -e 's/DATA:SYSTEM:/DATA:system\//g' \
+  -e 's/by-nameSYSTEM:/by-name\/system/g' \
+  -e 's/by-nameDATA:/by-name\/userdata/g' \
   -e 's/MTD //g' \
 temp.log
 
