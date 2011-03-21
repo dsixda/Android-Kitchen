@@ -27,7 +27,13 @@ else
 
   device_name=`scripts/get_device_name`
 
-  if [ "$device_name" == "ace" ] || [ "$device_name" == "speedy" ]
+  #
+  # If you add a device here, ensure you also update the file
+  # scripts/adjust_mnt!
+  #
+
+  if [ "$device_name" == "ace" ] || [ "$device_name" == "speedy" ] \
+    [ "$device_name" == "crespo" ]
   then
 
     if [ "$1" == "" ]
