@@ -277,6 +277,9 @@ do
   sed -i \
     -e ''$line_num' s/package_extract_file \(.*\)/package_extract_file(\"\1\");/g' \
     -e ''$line_num' s/ /", "/g' \
+    -e ''$line_num' s/(\"SYSTEM:\([^)]*\))/(\"system\/\1)/g' \
+    -e ''$line_num' s/(\"DATA:\([^)]*\))/(\"data\/\1)/g' \
+    -e ''$line_num' s/(\"TMP:\([^)]*\))/(\"tmp\/\1)/g' \
     -e ''$line_num' s/SYSTEM:\([^)]*\))/\/system\/\1)/g' \
     -e ''$line_num' s/DATA:\([^)]*\))/\/data\/\1)/g' \
     -e ''$line_num' s/TMP:\([^)]*\))/\/tmp\/\1)/g' \
