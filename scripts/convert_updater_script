@@ -291,7 +291,8 @@ sed -i \
   -e 's/package_extract_dir \"\([^ ]*\)/copy_dir PACKAGE:\1/g' \
   \
   -e 's/\/system\//SYSTEM:/g' \
-  -e 's/\/system/SYSTEM:/g' \
+  -e 's/ \/system/ SYSTEM:/g' \
+  -e 's/"\/system"/SYSTEM:/g' \
   -e 's/\"system\"/SYSTEM:/g' \
   -e 's/\"SYSTEM:\"/SYSTEM:/g' \
   -e 's/\" SYSTEM/ SYSTEM/g' \
@@ -299,33 +300,38 @@ sed -i \
   -e 's/symlink SYSTEM:/symlink \/system\//g' \
   \
   -e 's/\/tmp\//TMP:/g' \
-  -e 's/\/tmp/TMP:/g' \
+  -e 's/ \/tmp/ TMP:/g' \
+  -e 's/"\/tmp"/TMP:/g' \
   -e 's/\"tmp\"/TMP:/g' \
   -e 's/\"TMP:\"/TMP:/g' \
   -e 's/\" TMP/ TMP/g' \
   -e 's/ \"TMP:/ TMP:/g' \
   \
   -e 's/\/data\//DATA:/g' \
-  -e 's/\/data/DATA:/g' \
+  -e 's/ \/data/ DATA:/g' \
+  -e 's/"\/data"/DATA:/g' \
   -e 's/\"data\"/DATA:/g' \
   -e 's/\"DATA:\"/DATA:/g' \
   -e 's/\" DATA/ DATA/g' \
   -e 's/"userdata"/DATA:/g' \
   \
   -e 's/\/sdcard\//SDCARD:/g' \
-  -e 's/\/sdcard/SDCARD:/g' \
+  -e 's/ \/sdcard/ SDCARD:/g' \
+  -e 's/"\/sdcard"/SDCARD:/g' \
   -e 's/\"sdcard\"/SDCARD:/g' \
   -e 's/\"SDCARD:\"/SDCARD:/g' \
   -e 's/\" SDCARD/ SDCARD/g' \
   \
   -e 's/\/cache\//CACHE:/g' \
-  -e 's/\/cache/CACHE:/g' \
+  -e 's/ \/cache/ CACHE:/g' \
+  -e 's/"\/cache"/CACHE:/g' \
   -e 's/\"cache\"/CACHE:/g' \
   -e 's/\"CACHE:\"/CACHE:/g' \
   -e 's/\" CACHE/ CACHE/g' \
   \
   -e 's/\/sdext\//SDEXT:/g' \
-  -e 's/\/sdext/SDEXT:/g' \
+  -e 's/ \/sdext/ SDEXT:/g' \
+  -e 's/"\/sdext"/SDEXT:/g' \
   -e 's/\"sdext\"/SDEXT:/g' \
   -e 's/\"SDEXT:\"/SDEXT:/g' \
   -e 's/\" SDEXT/ SDEXT/g' \
@@ -333,6 +339,7 @@ sed -i \
   -e 's/"\/boot\//BOOT:/g' \
   -e 's/"\/boot/BOOT:/g' \
   -e 's/ \/boot\// BOOT:/g' \
+  -e 's/"\/boot"/BOOT:/g' \
   -e 's/\"boot\"/BOOT:/g' \
   -e 's/\"BOOT:\"/BOOT:/g' \
   -e 's/\" BOOT/ BOOT/g' \
@@ -348,14 +355,18 @@ temp.log
 
 
 #
-# Patch up conversion issues
+# Patch up any conversion issues here
 #
+
 sed -i \
-  -e 's/\/dataSYSTEM:/DATA:system\//g' \
-  -e 's/DATA:SYSTEM:/DATA:system\//g' \
-  -e 's/by-nameSYSTEM:/by-name\/system/g' \
-  -e 's/by-nameDATA:/by-name\/userdata/g' \
   -e 's/MTD //g' \
+  -e 's/ system\// SYSTEM:/g' \
+  -e 's/ tmp\// TMP:/g' \
+  -e 's/ data\// DATA:/g' \
+  -e 's/ sdcard\// SDCARD:/g' \
+  -e 's/ cache\// CACHE:/g' \
+  -e 's/ sdext\// SDEXT:/g' \
+  -e 's/ boot\// BOOT:/g' \
 temp.log
 
 
