@@ -7,6 +7,14 @@
 
 base_dir=`pwd`
 cd WORKING_*
+
+if [ ! -e META-INF/com/google/android/update-script ]
+then
+  echo "Warning: No update-script found"
+  cd ..
+  exit 0
+fi
+
 cd META-INF/com/google/android
 
 if [ "`grep package_extract_file update-script`" != "" ] || \
@@ -32,7 +40,7 @@ else
   # scripts/adjust_mnt!
   #
 
-  if [ "$device_name" == "ace" ] || [ "$device_name" == "speedy" ] \
+  if [ "$device_name" == "ace" ] || [ "$device_name" == "speedy" ] || \
     [ "$device_name" == "crespo" ]
   then
 
