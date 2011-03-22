@@ -63,7 +63,17 @@ then
   echo
   echo "The following files/folders have been copied to the MY_KERNEL folder:"
   echo
-  ls -R MY_KERNEL
+  ls MY_KERNEL
+
+  if [ -d MY_KERNEL/system ]
+  then
+    echo 
+    echo "Under the /system folder:"
+    ls MY_KERNEL/system
+  fi
+
+  echo
+  echo "----------------------------------------------------------------------"
   echo
   echo "You can add zImage to the BOOT-EXTRACTED folder, which is created"
   echo "when unpacking the working folder's boot.img in the kitchen."
