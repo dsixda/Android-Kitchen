@@ -47,6 +47,11 @@ else
   scripts/choose_rom $2
   res=$?
 
+  if [ "$res" == "1" ] && [ "$2" == "kernel_only" ]
+  then
+    scripts/press_enter
+  fi
+
   if [ `ls | grep -m 1 WORKING_` ] && [ "$res" != "1" ] && [ "$1" == "" ]
   then
 
@@ -118,3 +123,5 @@ if [ "$1" == "" ]
 then
   scripts/press_enter
 fi
+
+exit $res
