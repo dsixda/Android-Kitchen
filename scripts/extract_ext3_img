@@ -26,33 +26,107 @@ then
 
   dos_path=`cygpath -wp $img_dir`
 
-  echo "#####################################################################"
-  echo 
-  echo " PLEASE FOLLOW INSTRUCTIONS BELOW TO EXTRACT FILES FROM $img_file:"
-  echo 
-  echo " 1) Ignore the 'Cannot Read Disk' warning dialog (press 'OK') if it"
-  echo "    appears"
-  echo 
-  echo " 2) When Ext2Explore appears, use 'File->Open Image' to open:"
-  echo "    $dos_path\\$img_file"
-  echo
-  echo " 3) After it loads, right-click on the new icon displayed in the left"
-  echo "    frame, and select Save"
-  echo
-  echo " 4) Select $dos_path"
-  echo
-  echo " 5) Wait for extraction to finish and then close Ext2Explore"
-  echo 
-  echo "#####################################################################"
-  echo
+  while :
+  do
 
-  tools/ext2read_windows/ext2explore.exe &
+    clear
 
-  echo 
-  echo ">>>> PERFORM THE STEPS ABOVE BEFORE PRESSING ENTER! <<<<"
-  echo
+    echo 
+    echo "Unpack the $img_file"
+    echo "-----------------------"
+    echo 
+    echo "Enter a choice below to unpack your image file, assuming it"
+    echo "uses an EXT filesystem. You might find that one option works"
+    echo "better than the other."
+    echo
+    echo "e.g.  EXT3: HTC Desire HD, HTC Thunderbolt"
+    echo "      EXT4: HTC Desire S"
+    echo 
+    echo "  1 - Run Explore2fs  (Best choice for EXT2/EXT3)"
+    echo "  2 - Run Ext2Explore (EXT2/EXT3/EXT4)"
+    echo "  3 - I'm finished unpacking / Abort"
+    echo
+    echo -n "? "
 
-  scripts/press_enter
+    read enterNumber
+
+    if [ "$enterNumber" == "1" ]
+    then
+
+      echo
+      echo "####################################################################"
+      echo 
+      echo " PLEASE FOLLOW INSTRUCTIONS BELOW TO EXTRACT FILES FROM $img_file:"
+      echo 
+      echo " 1) When Explore2fs appears, use 'File->Open Image File' to open:"
+      echo "    $dos_path\\$img_file"
+      echo
+      echo " 2) After it loads, right-click on the hard disk icon in the left"
+      echo "    frame, and select Export Directory"
+      echo
+      echo " 3) Select $dos_path"
+      echo
+      echo " 4) Wait for extraction to finish and then close Explore2fs"
+      echo
+      echo "NOTE: If the tool has problems with extraction, then close it,"
+      echo "      return to the menu and try the other option listed."      
+      echo 
+      echo "####################################################################"
+      echo
+
+      tools/explore2fs_windows/explore2fs.exe &
+
+      echo 
+      echo ">>>> PERFORM THE STEPS ABOVE BEFORE PRESSING ENTER! <<<<"
+      echo
+
+      scripts/press_enter
+
+    elif [ "$enterNumber" == "2" ]
+    then
+
+      echo 
+      echo "#####################################################################"
+      echo 
+      echo " PLEASE FOLLOW INSTRUCTIONS BELOW TO EXTRACT FILES FROM $img_file:"
+      echo 
+      echo " 1) Ignore the 'Cannot Read Disk' warning dialog (press 'OK') if it"
+      echo "    appears!"
+      echo 
+      echo " 2) When Ext2Explore appears, use 'File->Open Image' to open:"
+      echo "    $dos_path\\$img_file"
+      echo
+      echo " 3) After it loads, right-click on the new icon displayed in the left"
+      echo "    frame, and select Save"
+      echo
+      echo " 4) Select $dos_path"
+      echo
+      echo " 5) Wait for extraction to finish and then close Ext2Explore"
+      echo
+      echo "NOTE: If the tool has problems with extraction, then close it,"
+      echo "      return to the menu and try the other option listed."      
+      echo      
+      echo "#####################################################################"
+      echo
+
+      tools/ext2read_windows/ext2explore.exe &
+
+      echo 
+      echo ">>>> PERFORM THE STEPS ABOVE BEFORE PRESSING ENTER! <<<<"
+      echo
+
+      scripts/press_enter
+
+    elif [ "$enterNumber" == "3" ]
+    then
+      break
+    
+    else
+      echo "Invalid option"
+    fi
+
+  done
+
 
   cd $img_dir
   rm -f unyaffs*stackdump
