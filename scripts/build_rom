@@ -35,6 +35,11 @@ rm -f testkey.*
 rm -f signapk.jar
 rm -f signed*.zip
 
+if [ -e system/system.img ]
+then
+  rm -f system/system.img
+fi
+
 
 #
 # Clean up *.DS_Store hidden files
