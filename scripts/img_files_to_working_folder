@@ -77,7 +77,7 @@ scripts/check_bootimg_header
 
 
 #
-# Check for YAFFS/EXT3
+# Check for YAFFS/EXT*
 #
 
 system_dir=$build_dir/system
@@ -141,6 +141,20 @@ if [ ! -d system ]
 then
   echo
   echo "Error:  no /system folder found!"
+  exit 1
+fi
+
+if [ ! -d system/framework ]
+then
+  echo
+  echo "Error:  no /system/framework folder found!"
+  exit 1
+fi
+
+if [ ! -d system/app ]
+then
+  echo
+  echo "Error:  no /system/app folder found!"
   exit 1
 fi
 
