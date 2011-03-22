@@ -27,7 +27,8 @@ fi
 
 clear
 echo
-echo "--> Obtain a ROM meant for YOUR DEVICE <--"
+echo
+echo "--> Obtain a ROM that is currently meant for YOUR DEVICE <--"
 
 scripts/check_rom no_info kernel_only
 
@@ -85,7 +86,7 @@ mkdir MY_KERNEL
 
 #
 # Copy my device's kernel to MY_KERNEL
-# Also copy my device's module files to MY_KERNEL
+# Also copy my device's modules/drivers to MY_KERNEL
 #
 
 echo "Copying zImage to MY_KERNEL"
@@ -103,16 +104,48 @@ if [ -d MY_DEVICE_WORKING/system/lib/modules ]
 then
   mkdir -p MY_KERNEL/system/lib/modules
   echo 
-  echo "Copying ..."
-  cp -v MY_DEVICE_WORKING/system/lib/modules/* MY_KERNEL/system/lib/modules/
+  echo "Copying wireless ..."
+  cp -r MY_DEVICE_WORKING/system/lib/modules/* MY_KERNEL/system/lib/modules/
+fi
+
+if [ -d MY_DEVICE_WORKING/system/usr ]
+then
+  mkdir -p MY_KERNEL/system/usr
+  echo 
+  echo "Copying buttons ..."
+  cp -r MY_DEVICE_WORKING/system/usr/* MY_KERNEL/system/usr/
+fi
+
+if [ -d MY_DEVICE_WORKING/system/lib/hw ]
+then
+  mkdir -p MY_KERNEL/system/lib/hw
+  echo 
+  echo "Copying lights ..."
+  cp -r MY_DEVICE_WORKING/system/lib/hw/* MY_KERNEL/system/lib/hw/
+fi
+
+if [ -e MY_DEVICE_WORKING/system/etc/vold.fstab ]
+then
+  mkdir -p MY_KERNEL/system/etc
+  echo 
+  echo "Copying sdcard mount info ..."
+  cp -v MY_DEVICE_WORKING/system/etc/vold.fstab MY_KERNEL/system/etc/
+fi
+
+if [ -e MY_DEVICE_WORKING/system/etc/vold.conf ]
+then
+  mkdir -p MY_KERNEL/system/etc
+  echo 
+  echo "Copying sdcard mount info ..."
+  cp -v MY_DEVICE_WORKING/system/etc/vold.conf MY_KERNEL/system/etc/
 fi
 
 if [ -d MY_DEVICE_WORKING/system/modules ]
 then
   mkdir -p MY_KERNEL/system/modules
   echo 
-  echo "Copying ..."
-  cp -v MY_DEVICE_WORKING/system/modules/* MY_KERNEL/system/modules/
+  echo "Copying other modules ..."
+  cp -r MY_DEVICE_WORKING/system/modules/* MY_KERNEL/system/modules/
 fi
 
 
