@@ -48,7 +48,7 @@ fi
   
 
 #
-# Check for YAFFS/EXT3
+# Check for YAFFS/EXT*
 #
 
 scripts/check_if_img_yaffs $img_dir data.img
