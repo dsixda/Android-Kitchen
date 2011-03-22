@@ -20,6 +20,7 @@ then
 elif [ -e META-INF/com/google/android/update-binary ]
 then
 
+  echo
   echo "Warning:  update-script and update-binary detected,"
   echo "          renaming update-binary to update-binary.orig."
   echo
