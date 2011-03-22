@@ -110,6 +110,13 @@ cd ../..
 device_name=`scripts/get_device_name`
 
 
+#
+# Check Model
+#
+
+model=`scripts/get_product_model`
+
+
 
 #
 # Check root
@@ -312,7 +319,7 @@ cd WORKING_*
 
 if [ ! -d system/framework ]
 then
-  deodex_fr_status=UNKNOWN
+  deodex_fr_status="NO FOLDER"
 else
   if [ "`find system/framework -name *.odex`" == "" ]
   then
@@ -324,7 +331,7 @@ fi
 
 if [ ! -d system/app ]
 then
-  deodex_app_status=UNKNOWN
+  deodex_app_status="NO FOLDER"
 else
   if [ "`find system/app -name *.odex`" == "" ]
   then
@@ -387,6 +394,7 @@ echo "Working folder information"
 echo
 echo " Android OS version             : $android_os"
 echo " Device                         : $device_name"
+echo " Model                          : $model"
 echo " ROM Name                       : $rom_name"
 echo " Rooted (unsecured boot.img)    : $unsecure_status"
 echo " Rooted (Superuser.apk + su)    : $su_status"
