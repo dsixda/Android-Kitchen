@@ -95,7 +95,15 @@ fi
 
 cd $img_dir
 check_dump=`ls unyaffs*stackdump* 2>/dev/null`
-rm -f data.img
+rm -f data.img 2>/dev/null
+
+if [ "$?" == "1" ]
+then
+  echo
+  echo "WARNING: data.img is in use.  Close the application and remove file manually."
+  echo
+fi
+
 cd ..
 
 if [ "$check_dump" != "" ]
