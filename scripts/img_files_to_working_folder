@@ -131,7 +131,7 @@ rm -f system.img 2>/dev/null
 if [ "$?" == "1" ]
 then
   echo
-  echo "WARNING: system.img is in use.  Close the application and remove file manually."
+  echo "WARNING: system.img is in use.  Remove file manually after application is closed."
   echo
 fi
 
@@ -141,36 +141,36 @@ cd ..
 if [ "$check_dump" != "" ]
 then
   echo
-  echo "Error:  stackdump file found under /system folder due to incompatibility"
-  echo "        with unyaffs."
+  echo "Error: Stackdump file found under /system folder due to incompatibility"
+  echo "       with unyaffs."
   exit 1
 fi
 
 if [ ! -d system ]
 then
   echo
-  echo "Error:  no /system folder found!"
+  echo "Error:  No /system folder found!"
   exit 1
 fi
 
 if [ ! -d system/framework ]
 then
   echo
-  echo "Error:  no /system/framework folder found!"
+  echo "Error: No /system/framework folder found!"
   exit 1
 fi
 
 if [ ! -d system/app ]
 then
   echo
-  echo "Error:  no /system/app folder found!"
+  echo "Error: No /system/app folder found!"
   exit 1
 fi
 
 if [ "`ls system`" == "" ]
 then
   echo 
-  echo "Error:  /system folder is empty!"
+  echo "Error: /system folder is empty!"
   echo
   exit 1
 fi
