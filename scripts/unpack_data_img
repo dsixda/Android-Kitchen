@@ -100,7 +100,7 @@ rm -f data.img 2>/dev/null
 if [ "$?" == "1" ]
 then
   echo
-  echo "WARNING: data.img is in use.  Close the application and remove file manually."
+  echo "WARNING: data.img is in use.  Remove file manually after application is closed."
   echo
 fi
 
