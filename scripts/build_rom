@@ -35,11 +35,6 @@ rm -f testkey.*
 rm -f signapk.jar
 rm -f signed*.zip
 
-if [ -e system/system.img ]
-then
-  rm -f system/system.img
-fi
-
 
 #
 # Clean up *.DS_Store hidden files
@@ -143,10 +138,11 @@ if [ "$cmd_line" == "dsixda Null" ]
 then
   zip -r -y -q update * -x *.cvs* *.git* *.svn* \
       *updater-script.orig* *update-binary.orig* *update-script.orig* \
-      boot.img
+      boot.img *system.img*
 else
   zip -r -y -q update * -x *.cvs* *.git* *.svn* \
-      *updater-script.orig* *update-binary.orig* *update-script.orig*
+      *updater-script.orig* *update-binary.orig* *update-script.orig* \
+      *system.img*
 fi      
 
 echo
