@@ -46,7 +46,7 @@ then
     echo "  2 - Run Ext2Explore (EXT2/EXT3/EXT4)"
     echo "  3 - I'm finished unpacking / Abort"
     echo
-    echo -n "? "
+    echo -n "Select number: "
 
     read enterNumber
 
