@@ -77,8 +77,8 @@ echo
 echo "- Initial formatting ..."
 
 more updater-script \
-| sed -e ':a;N;$!ba;s/||\n//g' \
-| sed -e ':a;N;$!ba;s/,\n//g' \
+| sed -e ':a;N;$!ba;s/||[ ]*\n//g' \
+| sed -e ':a;N;$!ba;s/,[ ]*\n//g' \
 | sed -e 's/","/", "/g' \
 | sed -e 's/ui_print.*//g' \
 | sed -e 's/^\([a-zA-Z_]*\)[ ]*(/\1(/g' \
