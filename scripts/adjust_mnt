@@ -27,11 +27,15 @@ then
 
     param1=ext3
     param2=EMMC
+
+    param1_sdcard=vfat
+    param2_sdcard=MTD
+
     sys_mnt=\\\/dev\\\/block\\\/mmcblk0p25
     cache_mnt=\\\/dev\\\/block\\\/mmcblk0p27
     boot_mnt=\\\/dev\\\/block\\\/mmcblk0p22
     data_mnt=\\\/dev\\\/block\\\/mmcblk0p26
-    sdcard_mnt=???
+    sdcard_mnt=\\\/dev\\\/block\\\/vold\\\/179:33
 
   # Evo Shift 4G    
   elif [ "$device_name" == "speedy" ]
@@ -40,11 +44,26 @@ then
 
     param1=ext3
     param2=EMMC
+
     sys_mnt=\\\/dev\\\/block\\\/mmcblk0p26
     cache_mnt=\\\/dev\\\/block\\\/mmcblk0p28
     boot_mnt=\\\/dev\\\/block\\\/mmcblk0p22
     data_mnt=\\\/dev\\\/block\\\/mmcblk0p27
     sdcard_mnt=\\\/dev\\\/block\\\/mmcblk1p1
+
+  # Thunderbolt
+  elif [ "$device_name" == "mecha" ]
+  then
+    change_mnt=yes
+
+    param1=ext3
+    param2=EMMC
+
+    sys_mnt=\\\/dev\\\/block\\\/mmcblk0p25
+    cache_mnt=\\\/dev\\\/block\\\/mmcblk0p27
+    boot_mnt=\\\/dev\\\/block\\\/mmcblk0p22
+    data_mnt=\\\/dev\\\/block\\\/mmcblk0p26
+    sdcard_mnt=???
 
   # Samsung Nexus S
   elif [ "$device_name" == "crespo" ]
