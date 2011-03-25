@@ -108,20 +108,41 @@ fi
 #
 if [ -e radio.img ]
 then
-  if [ "`grep -c write_radio_image META-INF/com/google/android/update-script`" == "0" ] 
+  
+  #
+  # Add radio to HTC device
+  #
+  if [ `ls system/app | grep -c -i htc` -gt 0 ]
   then
-    echo "radio.img found."
-    echo "Modifying update-script with syntax for flashing radio ..."
-    echo "write_radio_image PACKAGE:radio.img" >> META-INF/com/google/android/update-script
-    echo
+    if [ "`grep -c write_radio_image META-INF/com/google/android/update-script`" == "0" ] 
+    then
+      echo "radio.img found."
+      echo "Modifying update-script with syntax for flashing radio ..."
+      echo "write_radio_image PACKAGE:radio.img" >> META-INF/com/google/android/update-script
+      echo
+    fi
+
+  #
+  # Add radio to non-HTC device
+  #
+  else
+    if [ "`grep -c \"write_raw_image PACKAGE:radio.img\" META-INF/com/google/android/update-script`" == "0" ] 
+    then
+      echo "radio.img found."
+      echo "Modifying update-script with syntax for flashing radio ..."
+      echo "write_raw_image PACKAGE:radio.img" >> META-INF/com/google/android/update-script
+      echo
+    fi
   fi
 
 else
-  if [ "`grep -c write_radio_image META-INF/com/google/android/update-script`" == "1" ] 
+  if [ "`grep -c write_radio_image META-INF/com/google/android/update-script`" == "1" ] || \
+      [ "`grep -c \"write_raw_image PACKAGE:radio.img\" META-INF/com/google/android/update-script`" == "1" ] 
   then
     echo "radio.img not present in ROM."
     echo "Modifying update-script to remove syntax for flashing radio ..."
     sed -i -e 's/write_radio_image PACKAGE:radio.img[ ]*$//g' META-INF/com/google/android/update-script
+    sed -i -e 's/write_raw_image PACKAGE:radio.img[ ]*$//g' META-INF/com/google/android/update-script    
   fi
 fi
 
