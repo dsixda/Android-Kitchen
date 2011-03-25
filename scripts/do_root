@@ -65,17 +65,9 @@ echo
 if [ "`grep -c ro.build.version.release=1 build.prop`" != "0" ]
 then
   echo " d - ChainsDD's Cupcake/Donut  (Android 1.x)" 
-fi
-
-if [ "`grep -c ro.build.version.release=2 build.prop`" != "0" ]
-then
-  echo " f - ChainsDD's Eclair/Froyo   (Android 2.x)" 
-fi
-
-if [ "`grep -c ro.build.version.release=1 build.prop`" == "0" ] && [ "`grep -c ro.build.version.release=2 build.prop`" == "0" ]
-then
-  echo " d - ChainsDD's Cupcake/Donut  (Android 1.x)" 
-  echo " f - ChainsDD's Eclair/Froyo   (Android 2.x)" 
+else
+  echo " f - ChainsDD's version        (Android 2.x+)" 
+  echo " r - rmk40's patched Superuser (If above force-closes)"
 fi
 
 echo " s - Old and simple version    (All Android)"
@@ -96,6 +88,9 @@ then
 elif [ "$enterVersion" == "s" ]
 then
   folder=old
+elif [ "$enterVersion" == "r" ]
+then
+  folder=rmk40
 else
   echo "Cancelled"
   cd ../..
@@ -110,10 +105,10 @@ then
   rm -fv $super_path
 fi
 
-if [ "$enterVersion" == "s" ]
+if [ "$enterVersion" == "s" ] || [ "$enterVersion" == "r" ]
 then
-  cp -fv ../../tools/su_files/old/app/Superuser.apk app
-  cp -fv ../../tools/su_files/old/bin/su bin
+  cp -fv ../../tools/su_files/$folder/app/Superuser.apk app
+  cp -fv ../../tools/su_files/$folder/bin/su bin
 else
   cp -fv ../../tools/su_files/chainsdd/Superuser.apk app
   cp -fv ../../tools/su_files/chainsdd/$folder/su bin
