@@ -164,12 +164,48 @@ then
     perl -pi -e 's/set_perm 0 2000 06750 SYSTEM:bin\/run-as\n//g' META-INF/com/google/android/update-script
   fi
 
+  if [ ! -d system/vendor ]
+  then
+    perl -pi -e 's/set_perm_recursive 0 2000 0755 0644 SYSTEM:vendor[ ]*$//g' META-INF/com/google/android/update-script
+  fi
+
   if [ ! -d system/vendor/firmware ]
   then
-    perl -pi -e 's/set_perm_recursive 0 2000 0755 0644 SYSTEM:vendor//g' META-INF/com/google/android/update-script
-    perl -pi -e 's/set_perm_recursive 0 0 0755 0644 SYSTEM:vendor\/firmware//g' META-INF/com/google/android/update-script
-    perl -pi -e 's/set_perm 0 2000 0755 SYSTEM:vendor\/firmware//g' META-INF/com/google/android/update-script    
+    perl -pi -e 's/set_perm_recursive 0 0 0755 0644 SYSTEM:vendor\/firmware[ ]*$//g' META-INF/com/google/android/update-script
+    perl -pi -e 's/set_perm 0 2000 0755 SYSTEM:vendor\/firmware[ ]*$//g' META-INF/com/google/android/update-script    
   fi
+
+  if [ ! -d system/vendor/bin ]
+  then
+    perl -pi -e 's/set_perm_recursive 0 2000 0755 0755 SYSTEM:vendor\/bin[ ]*$//g' META-INF/com/google/android/update-script
+  fi 
+
+  if [ ! -d system/vendor/etc ]
+  then
+    perl -pi -e 's/set_perm_recursive 0 2000 0755 0644 SYSTEM:vendor\/etc[ ]*$//g' META-INF/com/google/android/update-script
+  fi 
+
+  if [ ! -d system/vendor/lib ]
+  then
+    perl -pi -e 's/set_perm 0 2000 0755 SYSTEM:vendor\/lib[ ]*$//g' META-INF/com/google/android/update-script    
+  fi
+
+  if [ ! -d system/vendor/lib/egl ]
+  then
+    perl -pi -e 's/set_perm 0 2000 0755 SYSTEM:vendor\/lib\/egl[ ]*$//g' META-INF/com/google/android/update-script    
+  fi
+
+  if [ ! -d system/vendor/lib/hw ]
+  then
+    perl -pi -e 's/set_perm 0 2000 0755 SYSTEM:vendor\/lib\/hw[ ]*$//g' META-INF/com/google/android/update-script    
+  fi
+
+  if [ ! -e system/vendor/etc/gps.xml ]
+  then
+    perl -pi -e 's/set_perm 0 0 0644 SYSTEM:vendor\/etc\/gps.xml//g' META-INF/com/google/android/update-script    
+  fi
+
+
 
   if [ ! -d system/xbin ]
   then
