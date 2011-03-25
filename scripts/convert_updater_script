@@ -139,40 +139,59 @@ done
 
 
 #
-# boot.img
+# boot.img / radio.img / bootloader.img
 #
-echo "- boot.img ..."
+echo "- write_raw_image ..."
 
-#
-# Replace 3 consecutive lines if they match the required strings
-#
-line_num1=`grep -n -m 1 "package_extract_file(\"boot.img\", \"/tmp/boot.img\");" temp.log | sed 's/:.*//g'`
+img_list=( boot radio bootloader )
 
-if [ "$line_num1" != "" ]
-then
+for (( i = 0 ; i < ${#img_list[@]} ; i++ ))
+do
 
-  line_num2=$(($line_num1+1))
-  str2=`sed -n ''"$line_num2"','"$line_num2"'p' temp.log`
+  #
+  # Replace 3 consecutive lines if they match the required strings
+  #
 
-  if [ "$str2" == "write_raw_image(\"/tmp/boot.img\", \"boot\");" ]
+  img_name=${img_list[${i}]}
+   
+  line_num1=`grep -n -m 1 "package_extract_file(\"$img_name.img\", \"/tmp/$img_name.img\");" temp.log | sed 's/:.*//g'`
+
+  if [ "$line_num1" != "" ]
   then
-    
-    line_num3=$(($line_num2+1))
-    str3=`sed -n ''"$line_num3"','"$line_num3"'p' temp.log`
 
-    if [ "$str3" == "delete(\"/tmp/boot.img\");" ]
+    line_num2=$(($line_num1+1))
+    str2=`sed -n ''"$line_num2"','"$line_num2"'p' temp.log`
+
+    if [ "$str2" == "write_raw_image(\"/tmp/$img_name.img\", \"$img_name\");" ]
     then
-      sed -i \
-        -e ''$line_num1' s/.*/write_raw_image PACKAGE:boot.img BOOT:/g' \
-        -e ''$line_num2' s/.*//g' \
-        -e ''$line_num3' s/.*//g' \
-      temp.log
+      line_num3=$(($line_num2+1))
+      str3=`sed -n ''"$line_num3"','"$line_num3"'p' temp.log`
+
+      if [ "$str3" == "delete(\"/tmp/$img_name.img\");" ]
+      then
+
+        if [ -e ../../../../$img_name.img ]
+        then
+          sed -i \
+            -e ''$line_num1' s/.*/write_raw_image PACKAGE:'"$img_name"'.img/g' \
+            -e ''$line_num2' s/.*//g' \
+            -e ''$line_num3' s/.*//g' \
+          temp.log
+        else
+          sed -i \
+            -e ''$line_num1' s/.*//g' \
+            -e ''$line_num2' s/.*//g' \
+            -e ''$line_num3' s/.*//g' \
+          temp.log
+        fi
+      fi
     fi
   fi
-fi
+
+done
 
 sed -i -e 's/write_raw_image("boot.img", "boot");/write_raw_image PACKAGE:boot.img BOOT:/g' temp.log
-
+sed -i -e 's/write_raw_image PACKAGE:boot.img$/write_raw_image PACKAGE:boot.img BOOT:/g' temp.log
 
 #
 # run_program

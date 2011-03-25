@@ -122,10 +122,18 @@ sed -i -e 's/^[ \t]*//g' updater-script
 #
 sed -i -e '/^#/d' updater-script
 
+
 #
-# boot.img
+# boot.img / radio.img / bootloader.img
 #
-sed -i -e 's/write_raw_image PACKAGE:boot.img BOOT:/assert(package_extract_file("boot.img", "\/tmp\/boot.img"),\n       write_raw_image("\/tmp\/boot.img", "boot"),\n       delete("\/tmp\/boot.img"));/g' updater-script
+img_list=( boot radio bootloader )
+
+for (( i = 0 ; i < ${#img_list[@]} ; i++ ))
+do
+  img_name=${img_list[${i}]}
+  str="write_raw_image PACKAGE:$img_name.img"
+  sed -i -e 's/'"$str"'.*$/assert(package_extract_file("'"$img_name"'.img", "\/tmp\/'"$img_name"'.img"),\n       write_raw_image("\/tmp\/'"$img_name"'.img", "'"$img_name"'"),\n       delete("\/tmp\/'"$img_name"'.img"));/g' updater-script
+done
 
 #
 # radio.img
