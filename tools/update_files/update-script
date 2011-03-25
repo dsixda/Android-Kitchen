@@ -26,8 +26,15 @@ set_perm 0 2000 0550 SYSTEM:etc/init.goldfish.sh
 set_perm 0 0 0544 SYSTEM:etc/install-recovery.sh
 set_perm_recursive 0 0 0755 0555 SYSTEM:etc/ppp
 set_perm_recursive 0 2000 0755 0644 SYSTEM:vendor
+set_perm_recursive 0 2000 0755 0755 SYSTEM:vendor/bin
+set_perm_recursive 0 2000 0755 0644 SYSTEM:vendor/etc
+set_perm 0 0 0644 SYSTEM:vendor/etc/gps.xml
 set_perm_recursive 0 0 0755 0644 SYSTEM:vendor/firmware
 set_perm 0 2000 0755 SYSTEM:vendor/firmware
+set_perm 0 2000 0755 SYSTEM:vendor/lib
+set_perm 0 2000 0755 SYSTEM:vendor/lib/egl
+set_perm 0 2000 0755 SYSTEM:vendor/lib/hw
+
 set_perm_recursive 0 2000 0755 0755 SYSTEM:xbin
 show_progress 0.1 10
 
