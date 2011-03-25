@@ -2,21 +2,28 @@
 cd WORKING_*
 cd system
 
-str=^ro.product.model=
-file_count=`grep -l $str *.prop | grep -c .prop`
-
-if [ $file_count == 0 ]
+if [ ! -e build.prop ]
 then
   model=UNKNOWN
 
-elif [ $file_count -gt 1 ]
-then
-  model="DEFINED $file_count TIMES"
-
 else
-  model=`grep -m 1 $str *.prop \
-            | sed 's/ro.product.model=//g' \
-            | sed 's/[^:]*://g'`
+
+  str=^ro.product.model=
+  grep_str=`grep -c $str build.prop`
+
+  if [ $grep_str == 0 ]
+  then
+    model=UNKNOWN
+
+  else  
+    model=`grep -m 1 $str build.prop \
+            | sed 's/ro.product.model=//g'`
+
+    if [ "$model" == "" ]
+    then
+      model=UNKNOWN
+    fi
+  fi
 fi
 
 cd ../..

@@ -2,21 +2,28 @@
 cd WORKING_*
 cd system
 
-str=^ro.product.device=
-file_count=`grep -l $str *.prop | grep -c .prop`
-
-if [ $file_count == 0 ]
+if [ ! -e build.prop ]
 then
   device_name=UNKNOWN
 
-elif [ $file_count -gt 1 ]
-then
-  device_name="DEFINED $file_count TIMES"
-
 else
-  device_name=`grep -m 1 $str *.prop \
-            | sed 's/ro.product.device=//g' \
-            | sed 's/[^:]*://g'`
+
+  str=^ro.product.device=
+  grep_str=`grep -c $str build.prop`
+
+  if [ $grep_str == 0 ]
+  then
+    device_name=UNKNOWN
+
+  else  
+    device_name=`grep -m 1 $str build.prop \
+            | sed 's/ro.product.device=//g'`
+
+    if [ "$device_name" == "" ]
+    then
+      device_name=UNKNOWN
+    fi
+  fi
 fi
 
 cd ../..
