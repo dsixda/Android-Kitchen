@@ -1,6 +1,6 @@
 #!/bin/bash
  
-version=0.148
+version=0.149
 
 chmod 755 scripts/*
 scripts/check_install_dir
