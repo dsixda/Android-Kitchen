@@ -272,15 +272,19 @@ fi
 
 date_str=`date '+%m%d%y_%H%M%S'`
 
+cd ..
+device=`scripts/get_device_name | sed 's/ /_/g'`
+cd WORKING_*
+
 if [ "$express" == "yes" ]
 then
-  final_file=unsigned_$date_str.zip
+  final_file=$device\_unsigned_$date_str.zip
   mv -v update.zip $final_file
   echo
 
 else
 
-  final_file=signed_$date_str.zip
+  final_file=$device\_signed_$date_str.zip
 
   echo Signing update.zip as $final_file ...
 
