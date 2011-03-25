@@ -37,7 +37,7 @@ then
 
     cd $base_dir
     scripts/set_kernel_offset_files $dec_offset
-    exit $1
+    exit $?
 
   else
     echo "Error: kernel offset not found in boot.img!"
