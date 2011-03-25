@@ -37,11 +37,11 @@ then
 
   echo
   echo Extracting kernel ...
-  ./extract-kernel.pl boot.img
+  ./extract-kernel.pl boot.img 2>/dev/null
 
   echo
   echo Extracting ramdisk ... 
-  ./extract-ramdisk.pl boot.img
+  ./extract-ramdisk.pl boot.img 2>/dev/null
 
   rm boot.img
   rm extract-*.pl
