@@ -66,13 +66,13 @@ if [ "`grep -c ro.build.version.release=1 build.prop`" != "0" ]
 then
   echo " d - ChainsDD's Cupcake/Donut  (Android 1.x)" 
 else
-  echo " f - ChainsDD's version        (Android 2.x+)" 
-  echo " r - rmk40's patched Superuser (If above force-closes)"
+  echo " f - ChainsDD's version          (Android 2.x+)" 
+  echo " p - ChainsDD's patched version  (If above force-closes)"
 fi
 
-echo " s - Old and simple version    (All Android)"
+echo " s - Old and simple version      (All Android)"
 echo
-echo " x - Cancel rooting            (default)"
+echo " x - Cancel rooting              (default)"
 echo
 
 echo -n "? "
@@ -88,9 +88,9 @@ then
 elif [ "$enterVersion" == "s" ]
 then
   folder=old
-elif [ "$enterVersion" == "r" ]
+elif [ "$enterVersion" == "p" ]
 then
-  folder=rmk40
+  folder=chainsdd_patched
 else
   echo "Cancelled"
   cd ../..
@@ -105,7 +105,7 @@ then
   rm -fv $super_path
 fi
 
-if [ "$enterVersion" == "s" ] || [ "$enterVersion" == "r" ]
+if [ "$enterVersion" == "s" ] || [ "$enterVersion" == "p" ]
 then
   cp -fv ../../tools/su_files/$folder/app/Superuser.apk app
   cp -fv ../../tools/su_files/$folder/bin/su bin
