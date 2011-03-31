@@ -140,7 +140,7 @@ done
 #
 if [ `grep -c write_radio_image updater-script` -gt 0 ]
 then
-  echo "- Sorry, ignoring radio - unable to convert ..."
+  echo "- Sorry, ignoring 'write_radio_image' - unable to convert ..."
   sed -i -e 's/write_radio_image PACKAGE:radio.img//g' updater-script
 fi
 
@@ -149,7 +149,7 @@ fi
 #
 if [ `grep -c write_hboot_image updater-script` -gt 0 ]
 then
-  echo "- Sorry, ignoring hboot - unable to convert ..."
+  echo "- Sorry, ignoring 'write_hboot_image' - unable to convert ..."
   sed -i -e 's/write_hboot_image PACKAGE:hboot.img//g' updater-script
 fi
 
