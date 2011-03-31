@@ -276,7 +276,23 @@ cd ..
 device=`scripts/get_device_name | sed 's/ /_/g'`
 cd WORKING_*
 
-if [ "$express" == "yes" ]
+
+sign_update=no
+
+if [ "$express" == "no" ]
+then
+  echo "It is recommended that you sign your ROM."
+  echo -n "Sign it (y/n)? (default: y): "
+  read do_sign
+
+  if [ "$do_sign" != "n" ]
+  then
+    sign_update=yes
+  fi
+fi
+
+
+if [ "$sign_update" == "no" ]
 then
   final_file=$device\_unsigned_$date_str.zip
   mv -v update.zip $final_file
@@ -325,7 +341,7 @@ then
   echo 
   echo "Remember to do a wipe if necessary!"
 
-  if [ "$express" == "yes" ]
+  if [ "$sign_update" == "no" ]
   then
     echo
     echo "PLEASE NOTE: You will need to disable signature checks in"
@@ -338,7 +354,7 @@ else
   echo "Was not able to create $final_file!"
   echo
 
-  if [ "$express" == "no" ]
+  if [ "$sign_update" == "yes" ]
   then
     if [ `uname | grep Linux` ] 
     then
