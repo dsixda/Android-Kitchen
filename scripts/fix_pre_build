@@ -2,11 +2,17 @@
 cd WORKING_*
 
 
-if [ ! -e META-INF/com/google/android/update-script ] && [ ! -e META-INF/com/google/android/updater-script ]
+if [ ! -d system ]
+then
+  echo "Warning: system folder not found!"
+  echo
+  cd ..
+  exit 0
+
+elif [ ! -e META-INF/com/google/android/update-script ] && [ ! -e META-INF/com/google/android/updater-script ]
 then
   echo "Warning: update-script/updater-script not found"
   echo
-
   cd ..
   exit 0
 
@@ -109,10 +115,14 @@ fi
 if [ -e radio.img ]
 then
   
+  if [ ! -d system/app ]
+  then
+    echo "Warning: radio.img found but no system/app detected.  The update-script won't be modified."
+
   #
   # Add radio to HTC device
   #
-  if [ `ls system/app | grep -c -i htc` -gt 0 ]
+  elif [ `ls system/app | grep -c -i htc` -gt 0 ]
   then
     if [ "`grep -c write_radio_image META-INF/com/google/android/update-script`" == "0" ] 
     then
