@@ -4,7 +4,7 @@ cd WORKING_*
 
 if [ ! -d system ]
 then
-  echo "Warning: system folder not found!"
+  echo "Warning: system folder not found, cannot continue!"
   echo
   cd ..
   exit 0
