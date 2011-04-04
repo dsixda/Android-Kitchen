@@ -16,7 +16,7 @@ then
     echo Found working folder
   else
     echo No working folder found!
-    exit 0
+    exit 1
   fi
 fi
 
@@ -34,9 +34,11 @@ then
 
 else
   echo Error: Operating system not detected, cannot use zipalign
-  exit 0
+  exit 1
 fi
 
+
+return_val=0
 
 if [ "$1" == "for_build" ]
 then
@@ -57,8 +59,9 @@ else
   echo "Zipalign is a procedure that will optimize all of the *.apk"
   echo "files under your working folder for better RAM utilization."
   echo
-  echo "The option to zipalign all *.apk files will also be asked when"
-  echo "you build your ROM, so it is not necessary to zipalign now."
+  echo "NOTE: The option to zipalign all *.apk files will also be"
+  echo "provided when you build your ROM, so it is not necessary to"
+  echo "zipalign now."
   echo 
   echo "---------------------------------------------------------------"
   echo
@@ -131,7 +134,14 @@ do
     fi
 
   else
-    echo "Error: Unable to zipalign"
+
+    return_val=1
+    echo "Error: Unable to zipalign, aborting"
+    if [ `uname | grep Linux` ]
+    then
+      echo "If you are using 64-bit Linux, ensure you installed package ia32-libs"
+    fi
+    break
   fi
 
   name1=
@@ -140,6 +150,11 @@ done
 
 cd ..
 echo
-echo "Finished zipaligning"
 
+if [ "$return_val" == "0" ]
+then
+  echo "Finished zipaligning"
+fi
+
+exit $return_val
 
