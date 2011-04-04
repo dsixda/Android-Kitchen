@@ -281,9 +281,11 @@ sign_update=no
 
 if [ "$express" == "no" ]
 then
+  echo
   echo "It is recommended that you sign your ROM."
   echo -n "Sign it (y/n)? (default: y): "
   read do_sign
+  echo
 
   if [ "$do_sign" != "n" ]
   then
