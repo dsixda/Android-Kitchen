@@ -4,39 +4,5 @@
 # $1 = working folder name
 #
 
-if [ "$1" == "" ]
-then
-  cd WORKING_*
-else
-  cd $1
-fi
-
-cd system
-
-if [ ! -e build.prop ]
-then
-  model=UNKNOWN
-
-else
-
-  str=^ro.product.model=
-  grep_str=`grep -c $str build.prop`
-
-  if [ $grep_str == 0 ]
-  then
-    model=UNKNOWN
-
-  else  
-    model=`grep -m 1 $str build.prop \
-            | sed 's/ro.product.model=//g'`
-
-    if [ "$model" == "" ]
-    then
-      model=UNKNOWN
-    fi
-  fi
-fi
-
-cd ../..
-
+model=`scripts/get_build_prop_val ro.product.model $1`
 echo $model

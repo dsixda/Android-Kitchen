@@ -4,39 +4,5 @@
 # $1 = working folder name
 #
 
-if [ "$1" == "" ]
-then
-  cd WORKING_*
-else
-  cd $1
-fi
-
-cd system
-
-if [ ! -e build.prop ]
-then
-  device_name=UNKNOWN
-
-else
-
-  str=^ro.product.device=
-  grep_str=`grep -c $str build.prop`
-
-  if [ $grep_str == 0 ]
-  then
-    device_name=UNKNOWN
-
-  else  
-    device_name=`grep -m 1 $str build.prop \
-            | sed 's/ro.product.device=//g'`
-
-    if [ "$device_name" == "" ]
-    then
-      device_name=UNKNOWN
-    fi
-  fi
-fi
-
-cd ../..
-
-echo $device_name
+device=`scripts/get_build_prop_val ro.product.device $1`
+echo $device
