@@ -125,6 +125,11 @@ fi
 
 scripts/do_zipalign for_build $express
 
+if [ "$?" == "1" ]
+then
+  echo "Cancelling build"
+  exit 0
+fi
 
 cd WORKING_*
 
