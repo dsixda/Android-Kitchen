@@ -43,7 +43,8 @@ do
     cd $base_path
     cd WORKING_*
 
-    grep_cmd=`find system/app | grep \\.apk$ | sort -f`
+    grep_cmd=`find system/framework | grep \\.apk$ | sort -f`
+    grep_cmd="$grep_cmd `find system/app | grep \\.apk$ | sort -f`"
 
     if [ -d data/app ]
     then
@@ -52,7 +53,8 @@ do
       echo "      Market updates will fail.  You can choose to not sign them now and"
       echo "      later individually sign the ones you want."
       echo
-      echo "      All *.apk under /system/app will still be signed."
+      echo "      All *.apk under /system/app and /system/framework will still be"
+      echo "      signed."
       echo 
       echo
       echo -n "Sign all *.apk under /data/app (y/n)? (default: n): "
