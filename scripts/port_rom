@@ -1,8 +1,9 @@
 
 scripts/extract_kernel_and_modules
 
-my_device=`scripts/get_device_name MY_DEVICE_WORKING`
-my_board=`scripts/get_product_board MY_DEVICE_WORKING`
+my_device=`scripts/get_build_prop_val ro.product.device MY_DEVICE_WORKING`
+my_board=`scripts/get_build_prop_val ro.product.board MY_DEVICE_WORKING`
+my_platform=`scripts/get_build_prop_val ro.board.platform MY_DEVICE_WORKING`
 
 if [ -d MY_KERNEL ] 
 then
@@ -61,45 +62,22 @@ fi
 
 
 #
-# Set ro.product.device
+# Set values in build.prop
 #
 
 if [ "$my_device" == "UNKNOWN" ]
 then
-  echo "WARNING: Not going to change ro.product.device in build.prop (device=UNKNOWN)"
+  echo "WARNING: Won't modify ro.product.device in build.prop (device=UNKNOWN)"
 else
-
-  cd WORKING_*
-  cd system
-
-  if [ -e build.prop ]
-  then
-
-    if [ `grep -m 1 ro.product.device= build.prop` ]
-    then
-
-      echo "Setting ro.product.device=$my_device in build.prop"
-
-      export MY_DEVICE=${my_device}
-      perl -pi -e 's/ro.product.device=[a-zA-Z0-9\ \-]*/ro.product.device=$ENV{"MY_DEVICE"}/g' build.prop
-
-      if [ -e build.prop.bak ]
-      then
-        rm build.prop.bak
-      fi
-
-    else
-      echo "NOTE: No reference to ro.product.device found in build.prop, so we won't modify the file"
-    fi
-
-  else
-    echo "WARNING: build.prop not found!"
-  fi
-
-  cd ../..
-
+  scripts/set_build_prop_val ro.product.device $my_device
 fi
-  
+
+if [ "$my_platform" == "UNKNOWN" ]
+then
+  echo "WARNING: Won't modify ro.board.platform in build.prop (platform=UNKNOWN)"
+else
+  scripts/set_build_prop_val ro.board.platform $my_platform
+fi  
 
 
 
