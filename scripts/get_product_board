@@ -1,0 +1,42 @@
+#
+# This script has one optional parameter:
+#
+# $1 = working folder name
+#
+
+if [ "$1" == "" ]
+then
+  cd WORKING_*
+else
+  cd $1
+fi
+
+cd system
+
+if [ ! -e build.prop ]
+then
+  board=UNKNOWN
+
+else
+
+  str=^ro.product.board=
+  grep_str=`grep -c $str build.prop`
+
+  if [ $grep_str == 0 ]
+  then
+    board=UNKNOWN
+
+  else  
+    board=`grep -m 1 $str build.prop \
+            | sed 's/ro.product.board=//g'`
+
+    if [ "$board" == "" ]
+    then
+      board=UNKNOWN
+    fi
+  fi
+fi
+
+cd ../..
+
+echo $board
