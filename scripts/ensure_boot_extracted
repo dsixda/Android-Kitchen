@@ -59,7 +59,6 @@ then
       echo Extracting kernel ...
       ./extract-kernel.pl boot.img 2>/dev/null
 
-      echo
       echo Extracting ramdisk ... 
       ./extract-ramdisk.pl boot.img 2>/dev/null
 
