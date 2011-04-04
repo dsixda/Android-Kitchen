@@ -1,5 +1,16 @@
+#
+# This script has one optional parameter:
+#
+# $1 = working folder name
+#
 
-cd WORKING_*
+if [ "$1" == "" ]
+then
+  cd WORKING_*
+else
+  cd $1
+fi
+
 cd system
 
 if [ ! -e build.prop ]
