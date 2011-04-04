@@ -1,11 +1,8 @@
 
-scripts/extract_kernel_and_modules for_porting
+scripts/extract_kernel_and_modules
 
-if [ -e device.cfg ]
-then
-  my_device=`cat device.cfg`
-  rm device.cfg
-fi
+my_device=`scripts/get_device_name MY_DEVICE_WORKING`
+my_board=`scripts/get_product_board MY_DEVICE_WORKING`
 
 if [ -d MY_KERNEL ] 
 then
@@ -67,9 +64,9 @@ fi
 # Set ro.product.device
 #
 
-if [ "$my_device" == "other" ]
+if [ "$my_device" == "UNKNOWN" ]
 then
-  echo "WARNING: Not going to change ro.product.device in build.prop (device=other)"
+  echo "WARNING: Not going to change ro.product.device in build.prop (device=UNKNOWN)"
 else
 
   cd WORKING_*
@@ -93,9 +90,6 @@ else
 
     else
       echo "NOTE: No reference to ro.product.device found in build.prop, so we won't modify the file"
-      #echo "Adding ro.product.device=$my_device to build.prop"
-      #echo >> build.prop
-      #echo "ro.product.device=$my_device" >> build.prop
     fi
 
   else
@@ -126,18 +120,36 @@ echo "the new boot.img."
 cd WORKING_*
 cp -f ../MY_KERNEL/boot.img .
 cd ..
-
 echo
-echo "Press Enter to continue"
-read enterKey
+
+
+#
+# Rename *.rc files if required
+#
+
+board=`scripts/get_product_board`
+
+cd BOOT-EXTRACTED/boot.img-ramdisk
+file_list=`ls *.$board.rc`
+
+if [ "$file_list" != "" ]
+then
+  echo "Renaming *.rc files ..."
+
+  for rc_file in ${file_list[@]}
+  do
+    new_name=`echo $rc_file | sed -e 's/'"$board"'/'"$my_board"'/g'`
+    mv -v $rc_file $new_name
+  done
+
+  echo
+fi
 
 
 #
 # Check if init.rc refers to busybox, and if the busybox binary is
 # found in the working folder
 # 
-cd BOOT-EXTRACTED/boot.img-ramdisk
-
 if [ "`grep -o -m 1 busybox init.rc`" == "busybox" ]
 then
   cd ../../WORKING_*
@@ -195,8 +207,8 @@ if [ -d MY_KERNEL/system ]
 then
   cd WORKING_*
   echo 
-  echo "Copying ..."
-  cp -rfv ../MY_KERNEL/system/* system/
+  echo "Copying modules/drivers ..."
+  cp -rf ../MY_KERNEL/system/* system/
   cd ..
 fi
 
@@ -210,8 +222,8 @@ echo
 echo "=============================================================="
 echo
 echo "If all went well, you should now have the ROM ported for your"
-echo "kitchen.  Make any necessary changes and then build the ROM"
-echo "when you are ready."
+echo "kitchen.  Make any necessary additional changes and then build"
+echo "the ROM when you are ready."
 echo 
 
 
