@@ -42,15 +42,16 @@ then
     dd if=boot.img of=newboot.img bs=1 skip=$dec_offset
     rm -f boot.img
     mv newboot.img boot.img
-
     echo
+    cd $base_dir
+    exit 1
 
   else
     echo "Warning: Android header not located anywhere in boot.img"
-
   fi
 fi
 
 
 cd $base_dir
+exit 0
 
