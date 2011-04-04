@@ -1,0 +1,43 @@
+#
+# This script has three parameters:
+#
+# $1 = parameter in build.prop (mandatory)
+# $2 = value we want to set the parameter to (mandatory)
+# $3 = working folder name (optional)
+#
+
+base_dir=`pwd`
+return_val=0
+
+if [ "$3" == "" ]
+then
+  cd WORKING_*
+else
+  cd $3
+fi
+
+if [ -e system/build.prop ]
+then
+
+  cd system
+
+  if [ `grep -m 1 $1= build.prop` ]
+  then
+
+    echo "Setting $1=$2 in build.prop"
+    sed -i -e 's/\('"$1"'=\).*$/\1'"$2"'/g' build.prop
+
+  else
+    echo "NOTE: No reference to $1 found in build.prop, so we won't modify the file"
+    return_val=1
+  fi
+
+else
+  echo "WARNING: build.prop not found!"
+  return_val=1
+fi
+
+
+cd $base_dir
+exit $return_val
+

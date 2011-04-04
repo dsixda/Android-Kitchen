@@ -1,0 +1,44 @@
+#
+# This script has two parameters:
+#
+# $1 = parameter in build.prop (mandatory)
+# $2 = working folder name (optional)
+#
+
+if [ "$2" == "" ]
+then
+  cd WORKING_*
+else
+  cd $2
+fi
+
+cd system
+
+if [ ! -e build.prop ]
+then
+  value=UNKNOWN
+
+else
+
+  str=^$1=
+  grep_str=`grep -c $str build.prop`
+
+  if [ $grep_str == 0 ]
+  then
+    value=UNKNOWN
+
+  else  
+    value=`grep -m 1 $str build.prop \
+            | sed 's/'"$1"'=//g'`
+
+    if [ "$value" == "" ]
+    then
+      value=UNKNOWN
+    fi
+  fi
+fi
+
+cd ../..
+
+echo $value
+
