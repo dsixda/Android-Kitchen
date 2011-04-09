@@ -153,39 +153,12 @@ do
   #
 
   img_name=${img_list[${i}]}
-   
-  line_num1=`grep -n -m 1 "package_extract_file(\"$img_name.img\", \"/tmp/$img_name.img\");" temp.log | sed 's/:.*//g'`
 
-  if [ "$line_num1" != "" ]
+  if [ -e ../../../../$img_name.img ]
   then
-
-    line_num2=$(($line_num1+1))
-    str2=`sed -n ''"$line_num2"','"$line_num2"'p' temp.log`
-
-    if [ "$str2" == "write_raw_image(\"/tmp/$img_name.img\", \"$img_name\");" ]
-    then
-      line_num3=$(($line_num2+1))
-      str3=`sed -n ''"$line_num3"','"$line_num3"'p' temp.log`
-
-      if [ "$str3" == "delete(\"/tmp/$img_name.img\");" ]
-      then
-
-        if [ -e ../../../../$img_name.img ]
-        then
-          sed -i \
-            -e ''$line_num1' s/.*/write_raw_image PACKAGE:'"$img_name"'.img/g' \
-            -e ''$line_num2' s/.*//g' \
-            -e ''$line_num3' s/.*//g' \
-          temp.log
-        else
-          sed -i \
-            -e ''$line_num1' s/.*//g' \
-            -e ''$line_num2' s/.*//g' \
-            -e ''$line_num3' s/.*//g' \
-          temp.log
-        fi
-      fi
-    fi
+    sed -i -e ':a;N;$!ba;s/package_extract_file("'"$img_name"'.img", "\/tmp\/'"$img_name"'.img");\n[ ]*write_raw_image("\/tmp\/'"$img_name"'.img", "'"$img_name"'");\n[ ]*delete("\/tmp\/'"$img_name"'.img");/write_raw_image PACKAGE:'"$img_name"'.img/g' temp.log
+  else
+    sed -i -e ':a;N;$!ba;s/package_extract_file("'"$img_name"'.img", "\/tmp\/'"$img_name"'.img");\n[ ]*write_raw_image("\/tmp\/'"$img_name"'.img", "'"$img_name"'");\n[ ]*delete("\/tmp\/'"$img_name"'.img");//g' temp.log
   fi
 
 done
