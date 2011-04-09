@@ -62,27 +62,7 @@ fi
 
 
 #
-# Set values in build.prop
-#
-
-if [ "$my_device" == "UNKNOWN" ]
-then
-  echo "WARNING: Won't modify ro.product.device in build.prop (device=UNKNOWN)"
-else
-  scripts/set_build_prop_val ro.product.device $my_device
-fi
-
-if [ "$my_platform" == "UNKNOWN" ]
-then
-  echo "WARNING: Won't modify ro.board.platform in build.prop (platform=UNKNOWN)"
-else
-  scripts/set_build_prop_val ro.board.platform $my_platform
-fi  
-
-
-
-#
-# Replace kernel and then build new boot.img
+# Replace kernel, modify ramdisk and then build new boot.img
 #
 
 echo
@@ -108,7 +88,7 @@ echo
 board=`scripts/get_product_board`
 
 cd BOOT-EXTRACTED/boot.img-ramdisk
-file_list=`ls *.$board.rc`
+file_list=`ls *.$board.rc 2>/dev/null`
 
 if [ "$file_list" != "" ]
 then
@@ -175,6 +155,33 @@ else
 fi
 
 scripts/build_boot_img
+
+
+#
+# Set values in build.prop
+#
+
+if [ "$my_device" == "UNKNOWN" ]
+then
+  echo "WARNING: Won't modify ro.product.device in build.prop (device=UNKNOWN)"
+else
+  scripts/set_build_prop_val ro.product.device $my_device
+fi
+
+if [ "$my_board" == "UNKNOWN" ]
+then
+  echo "WARNING: Won't modify ro.product.board in build.prop (board=UNKNOWN)"
+else
+  scripts/set_build_prop_val ro.product.board $my_board
+fi
+
+if [ "$my_platform" == "UNKNOWN" ]
+then
+  echo "WARNING: Won't modify ro.board.platform in build.prop (platform=UNKNOWN)"
+else
+  scripts/set_build_prop_val ro.board.platform $my_platform
+fi  
+
 
 
 #
