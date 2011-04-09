@@ -65,6 +65,21 @@ then
     data_mnt=\\\/dev\\\/block\\\/mmcblk0p26
     sdcard_mnt=???
 
+  # myTouch 4G
+  elif [ "$device_name" == "glacier" ]
+  then
+    change_mnt=yes
+    fix_boot=yes
+
+    param1=ext3
+    param2=EMMC
+
+    sys_mnt=\\\/dev\\\/block\\\/mmcblk0p25
+    cache_mnt=\\\/dev\\\/block\\\/mmcblk0p27
+    boot_mnt=\\\/dev\\\/block\\\/mmcblk0p22
+    data_mnt=\\\/dev\\\/block\\\/mmcblk0p26
+    sdcard_mnt=???
+
   # Samsung Nexus S
   elif [ "$device_name" == "crespo" ]
   then
@@ -85,6 +100,9 @@ then
     data_mnt=\\\/dev\\\/block\\\/platform\\\/s3c-sdhci.0\\\/by-name\\\/userdata
     sdcard_mnt=\\\/dev\\\/block\\\/vold\\\/179:3
   fi
+
+
+
 
   if [ "$change_mnt" == "yes" ]
   then
@@ -136,6 +154,18 @@ then
         -e 's/mount("'"$param1"'", "MTD", "userdata"/mount("'"$param1"'", "'"$data_mnt"'"/g' \
         -e 's/mount("'"$param1_sdcard"'", "MTD", "sdcard"/mount("'"$param1_sdcard"'", "'"$sdcard_mnt"'"/g' \
         updater-script
+
+
+      #
+      # Certain devices require a special way of flashing the boot.img
+      #
+      # NOTE: :a;N;$!ba; = reads multi-line pattern as one-line pattern
+      #
+      if [ "$fix_boot" == "yes" ]
+      then
+        sed -i -e ':a;N;$!ba;s/assert(package_extract_file("boot.img", "\/tmp\/boot.img"),\n[ ]*write_raw_image("\/tmp\/boot.img", "boot"),\n[ ]*delete("\/tmp\/boot.img"));/package_extract_file("boot.img", "'"$boot_mnt"'");/g' updater-script
+      fi
+
 
       #
       # Fix cases where some formats/mounts have different numbers of args in the same file
@@ -205,6 +235,8 @@ then
         -e 's/format '"$param1_cache"' '"$cache_mnt"'/format '"$param1_cache"' CACHE:/g' \
         -e 's/format '"$param1"' '"$boot_mnt"'/format '"$param1"' BOOT:/g' \
         -e 's/format '"$param1"' '"$data_mnt"'/format '"$param1"' DATA:/g' \
+        \
+        -e 's/package_extract_file boot.img '"$boot_mnt"'/write_raw_image PACKAGE:boot.img BOOT:/g' \
         update-script
     fi
   fi

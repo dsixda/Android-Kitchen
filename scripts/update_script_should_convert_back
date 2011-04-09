@@ -41,7 +41,8 @@ else
   #
 
   if [ "$device_name" == "ace" ] || [ "$device_name" == "speedy" ] || \
-    [ "$device_name" == "crespo" ] || [ "$device_name" == "mecha" ]
+    [ "$device_name" == "crespo" ] || [ "$device_name" == "mecha" ] || \
+    [ "$device_name" == "glacier" ]
   then
 
     if [ "$1" == "" ]
