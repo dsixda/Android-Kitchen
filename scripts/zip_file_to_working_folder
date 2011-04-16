@@ -1,5 +1,6 @@
 #
-# This file has two arguments:
+# This script has two arguments:
+#
 # $1 = file name (mandatory)
 # $2 = "kernel_only" (optional)
 #
@@ -22,7 +23,7 @@ fi
 #
 # Working folder name
 #
-build_dir=`scripts/set_working_folder_name`
+build_dir=`scripts/set_working_folder_name $2` 
 
 #
 # Creating folder structure

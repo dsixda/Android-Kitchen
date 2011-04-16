@@ -1,3 +1,9 @@
+#
+# This script has two optional arguments:
+#
+# $1 = "no_create" or "create" - must specify no_create if working folder already exists
+# $2 = "kernel_only" - if this is specified then $1 is mandatory
+#
 
 if [ "$1" == "no_create" ] 
 then
@@ -45,7 +51,7 @@ else
   #
   # Working folder name
   #
-  build_dir=`scripts/set_working_folder_name`
+  build_dir=`scripts/set_working_folder_name $2`
 
   echo
   echo "Creating working folder $build_dir ..."
@@ -175,12 +181,16 @@ then
 fi
 
 cd ..
-scripts/fix_update_script 
 
-# Modify the update-script with features found in Nandroid backup
-scripts/fix_update_script_with_features
+if [ "$2" != "kernel_only" ]
+then
+  scripts/fix_update_script 
 
-scripts/remove_recovery
+  # Modify the update-script with features found in Nandroid backup
+  scripts/fix_update_script_with_features
+
+  scripts/remove_recovery
+fi
 
 echo Listing of $build_dir:
 echo
