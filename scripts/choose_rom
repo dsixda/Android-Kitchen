@@ -1,5 +1,5 @@
 #
-# This file has two optional arguments:
+# This script has one optional argument:
 # $1 = "kernel_only"
 #
 
@@ -111,7 +111,7 @@ then
 
   if [ "$file_chosen" == "system.img" ]
   then
-    scripts/img_files_to_working_folder
+    scripts/img_files_to_working_folder create_working $1
     exit $?
 
   elif [ "`echo $file_chosen | grep -i \\.zip$`" != "" ]
@@ -121,7 +121,7 @@ then
 
   elif [ "`echo $file_chosen | grep -i \\.app$`" != "" ]
   then
-    scripts/app_file_to_working_folder "$file_chosen"
+    scripts/app_file_to_working_folder "$file_chosen" $1
     exit $?
   fi 
 
