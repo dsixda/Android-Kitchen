@@ -1,7 +1,8 @@
 #
-# This file has two optional arguments: 
-# $1 = "no_info"
-# $2 = "kernel_only"
+# This script has two optional arguments: 
+#
+# $1 = "no_info"      - specify this when porting or extracting kernel
+# $2 = "kernel_only"  - if this is specified, then $1 is mandatory
 #
 
 
