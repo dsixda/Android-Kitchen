@@ -1,5 +1,6 @@
 #
-# This file has two optional arguments:
+# This script has two optional arguments:
+#
 # $1 = "for_zip"
 # $2 = yes/no (express build mode) - relies on $1 being present
 #
