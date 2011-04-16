@@ -22,8 +22,7 @@ fi
 #
 # Working folder name
 #
-date_str=`date '+%m%d%y_%H%M%S'`
-build_dir=WORKING_$date_str
+build_dir=`scripts/set_working_folder_name`
 
 #
 # Creating folder structure
@@ -113,7 +112,7 @@ then
   cd ..
   exit 1
 
-elif [ ! -d system ]
+elif [ ! -d system ] && [ ! -d SYSTEM ]
 then
 
   echo
@@ -138,6 +137,18 @@ else
       cd ..
       scripts/ensure_nand_extracted no_clear
       scripts/build_boot_img
+      cd WORKING_*
+
+    #
+    # Leaked ROMs with partitions in folder format
+    # 
+    elif [ -e BOOT/kernel ] && [ -e BOOT/base ] && [ -e BOOT/cmdline ] && [ -d BOOT/RAMDISK ]
+    then
+      echo "Partitions are in folder format; BOOT folder will need to be"
+      echo "converted into a boot.img ..."
+     
+      cd ..
+      scripts/build_boot_img_from_folder_form
       cd WORKING_*
 
     else
@@ -198,8 +209,8 @@ else
 
     scripts/check_no_update_script
     error_code=$?
-    cd WORKING_*
 
+    cd WORKING_*
     cd META-INF/com/google/android
 
 
@@ -212,14 +223,27 @@ else
       echo
       echo "Warning: Both updater-script and update-script are found."
       echo -n "Remove updater-script (y/n)? (default: y) "
+
       read enterRemove
-      if [ "$enterRemove" != "n" ]
+      echo
+
+      if [ "$enterRemove" == "n" ]
       then
+        echo "Keeping updater-script, but we must remove update-script"
+        rm -rf update-script
+
+        cd ../../../../..
+        scripts/check_no_update_script
+        error_code=$?
+
+        cd WORKING_*
+        cd META-INF/com/google/android
+
+      else 
         echo "Removing updater-script"
         rm -f updater-script
-      else
-        echo "Not removing updater-script"
       fi
+
     fi
     if [ -e update-binary ] && [ -e update-script ]
     then
