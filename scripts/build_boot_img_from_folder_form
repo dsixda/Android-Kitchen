@@ -1,0 +1,49 @@
+
+
+scripts/prompt_remove_boot_extracted
+mkdir BOOT-EXTRACTED
+
+cd WORKING_*
+cd BOOT
+mv RAMDISK ../../BOOT-EXTRACTED/boot.img-ramdisk
+mv kernel ../../BOOT-EXTRACTED/zImage
+
+base_offset=`echo base`
+cmd_line=`echo cmdline`
+
+cd ..
+rm -rf BOOT
+mv SYSTEM ../system.temp
+rm -rf *
+mv ../system.temp system
+cd ..
+
+platform=`scripts/get_build_prop_val ro.board.platform`
+
+if [ "$platform" == "qsd8k" ]
+then
+  kernel_offset=2048
+
+elif [ "$platform" == "msm8660" ] || [ "$platform" == "s5pc110" ] || \
+      [ "$platform" == "msm7x30" ]
+then
+  kernel_offset=4096
+
+else
+  echo
+  echo "Unable to determine offset of kernel (also known as page size) in boot.img."
+  echo "If you are not going to flash this boot.img then just use the default value."
+  echo
+  echo -n "Please enter page size (default=4096): "
+  read kernel_offset
+  echo
+
+  if [ "$kernel_offset" == "" ]
+  then
+    kernel_offset=4096
+  fi
+
+fi
+
+scripts/build_boot_img $kernel_offset $base_offset $cmd_line
+
