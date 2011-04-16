@@ -171,6 +171,7 @@ do
     -e ''$line_num' s/TMP:\([^)]*\))/\/tmp\/\1)/g' \
     -e ''$line_num' s/SDCARD:\([^)]*\))/\/sdcard\/\1)/g' \
     -e ''$line_num' s/BOOT:\([^)]*\))/\/boot\/\1)/g' \
+    -e ''$line_num' s/CACHE:\([^)]*\))/\/cache\/\1)/g' \
     updater-script
 
   line_num=`grep -n -m 1 "copy_dir " updater-script | sed -e 's/:.*//g'`
@@ -577,9 +578,23 @@ fi
 echo "- Final formatting ..."
 
 #
+# Other commands 
+#
+sed -i \
+  -e 's/add_upgrade_property/add_upgrade_property();/g' \
+  -e 's/install_modem_package/install_modem_package();/g' \
+  updater-script
+
+sed -i -e 's/write_blob_raw_image PACKAGE:blob/assert(package_extract_file("blob", "\/tmp\/blob"),\n       write_blob_raw_image("\/tmp\/blob", "staging"),\n       delete("\/tmp\/blob"));/g' updater-script
+
+
+#
 # Clean up any mess left by my script
 #
-sed -i -e 's/\/");/");/g' updater-script
+sed -i \
+  -e 's/\/");/");/g' \
+  -e 's/; $/;/g' \
+  updater-script
 
 #
 # Remove blank lines

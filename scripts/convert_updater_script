@@ -166,6 +166,23 @@ done
 sed -i -e 's/write_raw_image("boot.img", "boot");/write_raw_image PACKAGE:boot.img BOOT:/g' temp.log
 sed -i -e 's/write_raw_image PACKAGE:boot.img$/write_raw_image PACKAGE:boot.img BOOT:/g' temp.log
 
+
+#
+# Dell Streak
+#
+if [ -e ../../../../boot.img ]
+then
+  sed -i -e ':a;N;$!ba;s/package_extract_file("boot.img", "\/tmp\/boot.img");\n[ ]*write_boot_raw_image("\/tmp\/boot.img", "boot");\n[ ]*delete("\/tmp\/boot.img");/write_raw_image PACKAGE:boot.img BOOT:/g' temp.log
+else
+  sed -i -e ':a;N;$!ba;s/package_extract_file("boot.img", "\/tmp\/boot.img");\n[ ]*write_boot_raw_image("\/tmp\/boot.img", "boot");\n[ ]*delete("\/tmp\/boot.img");//g' temp.log
+fi
+if [ -e ../../../../blob ]
+then
+  sed -i -e ':a;N;$!ba;s/package_extract_file("blob", "\/tmp\/blob");\n[ ]*write_blob_raw_image("\/tmp\/blob", "staging");\n[ ]*delete("\/tmp\/blob");/write_blob_raw_image PACKAGE:blob/g' temp.log
+else
+  sed -i -e ':a;N;$!ba;s/package_extract_file("blob", "\/tmp\/blob");\n[ ]*write_blob_raw_image("\/tmp\/blob", "staging");\n[ ]*delete("\/tmp\/blob");//g' temp.log
+fi
+
 #
 # run_program
 #
