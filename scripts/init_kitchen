@@ -7,6 +7,7 @@ rm -f symlinks.log
 rm -f tools/explore2fs_windows/explore*.txt
 rm -f tools/ext2read_windows/ext2*.log
 rm -f ext2*.log
+rm -f sh.exe.stackdump
 
 bin_list=( mkbootfs mkbootfs.exe mkbootimg mkbootimg.exe mkbootimg_4k_offset mkbootimg_4k_offset.exe )
 
