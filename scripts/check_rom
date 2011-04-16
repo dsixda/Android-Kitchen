@@ -11,7 +11,7 @@ echo "may be one of the following:"
 echo 
 echo " - A ZIP file for a custom ROM  (e.g. update.zip)"
 echo " - A ZIP file containing *.img  (e.g. rom.zip from shipped ROM)"
-echo " - A ZIP file containing SYSTEM and BOOT folders from a leaked ROM"
+echo " - A ZIP file containing shipped ROM in SYSTEM + BOOT folder format"
 echo " - system.img + boot.img        (e.g. from shipped ROM or Nandroid)"
 echo " - An APP file from Huawei      (e.g. UPDATE.APP from software update)"
 echo
