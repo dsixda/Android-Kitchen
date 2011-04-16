@@ -1,5 +1,5 @@
 #
-# This file has one mandatory argument:
+# This script has one mandatory argument:
 # $1 = updater-script/update-script
 #
 

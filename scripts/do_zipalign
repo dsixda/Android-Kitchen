@@ -1,6 +1,5 @@
 #
-# This file has two optional arguments:
-#
+# This script has two optional arguments:
 # $1 = "for_build"
 # $2 = yes/no (ignore prompt) - relies on $1 being present, default=yes
 #
