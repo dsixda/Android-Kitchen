@@ -50,19 +50,7 @@ fi
 # Check Android OS version
 #
 
-cd WORKING_*
-cd system
-
-android_os=`grep -m 1 ^ro.build.version.release= *.prop \
-           | sed 's/ro.build.version.release=//g' \
-           | sed 's/[^:]*://g'`
-
-if [ "$android_os" == "" ]
-then
-  android_os=UNKNOWN
-fi
-
-cd ../..
+android_os=`scripts/get_build_prop_val ro.build.version.release`
 
 
 
@@ -81,25 +69,9 @@ else
   id_var=ro.product.version
 fi
 
-str=^$id_var=
-file_count=`grep -l $str *.prop | grep -c .prop`
-
-if [ $file_count == 0 ]
-then
-  rom_name=UNKNOWN
-
-elif [ $file_count -gt 1 ]
-then
-  rom_name="DEFINED $file_count TIMES"
-
-else
-  rom_name=`grep -m 1 $str *.prop \
-            | sed 's/'"$id_var"'=//g' \
-            | sed 's/[^:]*://g'`
-fi
-
 cd ../..
 
+rom_name=`scripts/get_build_prop_val $id_var`
 
 
 
