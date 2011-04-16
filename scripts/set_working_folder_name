@@ -1,26 +1,34 @@
+#
+# This script has one optional argument
+#
+# $1 = "kernel_only"
+#
 
 date_str=`date '+%m%d%y_%H%M%S'`
 working_dir=WORKING_$date_str
 
-echo 1>&2
-echo "The new working folder will be named $working_dir" 1>&2
-echo -n "Change it (y/n)? (default: n): " 1>&2
+if [ "$1" != "kernel_only" ]
+  then
 
-read change_it
-echo 1>&2
+  echo 1>&2
+  echo "The new working folder will be named $working_dir" 1>&2
+  echo -n "Change it (y/n)? (default: n): " 1>&2
 
-if [ "$change_it" == "y" ]
-then
+  read change_it
+  echo 1>&2
 
-  echo -n "Enter a new name (using this prefix): WORKING_" 1>&2
+  if [ "$change_it" == "y" ]
+  then
 
-  read newname 
-  
-  newname=`echo $newname | sed -e 's/ /_/g'`
+    echo -n "Enter a new name (using this prefix): WORKING_" 1>&2
 
-  working_dir="WORKING_$newname"
+    read newname 
+    
+    newname=`echo $newname | sed -e 's/ /_/g'`
+
+    working_dir="WORKING_$newname"
+  fi
 fi
-
 
 echo $working_dir
 
