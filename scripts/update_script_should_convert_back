@@ -42,7 +42,7 @@ else
 
   if [ "$device_name" == "ace" ] || [ "$device_name" == "speedy" ] || \
     [ "$device_name" == "crespo" ] || [ "$device_name" == "mecha" ] || \
-    [ "$device_name" == "glacier" ]
+    [ "$device_name" == "glacier" ] || [ "$device_name" == "streak7" ]
   then
 
     if [ "$1" == "" ]
