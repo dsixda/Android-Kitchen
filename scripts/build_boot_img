@@ -239,9 +239,6 @@ echo Building newBoot.img ...
 
 ./$mkbootimg_file --kernel zImage --ramdisk ramdisk-boot --cmdline "$cmd_line" -o newBoot.img --base $base
 
-rm $mkbootfs_file
-rm $mkbootimg_file
-
 
 if [ -e newBoot.img ]
 then
@@ -265,11 +262,18 @@ then
   echo
   echo "Removing BOOT-EXTRACTED folder ..."
   rm -rf BOOT-EXTRACTED
+  
+  exit_code=1
 
 else
   echo
   echo newBoot.img not created!
-  exit 0
+
+  rm $mkbootfs_file
+  rm $mkbootimg_file
+
+  cd ..
+  exit_code=0
 fi
 
-cd ..
+exit $exit_code
