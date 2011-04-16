@@ -16,8 +16,7 @@ fi
 #
 # Working folder name
 #
-date_str=`date '+%m%d%y_%H%M%S'`
-build_dir=WORKING_$date_str
+build_dir=`scripts/set_working_folder_name`
 
 #
 # Creating folder structure
