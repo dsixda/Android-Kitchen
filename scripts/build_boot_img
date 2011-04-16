@@ -1,7 +1,7 @@
 #
 # This script has three optional parameters:
 #
-# $1 = kernel offset in boot.img (in decimal)
+# $1 = page size / kernel offset in boot.img (in decimal)
 # $2 = kernel base offset (in hexadecimal, e.g. 0x200000; needs $1 defined)
 # $3 = command line (needs $1 and $2 defined)
 #
