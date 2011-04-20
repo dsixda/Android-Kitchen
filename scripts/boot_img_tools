@@ -16,28 +16,53 @@ do
   if [ -d WORKING_* ]
   then
 
-    if [ -d BOOT-EXTRACTED ] 
+    if [ -d BOOT-EXTRACTED ]
+    then
+      extracted=true
+    else
+      extracted=false
+    fi
+
+    cd WORKING_*
+    if [ -e boot.img ]
+    then
+      boot_img=true
+    else
+      boot_img=false
+    fi
+
+    if [ -d boot ]
+    then
+      boot_folder=true
+    else
+      boot_folder=false
+    fi
+
+    cd ..
+
+
+    if [ "$boot_img" == "true" ]
+    then
+      echo "  s = Show boot.img information"
+    fi
+
+    if [ "$extracted" == "true" ] 
     then
       echo "  b = Build boot.img from BOOT-EXTRACTED folder (for working folder)"
       echo "  n = Build NAND's boot folder from BOOT-EXTRACTED (for working folder)"
       echo "  r = Remove BOOT-EXTRACTED folder (don't build anything)"
     else
       
-      cd WORKING_*
-
-      if [ -e boot.img ]
+      if [ "$boot_img" == "true" ]
       then
         echo "  w = Extract kernel+ramdisk from boot.img"
         echo "  c = Convert boot.img into NAND boot folder"
 
-      elif [ -d boot ]
+      elif [ "$boot_folder" == "true" ]
       then
         echo "  y = Convert NAND boot folder into boot.img"
         echo "  z = Extract kernel+ramdisk (regular format) from NAND boot folder"
       fi
-
-      cd ..
-
     fi
   fi
 
@@ -48,7 +73,11 @@ do
 
   read enterLetter
 
-  if [ "$enterLetter" == "w" ]
+  if [ "$enterLetter" == "s" ]
+  then
+    scripts/show_boot_img_info
+
+  elif [ "$enterLetter" == "w" ]
   then
     scripts/ensure_boot_extracted
 
