@@ -1,0 +1,39 @@
+clear
+
+echo
+
+if [ -d WORKING_* ]
+then
+  cd WORKING_*
+
+  if [ ! -e boot.img ]
+  then
+    echo "boot.img not found!"
+    exit 0
+  fi
+
+else
+  echo "Working folder not found!"
+  exit 0
+fi
+
+cd ..
+base_addr=`scripts/get_kernel_base_addr`
+page_size=`scripts/get_boot_img_page_size`
+cmd_line=`scripts/get_cmdline`
+
+
+
+clear
+
+echo
+echo "Working folder's boot.img information"
+echo "-------------------------------------"
+echo
+echo " Kernel Base Address  : $base_addr"
+echo " Page Size            : $page_size"
+echo " Command Line         : $cmd_line"
+echo
+
+
+
