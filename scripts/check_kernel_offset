@@ -1,7 +1,7 @@
 #
 # This script has one optional parameter:
 #
-# $1 = folder name
+# $1 = folder containing boot.img
 #
 
 
@@ -16,9 +16,11 @@ then
   fi
 
   cd WORKING_*
+  working_folder=`pwd`
 
 else
   cd $1
+  working_folder=`pwd`
 fi
 
 
@@ -27,21 +29,18 @@ echo
 if [ -e boot.img ] 
 then
 
-  # Mac OS X adds extra spaces between the numbers!
-  hex_offset=`od -x -A x boot.img | grep -m 1 "0000 [ ]*e1a0" | sed -e 's/ .*//'`
+  cd $base_dir
+  dec_offset=`scripts/get_boot_img_page_size $working_folder`
 
-  if [ "$hex_offset" != "" ]
+  if [ "$dec_offset" != "" ]
   then
-    dec_offset=`printf "%d" 0x$hex_offset`
     echo "Kernel found at offset $dec_offset in boot.img"
 
-    cd $base_dir
     scripts/set_kernel_offset_files $dec_offset
     exit $?
 
   else
     echo "Error: kernel offset not found in boot.img!"
-    cd $base_dir
     exit 1
   fi
 
