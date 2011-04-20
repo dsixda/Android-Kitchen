@@ -12,7 +12,7 @@ if [ "$1" != "kernel_only" ]
 
   echo 1>&2
   echo "The new working folder will be named $working_dir" 1>&2
-  echo -n "Change it (y/n)? (default: n): " 1>&2
+  echo -n "Change the name (y/n)? (default: n): " 1>&2
 
   read change_it
   echo 1>&2
