@@ -1,0 +1,36 @@
+
+#
+# This script has one optional parameter:
+#
+# $1 = folder containing boot.img
+#
+
+base_dir=`pwd`
+
+if [ "$1" == "" ]
+then
+  if [ ! -d WORKING_* ]
+  then
+    echo Working folder not found!
+    exit 0
+  fi
+  cd WORKING_*
+else
+  cd $1
+fi
+
+# Mac OS X adds extra spaces between the numbers!
+hex_offset=`od -x -A x boot.img | grep -m 1 "0000 [ ]*e1a0" | sed -e 's/ .*//'`
+
+if [ "$hex_offset" != "" ]
+then
+  dec_offset=`printf "%d" 0x$hex_offset`
+else
+  dec_offset=""
+fi
+
+cd $base_dir
+
+echo $dec_offset
+
+
