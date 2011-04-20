@@ -27,8 +27,6 @@ else
 fi
 
 
-
-
 if [ -d WORKING_* ]
 then
   echo Working folder found
@@ -36,9 +34,6 @@ else
   echo Working folder not found!
   exit 0
 fi
-
-
-
 
 
 echo 
