@@ -89,6 +89,7 @@ echo
 
 
 scripts/fix_pre_build
+cmd_line=`scripts/get_cmdline`
 
 
 echo
@@ -96,13 +97,16 @@ echo "======================================================="
 echo
 echo "Select a build option:"
 echo
-echo "  1 = Interactive Mode"
+echo "  1 = Interactive Mode - recommended for most users"
 echo "      (Guide me through the build)"
 echo
-echo "  2 = Express Mode - Advanced users only!"
+echo "  2 = Express Mode - for advanced users"
 echo "      (Automatically zipalign, Edify, don't sign ROM)"
 echo 
-echo "  3 = Cancel - Don't build now"
+echo "  3 = Extreme Mode - for advanced users"
+echo "      (No zipalign, no script conversion, don't sign)"
+echo 
+echo "  4 = Cancel - Don't build now"
 echo
 echo "======================================================="
 echo
@@ -111,19 +115,26 @@ echo -n "Number (default: 1): "
 read build_mode
 
 # Default is 1, so remember to account for Enter key
-if [ "$build_mode" == "3" ]
+if [ "$build_mode" == "4" ]
 then
   echo "Cancelled"
   exit 0
 elif [ "$build_mode" == "2" ]
 then
   express=yes 
+elif [ "$build_mode" == "3" ]
+then
+  express=yes
+  extreme=yes
 else
   express=no
 fi
 
 
-scripts/do_zipalign for_build $express
+if [ "$extreme" != "yes" ]
+then
+  scripts/do_zipalign for_build $express
+fi
 
 if [ "$?" == "1" ]
 then
@@ -167,7 +178,7 @@ fi
 # Convert update-script (Amend) to updater-script (Edify) in the ZIP file only
 #
 
-if [ -e META-INF/com/google/android/update-script ]
+if [ "$extreme" != "yes" ] && [ -e META-INF/com/google/android/update-script ]
 then
  
   cd ..
@@ -267,6 +278,21 @@ then
 
   echo
 
+else
+
+  #
+  # For Extreme mode
+  #
+
+  if [ -e META-INF/com/google/android/update-script ]
+  then
+    echo "update-script (Amend) found"
+  elif [ -e META-INF/com/google/android/updater-script ]
+  then
+    echo "updater-script (Edify) found"
+  fi
+
+  echo
 fi
 
 
