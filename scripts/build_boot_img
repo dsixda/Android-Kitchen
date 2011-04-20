@@ -195,20 +195,16 @@ cd WORKING_*
 if [ -e boot.img ]
 then
 
+  cd ..
   echo
 
   if [ "$base" == "" ]
   then
     echo "Attempting to determine kernel base address ..."
-
-    base_temp=`od -A n -h -j 34 -N 2 boot.img | sed 's/ //g'`
-    zeros=0000
-    base=0x$base_temp$zeros
+    base=`scripts/get_kernel_base_addr`
   fi
 
   echo "Using base address of $base"
-
-  cd ..
 
   if [ "$cmd_line" == "" ]
   then
