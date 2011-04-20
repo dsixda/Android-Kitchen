@@ -12,7 +12,7 @@ fi
 
 if [ ! -d META-INF/com/google/android ]
 then
-  echo "Warning: No META-INF/com/google/android folder found, creating it."
+  echo "No META-INF/com/google/android folder found, creating it."
   mkdir -p META-INF/com/google/android
   echo
 fi
@@ -70,29 +70,13 @@ else
 
     cd ../../../../..
 
-    echo -n "Did not find an update-script.  Shall I create one (y/n)? (default: y): "
-    read create_update
-
-    echo
-
-    if [ "$create_update" == "n" ]
-    then
-      echo "WARNING: The kitchen may have problems without an update-script"
-      exit 2
-      echo
-    else
-      create_new=1
-    fi
-  fi
-
-  if [ "$create_new" == "1" ]
-  then
-    echo "Adding an update-script ..."
+    echo "Did not find an update-script, creating one."
     cd WORKING_*
     cp ../tools/update_files/update-script META-INF/com/google/android/
     cd ..
     scripts/fix_update_script
     scripts/fix_update_script_with_features
+
   fi
 fi
 
