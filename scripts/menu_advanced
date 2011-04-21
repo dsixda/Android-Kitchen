@@ -21,7 +21,7 @@ do
  echo " 17 - Add /etc/init.d scripts support (busybox run-parts)"
  echo " 18 - Add custom boot animation functionality"
  echo " 19 - Porting tools (experimental)"
- echo " 20 - Unpack or re-pack a boot image" 
+ echo " 20 - Tools for boot image (unpack/re-pack/etc.)" 
  echo " 21 - Unpack data.img"
  echo " 22 - Sign APK file(s)" 
  echo " 23 - Convert update-script or updater-script"
