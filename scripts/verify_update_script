@@ -90,6 +90,8 @@ echo "update-script has $num_lines lines"
 echo
 
 errors_found=0
+resolve_conflicts=0
+resolved=0
 
 for (( i = 1 ; i <= $num_lines ; i++ ))
 do
@@ -351,6 +353,30 @@ do
       then
         errors_found=$(($errors_found+1))
         echo ">> ERROR: $var found in working folder"
+
+        #
+        # Automatically fix symlink conflicts
+        #
+
+        if [ "$resolve_conflicts" == "0" ]
+        then
+          echo -n "Automatically fix all symlink conflicts (y/n)? (default: y): "
+          read ask_delete
+
+          if [ "$ask_delete" != "n" ]
+          then
+            resolve_conflicts=1
+          fi
+        fi
+
+        if [ "$resolve_conflicts" == "1" ]
+        then
+          rm -rfv $var
+          if [ "$?" == "0" ]
+          then
+            resolved=$(($resolved+1))
+          fi
+        fi
       fi   
     fi
   done
@@ -365,6 +391,13 @@ echo
 if [ "$errors_found" != "0" ]
 then
   echo "$errors_found issue(s) found.  Please review the update-script to ensure it is correct."
+
+  if [ "$resolve_conflicts" == "1" ]
+  then
+    echo
+    echo "Number of symlink conflicts resolved: $resolved"
+  fi
+
 else
   echo "No issues found."
 fi
