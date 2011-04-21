@@ -32,7 +32,8 @@ echo "-------------------------------------"
 echo
 echo " Kernel Base Address  : $base_addr"
 echo " Page Size            : $page_size"
-echo " Command Line         : $cmd_line"
+echo
+echo " Command Line: \"$cmd_line\""
 echo
 
 
