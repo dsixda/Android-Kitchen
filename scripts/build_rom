@@ -91,6 +91,8 @@ echo
 scripts/fix_pre_build
 cmd_line=`scripts/get_cmdline`
 
+extreme=no
+express=no
 
 echo
 echo "======================================================="
@@ -101,7 +103,7 @@ echo "  1 = Interactive Mode - recommended for most users"
 echo "      (Guide me through the build)"
 echo
 echo "  2 = Express Mode - for advanced users"
-echo "      (Automatically zipalign, Edify, don't sign ROM)"
+echo "      (Zipalign, Edify, don't sign ROM)"
 echo 
 echo "  3 = Extreme Mode - for advanced users"
 echo "      (No zipalign, no script conversion, don't sign)"
@@ -119,19 +121,16 @@ if [ "$build_mode" == "4" ]
 then
   echo "Cancelled"
   exit 0
+elif [ "$build_mode" == "3" ]
+then
+  extreme=yes  
 elif [ "$build_mode" == "2" ]
 then
   express=yes 
-elif [ "$build_mode" == "3" ]
-then
-  express=yes
-  extreme=yes
-else
-  express=no
 fi
 
 
-if [ "$extreme" != "yes" ]
+if [ "$extreme" == "no" ]
 then
   scripts/do_zipalign for_build $express
 fi
@@ -178,7 +177,7 @@ fi
 # Convert update-script (Amend) to updater-script (Edify) in the ZIP file only
 #
 
-if [ "$extreme" != "yes" ] && [ -e META-INF/com/google/android/update-script ]
+if [ "$extreme" == "no" ] && [ -e META-INF/com/google/android/update-script ]
 then
  
   cd ..
@@ -310,7 +309,7 @@ cd WORKING_*
 
 sign_update=no
 
-if [ "$express" == "no" ]
+if [ "$express" == "no" ] && [ "$extreme" == "no" ]
 then
   echo
   echo "It is recommended that you sign your ROM."
