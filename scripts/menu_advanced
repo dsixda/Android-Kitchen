@@ -5,52 +5,59 @@ version=$1
 while :
 do
 
- clear
+  clear
 
- echo 
- echo "============================================================"
- echo " HTC Android Kitchen $version - by dsixda (xda-developers.com)"
- echo "============================================================"
- echo
- echo " 11 - Deodex files in your ROM"
- echo " 12 - Add task killer tweak for speed (stock ROM only)"
- echo " 13 - Add /data/app functionality"
- echo " 14 - Add Nano text editor + sysro/sysrw"
- echo " 15 - Add Bash (command shell)"
- echo " 16 - Add Apps2SD"
- echo " 17 - Add /etc/init.d scripts support (busybox run-parts)"
- echo " 18 - Add custom boot animation functionality"
- echo " 19 - Porting tools (experimental)"
- echo " 20 - Tools for boot image (unpack/re-pack/etc.)" 
- echo " 21 - Unpack data.img"
- echo " 22 - Sign APK file(s)" 
- echo " 23 - Convert update-script or updater-script"
- echo " 24 - Run plugin scripts"
- echo
- echo " 99 - Build ROM from working folder"
- echo "  0 - BACK TO MAIN MENU"
- echo
- echo -n "Enter option: "
- read opt
- case $opt in
-   11) scripts/do_deodex; continue;; 
-   12) scripts/task_killer;;
-   13) scripts/add_data_app show_help;;
-   14) scripts/add_nano show_help;;
-   15) scripts/add_bash show_help;;
-   16) scripts/add_apps2sd show_help;;
-   17) scripts/add_busybox_run_parts show_help;;
-   18) scripts/add_custom_boot_anim;;
-   19) scripts/porting_tools; continue;;
-   20) scripts/boot_img_tools; continue;;   
-   21) scripts/unpack_data_img;; 
-   22) scripts/sign_apks; continue;;
-   23) scripts/update_script_convert_menu; continue;;
-   24) scripts/run_plugins; continue;;
-   99) scripts/build_rom;;
-   0) exit 1;;
-   *) echo "Invalid option"; continue;;
- esac
+  echo 
+  echo "============================================================"
+  echo " HTC Android Kitchen $version - by dsixda (xda-developers.com)"
+  echo "============================================================"
+  echo
+  echo " 11 - Deodex files in your ROM"
+  echo " 12 - Add task killer tweak for speed (stock ROM only)"
+  echo " 13 - Add /data/app functionality"
+  echo " 14 - Add Nano text editor + sysro/sysrw"
+  echo " 15 - Add Bash (command shell)"
+  echo " 16 - Add Apps2SD"
+  echo " 17 - Add /etc/init.d scripts support (busybox run-parts)"
+  echo " 18 - Add custom boot animation functionality"
+  echo " 19 - Porting tools (experimental)"
+  echo " 20 - Tools for boot image (unpack/re-pack/etc.)" 
+  echo " 21 - Unpack data.img"
+  echo " 22 - Sign APK file(s)" 
+  echo " 23 - Convert update-script or updater-script"
+  echo " 24 - Run plugin scripts"
+  echo
+  echo " 99 - Build ROM from working folder"
+  echo "  0 - BACK TO MAIN MENU"
+  echo
+  echo -n "Enter option: "
+  read opt
+
+  scripts/check_multiple_working
+  if [ "$?" == "1" ]
+  then
+    exit 0
+  fi
+
+  case $opt in
+    11) scripts/do_deodex; continue;; 
+    12) scripts/task_killer;;
+    13) scripts/add_data_app show_help;;
+    14) scripts/add_nano show_help;;
+    15) scripts/add_bash show_help;;
+    16) scripts/add_apps2sd show_help;;
+    17) scripts/add_busybox_run_parts show_help;;
+    18) scripts/add_custom_boot_anim;;
+    19) scripts/porting_tools; continue;;
+    20) scripts/boot_img_tools; continue;;   
+    21) scripts/unpack_data_img;; 
+    22) scripts/sign_apks; continue;;
+    23) scripts/update_script_convert_menu; continue;;
+    24) scripts/run_plugins; continue;;
+    99) scripts/build_rom;;
+    0) exit 1;;
+    *) echo "Invalid option"; continue;;
+  esac
 
   scripts/press_enter
 
