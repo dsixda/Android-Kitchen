@@ -23,7 +23,6 @@ if [ "$1" != "kernel_only" ]
     echo -n "Enter a new name (using this prefix): WORKING_" 1>&2
     read newname 
    
-    echo 1>&2
     newname=`echo $newname | sed -e 's/ /_/g'`
     working_dir="WORKING_$newname"
   fi
