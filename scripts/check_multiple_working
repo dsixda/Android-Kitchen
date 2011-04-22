@@ -1,0 +1,10 @@
+
+num_working=`ls | grep -c "^WORKING_"`
+if [ $num_working -gt 1 ]
+then
+  echo
+  echo "Error: You have more than one working folder created"
+  exit 1
+fi 
+
+exit 0
