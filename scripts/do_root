@@ -6,7 +6,7 @@ fi
 
 if [ ! -d WORKING_* ]
 then
-  echo No working folder found!
+  echo "No working folder found!"
   scripts/press_enter
   exit 0
 fi
@@ -25,6 +25,15 @@ echo "--------------------------------------------"
 echo
 
 cd WORKING_*
+
+if [ ! -d system ]
+then
+  echo "No system folder found!"
+  cd ..
+  scripts/press_enter
+  exit 0
+fi
+
 cd system
 
 if [ ! -e build.prop ]

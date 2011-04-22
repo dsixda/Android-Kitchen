@@ -5,6 +5,8 @@
 # $2 = working folder name (optional)
 #
 
+base_dir=`pwd`
+
 if [ "$2" == "" ]
 then
   cd WORKING_*
@@ -12,13 +14,13 @@ else
   cd $2
 fi
 
-cd system
-
-if [ ! -e build.prop ]
+if [ ! -e system/build.prop ]
 then
   value=UNKNOWN
 
 else
+
+  cd system
 
   str=^$1=
   grep_str=`grep -c $str build.prop`
@@ -38,7 +40,7 @@ else
   fi
 fi
 
-cd ../..
+cd $base_dir
 
 echo $value
 

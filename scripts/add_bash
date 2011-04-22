@@ -30,6 +30,14 @@ fi
 
 cd WORKING_*
 
+if [ ! -d system ]
+then
+  echo "No system folder found!"
+  cd ..
+  exit 0
+fi
+
+
 bash_path=`find . -name bash`
 if [ "$bash_path" == "" ] 
 then

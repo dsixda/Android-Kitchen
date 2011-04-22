@@ -26,6 +26,11 @@ then
   then
     exit 0
   fi
+elif [ "$is_old" == "2" ]
+then
+  echo "Error: No system folder found!"
+  exit 0
+
 else
   echo -n "ROM is newer than Android 2.1, add app anyway (y/n)? (default: n): "
   read do_tether

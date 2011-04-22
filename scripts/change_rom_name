@@ -10,14 +10,15 @@ fi
 
 clear
 cd WORKING_*
-cd system
 
-if [ ! -e build.prop ]
+if [ ! -e system/build.prop ]
 then
   echo "Error: Cannot find build.prop"
-  cd ../..
+  cd ..
   exit 0
 fi
+
+cd system
 
 echo
 
