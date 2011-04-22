@@ -93,9 +93,10 @@ cmd_line=`scripts/get_cmdline`
 
 extreme=no
 express=no
+interactive=no
 
 echo
-echo "======================================================="
+echo "=========================================================================="
 echo
 echo "Select a build option:"
 echo
@@ -103,14 +104,14 @@ echo "  1 = Interactive Mode - recommended for most users"
 echo "      (Guide me through the build)"
 echo
 echo "  2 = Express Mode - for advanced users"
-echo "      (Zipalign, Edify, don't sign ROM)"
+echo "      (Zipalign, Edify, don't sign ROM, auto-name ZIP)"
 echo 
 echo "  3 = Extreme Mode - for advanced users"
-echo "      (No zipalign, no script conversion, don't sign)"
+echo "      (No zipalign, no script conversion, don't sign ROM, auto-name ZIP)"
 echo 
 echo "  4 = Cancel - Don't build now"
 echo
-echo "======================================================="
+echo "=========================================================================="
 echo
 echo -n "Number (default: 1): "
 
@@ -127,6 +128,8 @@ then
 elif [ "$build_mode" == "2" ]
 then
   express=yes 
+else
+  interactive=yes
 fi
 
 
@@ -190,7 +193,7 @@ then
     convert_it=y
   else
     echo
-    echo "========================================================================"
+    echo "--------------------------------------------------------------------------"
     echo 
     echo " update-script detected in ROM"
     echo
@@ -308,8 +311,9 @@ cd WORKING_*
 
 
 sign_update=no
+sign_str=unsigned
 
-if [ "$express" == "no" ] && [ "$extreme" == "no" ]
+if [ "$interactive" == "yes" ]
 then
   echo
   echo "It is recommended that you sign your ROM."
@@ -320,20 +324,31 @@ then
   if [ "$do_sign" != "n" ]
   then
     sign_update=yes
+    sign_str=signed
   fi
+fi
+
+final_file=$device\_$sign_str\_$date_str.zip
+
+
+#
+# Rename zip
+#
+
+if [ "$interactive" == "yes" ]
+then
+  cd ..
+  final_file=`scripts/set_update_name $final_file`
+  cd WORKING_*
 fi
 
 
 if [ "$sign_update" == "no" ]
 then
-  final_file=$device\_unsigned_$date_str.zip
   mv -v update.zip $final_file
   echo
 
 else
-
-  final_file=$device\_signed_$date_str.zip
-
   echo Signing update.zip as $final_file ...
 
   cp ../tools/signapk_files/testkey.* .
