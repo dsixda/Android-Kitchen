@@ -34,30 +34,34 @@ do
   read opt
 
   scripts/check_multiple_working
-  if [ "$?" == "1" ]
+  if [ "$?" != "1" ]
   then
-    exit 0
+    case $opt in
+      11) scripts/do_deodex; continue;; 
+      12) scripts/task_killer;;
+      13) scripts/add_data_app show_help;;
+      14) scripts/add_nano show_help;;
+      15) scripts/add_bash show_help;;
+      16) scripts/add_apps2sd show_help;;
+      17) scripts/add_busybox_run_parts show_help;;
+      18) scripts/add_custom_boot_anim;;
+      19) scripts/porting_tools; continue;;
+      20) scripts/boot_img_tools; continue;;   
+      21) scripts/unpack_data_img;; 
+      22) scripts/sign_apks; continue;;
+      23) scripts/update_script_convert_menu; continue;;
+      24) scripts/run_plugins; continue;;
+      99) scripts/build_rom;;
+      0) exit 1;;
+      *) echo "Invalid option"; continue;;
+    esac
+  else
+    if [ "$opt" == 0 ]
+    then
+      scripts/press_enter
+      exit 1
+    fi
   fi
-
-  case $opt in
-    11) scripts/do_deodex; continue;; 
-    12) scripts/task_killer;;
-    13) scripts/add_data_app show_help;;
-    14) scripts/add_nano show_help;;
-    15) scripts/add_bash show_help;;
-    16) scripts/add_apps2sd show_help;;
-    17) scripts/add_busybox_run_parts show_help;;
-    18) scripts/add_custom_boot_anim;;
-    19) scripts/porting_tools; continue;;
-    20) scripts/boot_img_tools; continue;;   
-    21) scripts/unpack_data_img;; 
-    22) scripts/sign_apks; continue;;
-    23) scripts/update_script_convert_menu; continue;;
-    24) scripts/run_plugins; continue;;
-    99) scripts/build_rom;;
-    0) exit 1;;
-    *) echo "Invalid option"; continue;;
-  esac
 
   scripts/press_enter
 

@@ -59,28 +59,32 @@ do
   read opt
 
   scripts/check_multiple_working
-  if [ "$?" == "1" ]
+  if [ "$?" != "1" ]
   then
-    exit 0
+    case $opt in
+      1) clear; scripts/check_rom; continue;;
+      2) scripts/do_root; continue;;
+      3) scripts/add_busybox show_help;;
+      4) scripts/disable_sounds;;
+      5) scripts/add_tether;;
+      6) scripts/do_zipalign;;
+      7) scripts/change_wipe;;
+      8) scripts/change_rom_name;;
+      9) scripts/verify_update_script; continue;;
+      10) scripts/show_rom_info;;
+      0) scripts/menu_advanced $version; continue;;
+      99) scripts/build_rom;;
+      u) scripts/about $version; continue;;
+      x) scripts/init_kitchen; clear; echo; echo "Goodbye."; echo; exit 1;;
+      *) echo "Invalid option"; continue;;
+    esac
+  else
+    if [ "$opt" == "x" ]
+    then
+      scripts/press_enter
+      clear; echo; echo "Goodbye."; echo; exit 1;
+    fi
   fi
-
-  case $opt in
-    1) clear; scripts/check_rom; continue;;
-    2) scripts/do_root; continue;;
-    3) scripts/add_busybox show_help;;
-    4) scripts/disable_sounds;;
-    5) scripts/add_tether;;
-    6) scripts/do_zipalign;;
-    7) scripts/change_wipe;;
-    8) scripts/change_rom_name;;
-    9) scripts/verify_update_script; continue;;
-    10) scripts/show_rom_info;;
-    0) scripts/menu_advanced $version; continue;;
-    99) scripts/build_rom;;
-    u) scripts/about $version; continue;;
-    x) scripts/init_kitchen; clear; echo; echo "Goodbye."; echo; exit 1;;
-    *) echo "Invalid option"; continue;;
-  esac
 
   scripts/press_enter
 
