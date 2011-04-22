@@ -89,7 +89,7 @@ then
 fi
 
 echo
-echo "-------------------------------------------------------------------"
+echo "--------------------------------------------------------------------------"
 echo
 echo "Converting to updater-script, please wait ..."
 echo
@@ -630,7 +630,7 @@ then
   cd META-INF/com/google/android
 
   echo
-  echo "-------------------------------------------------------------------"
+  echo "--------------------------------------------------------------------------"
   echo
 
   if [ "$2" != "yes" ]
@@ -662,7 +662,7 @@ then
   if [ "$grep_huh" != "" ]
   then
     echo
-    echo "---------------------------------------------------------------------"
+    echo "--------------------------------------------------------------------------"
     echo
     echo "NOTE: Ensure you fix the unknown reference(s) at the line number(s)"
     echo "      below. Compare with the original version of the updater-script,"
