@@ -1,15 +1,12 @@
-cd WORKING_*
-cd system
 
-android_os=`grep -m 1 ^ro.build.version.release= *.prop \
-           | sed -e 's/ro.build.version.release=//g' -e 's/[^:]*://g'`
+android_os=`scripts/get_build_prop_val ro.build.version.release`
 
-if [[ `echo $android_os | grep -c "^1\."` == 1 || `echo $android_os | grep -c "^2\.1"` == 1 ]]
+if [[ `echo $android_os | grep -c "^1\."` -gt 0 || \
+     `echo $android_os | grep -c "^2\.1"` -gt 0 || \
+     `echo $android_os | grep -c "^2\.0"` -gt 0 ]]
 then
-  cd ../..
   exit 1
-fi
-  cd ../..
+else
   exit 0
 fi
 
