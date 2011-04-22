@@ -31,7 +31,7 @@ echo "Working folder's boot.img information"
 echo "-------------------------------------"
 echo
 echo " Kernel Base Address  : $base_addr"
-echo " Page Size            : $page_size"
+echo " Page Size            : $page_size bytes"
 echo
 echo " Command Line: \"$cmd_line\""
 echo
