@@ -1,0 +1,39 @@
+#
+# This script has one mandatory argument
+#
+# $1 = current name of update file (with extension) 
+#
+
+filename=$1
+
+echo 1>&2
+echo "The new ROM will be named $filename" 1>&2
+echo -n "Change the name (y/n)? (default: n): " 1>&2
+
+read change_it
+echo 1>&2
+
+if [ "$change_it" == "y" ]
+then
+  echo -n "Enter a new name: " 1>&2
+  read newname 
+
+  echo 1>&2
+
+  filename=`echo $newname | sed -e 's/ /_/g'`
+  
+  if [ "$filename" == "" ]
+  then
+    filename=$1
+  fi
+  
+  has_zip=`echo $filename | grep -ic "\.zip"`
+  if [ $has_zip == 0 ]
+  then
+    filename="$filename.zip"
+  fi
+
+fi
+
+echo $filename
+
