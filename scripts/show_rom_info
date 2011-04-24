@@ -1,14 +1,5 @@
 clear
 
-echo
-
-scripts/ensure_boot_extracted
-
-clear
-echo
-echo "Please wait ..."
-
-
 if [ -d WORKING_* ]
 then
 
@@ -18,7 +9,6 @@ then
   then
     echo "Error: update-script not found, cannot continue"
     cd ..
-    rm -rf BOOT-EXTRACTED
     exit 0
   fi
 
@@ -26,7 +16,6 @@ then
   then
     echo "Error: build.prop not found, cannot continue"
     cd ..
-    rm -rf BOOT-EXTRACTED
     exit 0
   fi
 
@@ -36,13 +25,19 @@ else
   exit 0
 fi
 
-if [ -d BOOT-EXTRACTED ] 
+
+scripts/ensure_boot_extracted
+
+if [ ! -d BOOT-EXTRACTED ] 
 then
-  echo
-else
   echo "BOOT-EXTRACTED folder not found"
   exit 0
 fi
+
+
+clear
+echo
+echo -n "Please wait ..."
 
 
 
@@ -51,7 +46,6 @@ fi
 #
 
 android_os=`scripts/get_build_prop_val ro.build.version.release`
-
 
 
 
