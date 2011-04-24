@@ -319,7 +319,6 @@ then
   echo "It is recommended that you sign your ROM."
   echo -n "Sign it (y/n)? (default: y): "
   read do_sign
-  echo
 
   if [ "$do_sign" != "n" ]
   then
@@ -331,25 +330,13 @@ fi
 final_file=$device\_$sign_str\_$date_str.zip
 
 
-#
-# Rename zip
-#
-
-if [ "$interactive" == "yes" ]
-then
-  cd ..
-  final_file=`scripts/set_update_name $final_file`
-  cd WORKING_*
-fi
-
-
 if [ "$sign_update" == "no" ]
 then
-  mv -v update.zip $final_file
-  echo
+  mv update.zip $final_file
 
 else
-  echo Signing update.zip as $final_file ...
+  echo
+  echo Signing update.zip ...
 
   cp ../tools/signapk_files/testkey.* .
   cp ../tools/signapk_files/signapk.jar .
@@ -361,8 +348,26 @@ else
   rm -f update.zip
 fi
 
+
 if [ -e $final_file ] && [ "$?" == "0" ]
 then
+
+  #
+  # Rename zip
+  #
+  if [ "$interactive" == "yes" ]
+  then
+    cd ..
+    final_file2=`scripts/set_update_name $final_file`
+    cd WORKING_*
+    if [ "$final_file2" != "$final_file" ]
+    then
+      mv -fv $final_file $final_file2
+      final_file=$final_file2
+    fi
+  fi
+
+  echo
 
   #
   # Make output folder
@@ -379,7 +384,8 @@ then
 
   echo
   echo
-  echo "==========================================================="
+  echo
+  echo "=========================================================================="
   echo
   echo "Congratulations, your ROM is here:"
   echo "OUTPUT_ZIP/$final_file" 
