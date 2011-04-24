@@ -81,6 +81,20 @@ then
     data_mnt=\\\/dev\\\/block\\\/mmcblk0p26
     sdcard_mnt=???
 
+  # Desire S
+  elif [ "$device_name" == "saga" ]
+  then
+    change_mnt=yes
+
+    param1=ext4
+    param2=EMMC
+
+    sys_mnt=\\\/dev\\\/block\\\/mmcblk0p25
+    cache_mnt=\\\/dev\\\/block\\\/mmcblk0p27
+    boot_mnt=\\\/dev\\\/block\\\/mmcblk0p22
+    data_mnt=\\\/dev\\\/block\\\/mmcblk0p26
+    sdcard_mnt=???
+
   # Samsung Nexus S
   elif [ "$device_name" == "crespo" ]
   then
