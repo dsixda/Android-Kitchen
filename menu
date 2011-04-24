@@ -1,6 +1,6 @@
 #!/bin/bash
  
-version=0.157
+version=0.158
 
 chmod 755 scripts/*
 scripts/check_install_dir
@@ -12,14 +12,6 @@ fi
 
 scripts/init_kitchen
 scripts/check_binaries
-
-if [ "$?" == "1" ]
-then
-  exit 0
-fi
-
-echo
-scripts/check_multiple_working
 
 if [ "$?" == "1" ]
 then
@@ -58,7 +50,11 @@ do
   echo -n "Enter option: "
   read opt
 
-  scripts/check_multiple_working
+  if [ "$opt" != "x" ] && [ "$opt" != "u" ]
+  then
+    scripts/check_multiple_working
+  fi
+  
   if [ "$?" != "1" ]
   then
     case $opt in
@@ -78,12 +74,6 @@ do
       x) scripts/init_kitchen; clear; echo; echo "Goodbye."; echo; exit 1;;
       *) echo "Invalid option"; continue;;
     esac
-  else
-    if [ "$opt" == "x" ]
-    then
-      scripts/press_enter
-      clear; echo; echo "Goodbye."; echo; exit 1;
-    fi
   fi
 
   scripts/press_enter
