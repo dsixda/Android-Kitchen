@@ -30,9 +30,10 @@ then
 
   cd $base_dir
   exit 1
-else
-  cd $base_dir
 
+else
+
+  cd $base_dir
   device_name=`scripts/get_device_name`
 
   #
@@ -43,7 +44,7 @@ else
   if [ "$device_name" == "ace" ] || [ "$device_name" == "speedy" ] || \
     [ "$device_name" == "crespo" ] || [ "$device_name" == "mecha" ] || \
     [ "$device_name" == "glacier" ] || [ "$device_name" == "streak7" ] || \
-    [ "$device_name" == "saga" ]
+    [ "$device_name" == "saga" ] || [ "$device_name" == "vivo" ]
   then
 
     if [ "$1" == "" ]
