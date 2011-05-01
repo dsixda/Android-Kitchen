@@ -1,0 +1,69 @@
+clear
+
+date_str=`date '+%m%d%y_%H%M%S'`
+zip_dir=sign_zips_$date_str
+
+echo
+echo "Creating folder `pwd`/$zip_dir ..."
+mkdir $zip_dir
+
+echo
+echo "---> Place your ZIP file(s) into the folder mentioned above <--"
+
+scripts/press_enter
+
+cd $zip_dir
+grep_cmd=`find . | grep -i \\.zip$ | sort -f`
+
+if [ "$grep_cmd" != "" ]
+then
+
+  cp ../tools/signapk_files/testkey.* .
+  cp ../tools/signapk_files/signapk.jar .
+
+  echo
+
+  for filename in $grep_cmd
+  do
+
+    filename=`echo $filename | sed -e 's/\.\///g'`
+    echo Signing $filename ...
+
+    final_file="signed_$filename"
+    final_file=`echo $final_file | sed -e 's/unsigned/(unsigned)/g'`
+    java -jar signapk.jar testkey.x509.pem testkey.pk8 $filename $final_file
+    res=$?
+
+    if [ "$res" == "0" ]
+    then
+      rm -f $filename
+    else
+      echo "Error signing $filename"
+      echo
+      rm -f $final_file
+    fi
+
+  done
+
+  rm -f testkey.*
+  rm -f signapk.jar
+
+  echo
+  echo
+  echo "Folder listing:"
+  echo "---------------"
+  echo
+  ls -X
+
+  cd ..
+
+else
+  echo "Error: No *.zip found!"
+  echo
+  cd ..
+  echo "Removing $zip_dir folder"
+  rm -rf $zip_dir
+  exit 0
+fi      
+  
+echo
