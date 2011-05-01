@@ -333,6 +333,7 @@ final_file=$device\_$sign_str\_$date_str.zip
 if [ "$sign_update" == "no" ]
 then
   mv update.zip $final_file
+  res=$?
 
 else
   echo
@@ -342,6 +343,7 @@ else
   cp ../tools/signapk_files/signapk.jar .
 
   java -jar signapk.jar testkey.x509.pem testkey.pk8 update.zip $final_file
+  res=$?
 
   rm -f testkey.*
   rm -f signapk.jar
@@ -349,7 +351,7 @@ else
 fi
 
 
-if [ -e $final_file ] && [ "$?" == "0" ]
+if [ -e $final_file ] && [ "$res" == "0" ]
 then
 
   #
