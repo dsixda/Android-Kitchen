@@ -23,7 +23,7 @@ do
   echo " 19 - Porting tools (experimental)"
   echo " 20 - Tools for boot image (unpack/re-pack/etc.)" 
   echo " 21 - Unpack data.img"
-  echo " 22 - Sign APK file(s)" 
+  echo " 22 - Sign APK or ZIP file(s)" 
   echo " 23 - Convert update-script or updater-script"
   echo " 24 - Run plugin scripts"
   echo
@@ -52,7 +52,7 @@ do
       19) scripts/porting_tools; continue;;
       20) scripts/boot_img_tools; continue;;   
       21) scripts/unpack_data_img;; 
-      22) scripts/sign_apks; continue;;
+      22) scripts/sign_files; continue;;
       23) scripts/update_script_convert_menu; continue;;
       24) scripts/run_plugins; continue;;
       99) scripts/build_rom;;
