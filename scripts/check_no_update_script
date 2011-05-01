@@ -35,23 +35,22 @@ else
     echo
     echo "======================================================="
     echo
-    echo "Found an updater-script but not an update-script. The"
-    echo "kitchen currently can only modify an update-script."
+    echo "Found an updater-script but not an update-script. For"
+    echo "compatibility with the kitchen scripts, only update-"
+    echo "scripts are used in the kitchen."
+    echo
     echo "Choose an option number:"
     echo 
     echo "  1 = Convert it to update-script (recommended)"
     echo "  2 = Do nothing, keep the updater-script"
     echo
-    echo "- Option #1 tries to do a translation of the updater-"
-    echo "  script (Edify) into an update-script (Amend). If"
-    echo "  the update-script contains commands that are only"
-    echo "  supported in updater-script, then the update-script"
-    echo "  will automatically be converted back to an updater-"
-    echo "  script when you build the ROM."
+    echo "- Option #1 will do a conversion of the updater-script"
+    echo "  (Edify) into an update-script (Amend).  It can be"
+    echo "  changed back to Edify format when you build the ROM."
     echo
     echo "- Option #2 should only be used if you wish not to use"
     echo "  any of the options in the kitchen other than to"
-    echo "  build the ROM or to convert to update-script."
+    echo "  build the ROM or to convert to update-script later."
     echo
     echo -n "? (default=1) "
 
