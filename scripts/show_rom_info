@@ -88,12 +88,26 @@ model=`scripts/get_product_model`
 # Check root
 #
 
+cd WORKING_*
+
+if [ "`find . -name su`" == "" ] 
+then
+  su_status=NO
+elif [ "`find . -iname Superuser.apk`" == "" ]
+then
+  su_status=NO
+else
+  su_status=YES
+fi
+
+cd ..
 
 if [ -e BOOT-EXTRACTED/boot.img-ramdisk/default.prop ]
 then
   cd BOOT-EXTRACTED/boot.img-ramdisk
 else
   echo "Error: BOOT-EXTRACTED/boot.img-ramdisk/default.prop not found!"
+  rm -rf BOOT-EXTRACTED
   exit 0
 fi
 
@@ -111,20 +125,6 @@ fi
 
 cd ../..
 
-cd WORKING_*
-
-if [ "`find . -name su`" == "" ] 
-then
-  su_status=NO
-elif [ "`find . -iname Superuser.apk`" == "" ]
-then
-  su_status=NO
-else
-  su_status=YES
-fi
-
-cd ..
-
 
 
 #
@@ -141,6 +141,7 @@ else
 fi
 
 cd ..
+
 
 
 #
@@ -362,8 +363,8 @@ echo " Android OS version             : $android_os"
 echo " Device                         : $device_name"
 echo " Model                          : $model"
 echo " ROM Name                       : $rom_name"
-echo " Rooted (unsecured boot.img)    : $unsecure_status"
 echo " Rooted (Superuser.apk + su)    : $su_status"
+echo " Rooted (unsecured boot.img)    : $unsecure_status"                                         
 echo " BusyBox installed              : $bb_status"
 echo " BusyBox run-parts support      : $runparts_status"
 echo " Apps2SD (Apps to EXT) enabled  : $apps2sd_status" 
