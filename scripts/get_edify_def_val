@@ -1,0 +1,43 @@
+#
+# This script has two mandatory parameters:
+#
+# $1 = name of device 
+# $2 = parameter in edify_defs file 
+#
+
+device=$1
+param=$2
+
+base_dir=`pwd`
+
+
+if [ ! -e tools/edify_defs/$device ]
+then
+  value=UNKNOWN
+
+else
+
+  cd tools/edify_defs
+
+  str=^$param=
+  grep_str=`grep -c $param $device`
+
+  if [ $grep_str == 0 ]
+  then
+    value=UNKNOWN
+
+  else  
+    value=`grep -m 1 $param $device \
+            | sed 's/'"$param"'=//g'`
+
+    if [ "$value" == "" ]
+    then
+      value=UNKNOWN
+    fi
+  fi
+
+  cd $base_dir
+fi
+
+echo $value
+
