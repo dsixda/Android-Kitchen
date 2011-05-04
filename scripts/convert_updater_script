@@ -236,7 +236,7 @@ sed -i -e 's/apply_patch.*[;]//g' temp.log
 #
 # symlink
 #
-echo  "- symlink (may take a few minutes) ..."
+echo -n "- symlink (may take a few minutes) "
 
 line_num=`grep -n "symlink(" temp.log | grep -m 1 ";" | sed 's/:.*//g'`
 
@@ -244,6 +244,8 @@ iterations=0
 
 while [ "$line_num" != "" ]
 do
+
+  echo -n "."
 
   cp temp.log temp.log.old
 
@@ -284,7 +286,7 @@ do
 done
 
 
-
+echo
 echo "- Final formatting ..."
 
 #

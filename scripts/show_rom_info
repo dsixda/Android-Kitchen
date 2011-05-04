@@ -37,7 +37,7 @@ fi
 
 clear
 echo
-echo -n "Please wait ..."
+echo -n "Please wait "
 
 
 
@@ -45,6 +45,7 @@ echo -n "Please wait ..."
 # Check Android OS version
 #
 
+echo -n "."
 android_os=`scripts/get_build_prop_val ro.build.version.release`
 
 
@@ -53,6 +54,7 @@ android_os=`scripts/get_build_prop_val ro.build.version.release`
 # Check Build Number
 #
 
+echo -n "."
 cd WORKING_*
 cd system
 
@@ -73,6 +75,7 @@ rom_name=`scripts/get_build_prop_val $id_var`
 # Check Device
 #
 
+echo -n "."
 device_name=`scripts/get_device_name`
 
 
@@ -80,6 +83,7 @@ device_name=`scripts/get_device_name`
 # Check Model
 #
 
+echo -n "."
 model=`scripts/get_product_model`
 
 
@@ -88,6 +92,7 @@ model=`scripts/get_product_model`
 # Check root
 #
 
+echo -n "."
 cd WORKING_*
 
 if [ "`find . -name su`" == "" ] 
@@ -131,6 +136,7 @@ cd ../..
 # Check busybox
 #
 
+echo -n "."
 cd WORKING_*
 
 if [ "`find . -name busybox`" == "" ] 
@@ -148,6 +154,7 @@ cd ..
 # Check apps2sd
 #
 
+echo -n "."
 scripts/a2sd_exists
 
 if [ "$?" == "1" ]
@@ -163,6 +170,7 @@ fi
 # Check wireless tethering
 #
 
+echo -n "."
 scripts/pre_froyo_check
 is_old=$?
 
@@ -199,6 +207,7 @@ fi
 # Check /data/app
 #
 
+echo -n "."
 scripts/data_app_exists
 
 if [ "$?" == "1" ]
@@ -213,6 +222,7 @@ fi
 # Check /data/local
 #
 
+echo -n "."
 cd WORKING_*
 cd META-INF/com/google/android
 grep_data_local=`grep -c "0771 DATA:local" update-script`
@@ -231,6 +241,7 @@ cd ../../../../..
 # Check if ROM contains Nano
 #
 
+echo -n "."
 cd WORKING_*
 
 if [ "`find . -name nano`" == "" ] 
@@ -248,6 +259,7 @@ cd ..
 # Check if ROM contains Bash
 #
 
+echo -n "."
 cd WORKING_*
 
 if [ "`find . -name bash`" == "" ]
@@ -265,6 +277,7 @@ cd ..
 # Check if ROM contains radio.img
 #
 
+echo -n "."
 cd WORKING_*
 
 if [ -e radio.img ]
@@ -282,6 +295,7 @@ cd ..
 # Check if ROM is deodexed
 #
 
+echo -n "."
 cd WORKING_*
 
 if [ ! -d system/framework ]
@@ -317,6 +331,7 @@ cd ..
 # Check if ROM does a wipe
 #
 
+echo -n "."
 cd WORKING_*
 
 cd META-INF/com/google/android
@@ -336,6 +351,7 @@ cd ../../../../..
 # Check for BusyBox run-parts method
 #
 
+echo -n "."
 cd BOOT-EXTRACTED/boot.img-ramdisk
 
 test_start=`grep -c "start sysinit" init.rc`

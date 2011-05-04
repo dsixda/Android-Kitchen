@@ -45,7 +45,7 @@ then
 
     if [ "`grep "symlink toolbox" ../META-INF/com/google/android/update-script`" == ""  ] && [ -e bin/toolbox ]
     then
-      echo "Adding a default set of toolbox symlinks to update-script ..."
+      echo -n "Adding a default set of toolbox symlinks to update-script "
 
       cp ../../tools/update_files/default_symlinks .
       sed -i -e '/copy_dir PACKAGE:system SYSTEM:/r default_symlinks' ../META-INF/com/google/android/update-script
@@ -58,12 +58,15 @@ then
       #
       for curr_file in $file_list
       do
+        echo -n "."
         check_line="symlink toolbox SYSTEM:bin\\/$curr_file"
         if [ `grep -c "$check_line" ../META-INF/com/google/android/update-script` != 0 ]
         then
           sed -i -e '/'"$check_line"'[ ]*$/d' ../META-INF/com/google/android/update-script
         fi
       done
+
+      echo
     fi
 
     if [ "`grep "symlink dumpstate" ../META-INF/com/google/android/update-script`" == "" ] && [ -e bin/dumpstate ]
@@ -90,10 +93,12 @@ then
   elif [ "$symlinks" != "" ]
   then
 
-    echo "They will now be added to the update-script and removed from system/bin"
+    echo -n "They will now be added to the update-script and removed from system/bin "
 
     for (( i=0 ; i < ${#symlinks[@]} ; i++ ))
     do
+
+      echo -n "."
 
       link=${symlinks[$i]}
       src=${source_files[$i]}
@@ -123,6 +128,8 @@ then
 
       perl -pi -e 's/set_perm_recursive 0 0 0755 0644 SYSTEM:[ ]*$/symlink $ENV{"SRC"} SYSTEM:bin\/$ENV{"LINK"}\nset_perm_recursive 0 0 0755 0644 SYSTEM:/' ../META-INF/com/google/android/update-script 
     done
+
+    echo
 
   else
     echo "No symbolic links in ROM; they are found in update-script"

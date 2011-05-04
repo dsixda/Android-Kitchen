@@ -361,11 +361,13 @@ done
 #
 # symlink
 #
-echo "- symlink (may take a few minutes) ..."
+echo -n "- symlink (may take a few minutes) "
 line_num=`grep -n -m 1 "symlink " updater-script | sed -e 's/:.*//g'`
 
 while [ "$line_num" != "" ]
 do
+  echo -n "."
+
   sed -i \
     -e ''$line_num' s/symlink \(.*\)/symlink(\"\1\");/g' \
     -e ''$line_num' s/ /", "/g' \
@@ -375,6 +377,7 @@ do
   line_num=`grep -n -m 1 "symlink " updater-script | sed -e 's/:.*//g'`
 done
 
+echo
 
 #
 # write_raw_image

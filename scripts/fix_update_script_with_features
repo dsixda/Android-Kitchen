@@ -26,10 +26,12 @@ then
   then
     echo "None detected"
   else
-    echo "They will now be added to the update-script and removed from system/xbin"
+    echo -n "They will now be added to the update-script and removed from system/xbin "
 
     for (( i=0 ; i < ${#symlinks[@]} ; i++ ))
     do
+
+      echo -n "."
 
       link=${symlinks[$i]}
       src=${source_files[$i]}
@@ -60,6 +62,8 @@ then
 
       perl -pi -e 's/set_perm_recursive 0 0 0755 0644 SYSTEM:[ ]*$/symlink $ENV{"XSRC"} SYSTEM:xbin\/$ENV{"XLINK"}\nset_perm_recursive 0 0 0755 0644 SYSTEM:/' ../META-INF/com/google/android/update-script 
     done
+
+    echo
 
   fi
 
