@@ -12,9 +12,10 @@ then
   echo  
   echo "Apps2SD is a feature that will allow all your apps to be"
   echo "installed onto the SD card to save storage space on your device."
-  echo "It is meant for devices with small internal storage space, so if"
-  echo "your device has large internal memory (such as on the Nexus S),"
-  echo "then Apps2SD is not necessary!"
+  echo
+  echo "NOTE: It is meant for devices with SMALL internal storage space,"
+  echo "so if your device has large internal memory (such as on the Nexus"
+  echo "S) then Apps2SD is not required and MAY NOT BE COMPATIBLE EITHER!"
   echo
   echo "This kitchen uses the Darktremor Apps2SD method. Ensure you have"
   echo "a fast memory card (e.g. Class 6), and that it is partitioned"
