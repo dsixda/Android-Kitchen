@@ -1,14 +1,5 @@
 clear
 
-if [ ! -d WORKING_* ]
-then
-  echo No working folder found!
-  scripts/press_enter
-  exit 0
-fi
-
-
-
 base_path=`pwd`
 util_dir=../tools/signapk_files
 
@@ -42,6 +33,14 @@ do
 
     echo
     cd $base_path
+
+    if [ ! -d WORKING_* ]
+    then
+      echo "No working folder found!"
+      scripts/press_enter
+      continue
+    fi
+
     cd WORKING_*
 
     grep_cmd=`find system/framework | grep \\.apk$ | sort -f`
@@ -101,6 +100,14 @@ do
 
     echo
     cd $base_path
+
+    if [ ! -d WORKING_* ]
+    then
+      echo "No working folder found!"
+      scripts/press_enter
+      continue
+    fi
+
     cd WORKING_*
 
     grep_cmd=`find . | grep .apk$ | sort -f`
