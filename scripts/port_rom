@@ -1,9 +1,12 @@
 
 scripts/extract_kernel_and_modules
 
-my_device=`scripts/get_build_prop_val ro.product.device MY_DEVICE_WORKING`
-my_board=`scripts/get_build_prop_val ro.product.board MY_DEVICE_WORKING`
-my_platform=`scripts/get_build_prop_val ro.board.platform MY_DEVICE_WORKING`
+if [ -d MY_DEVICE_WORKING ]
+then
+  my_device=`scripts/get_build_prop_val ro.product.device MY_DEVICE_WORKING`
+  my_board=`scripts/get_build_prop_val ro.product.board MY_DEVICE_WORKING`
+  my_platform=`scripts/get_build_prop_val ro.board.platform MY_DEVICE_WORKING`
+fi
 
 if [ -d MY_KERNEL ] 
 then
@@ -23,10 +26,11 @@ echo
 echo "--> Obtain a ROM that you want to port from ANOTHER DEVICE <--"
 
 scripts/check_rom no_info
-scripts/press_enter
 
 if [ -d WORKING_* ]
 then
+
+  scripts/press_enter
 
   cd WORKING_*
 
