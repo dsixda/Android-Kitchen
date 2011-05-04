@@ -1,7 +1,8 @@
 #
 # This script has two optional arguments:
 #
-# $1 = "no_create" or "create" - must specify no_create if working folder already exists
+# $1 = "no_create" or "create" or "create_working 
+#         - must specify no_create if working folder already exists
 # $2 = "kernel_only" - if this is specified then $1 is mandatory
 #
 
