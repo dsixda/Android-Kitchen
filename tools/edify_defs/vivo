@@ -1,0 +1,18 @@
+
+# HTC Incredible S
+
+change_mnt=yes
+
+param1=ext3
+param2=MMC
+
+param1_sdcard=vfat
+param2_sdcard=MTD
+
+sys_mnt=\/dev\/block\/mmcblk0p25
+cache_mnt=\/dev\/block\/mmcblk0p27
+boot_mnt=\/dev\/block\/mmcblk0p22
+data_mnt=\/dev\/block\/mmcblk0p26
+sdcard_mnt=\/dev\/block\/mmcblk1p1
+
+

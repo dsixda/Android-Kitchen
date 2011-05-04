@@ -1,0 +1,15 @@
+
+# HTC myTouch 4G
+
+change_mnt=yes
+
+fix_boot=yes
+
+param1=ext3
+param2=EMMC
+
+sys_mnt=\/dev\/block\/mmcblk0p25
+cache_mnt=\/dev\/block\/mmcblk0p27
+boot_mnt=\/dev\/block\/mmcblk0p22
+data_mnt=\/dev\/block\/mmcblk0p26
+sdcard_mnt=???

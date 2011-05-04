@@ -1,0 +1,9 @@
+
+# Dell Streak 7
+
+change_mnt_dell=yes
+
+param_system=ext2
+param_cache=ext3
+param_data=ext3
+
