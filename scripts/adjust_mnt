@@ -3,177 +3,59 @@
 # $1 = updater-script/update-script
 #
 
-###############################
-# Device-specific mount points
-###############################
 
 if [ "$1" != "" ]
 then
 
   device_name=`scripts/get_device_name`
+
+  change_mnt=`scripts/get_edify_def_val $device_name change_mnt`
+  change_mnt_dell=`scripts/get_edify_def_val $device_name change_mnt_dell`
+
+  if [ "$change_mnt" == "yes" ] || [ "$change_mnt_dell" == "yes" ]
+  then
+    param1=`scripts/get_edify_def_val $device_name param1`
+    param2=`scripts/get_edify_def_val $device_name param2`
+    param1_sdcard=`scripts/get_edify_def_val $device_name param1_sdcard`
+    param2_sdcard=`scripts/get_edify_def_val $device_name param2_sdcard`
+    param1_cache=`scripts/get_edify_def_val $device_name param1_cache`
+    param2_cache=`scripts/get_edify_def_val $device_name param2_cache`
+    fix_boot=`scripts/get_edify_def_val $device_name fix_boot`
+    sys_mnt=`scripts/get_edify_def_val $device_name sys_mnt`
+    cache_mnt=`scripts/get_edify_def_val $device_name cache_mnt`
+    boot_mnt=`scripts/get_edify_def_val $device_name boot_mnt`
+    data_mnt=`scripts/get_edify_def_val $device_name data_mnt`
+    sdcard_mnt=`scripts/get_edify_def_val $device_name sdcard_mnt`
+  fi
+
   cd WORKING_*
   cd META-INF/com/google/android
 
 
-  #
-  # Device definitions go here
-  #
-  # **** Ensure scripts/update_script_should_convert_back is also updated! ****
-  #
-
-  # Desire HD
-  if [ "$device_name" == "ace" ]
-  then
-    change_mnt=yes
-
-    param1=ext3
-    param2=EMMC
-
-    param1_sdcard=vfat
-    param2_sdcard=MTD
-
-    sys_mnt=\\\/dev\\\/block\\\/mmcblk0p25
-    cache_mnt=\\\/dev\\\/block\\\/mmcblk0p27
-    boot_mnt=\\\/dev\\\/block\\\/mmcblk0p22
-    data_mnt=\\\/dev\\\/block\\\/mmcblk0p26
-    sdcard_mnt=\\\/dev\\\/block\\\/vold\\\/179:33
-
-  # Evo Shift 4G    
-  elif [ "$device_name" == "speedy" ]
-  then
-    change_mnt=yes
-
-    param1=ext3
-    param2=EMMC
-
-    sys_mnt=\\\/dev\\\/block\\\/mmcblk0p26
-    cache_mnt=\\\/dev\\\/block\\\/mmcblk0p28
-    boot_mnt=\\\/dev\\\/block\\\/mmcblk0p22
-    data_mnt=\\\/dev\\\/block\\\/mmcblk0p27
-    sdcard_mnt=\\\/dev\\\/block\\\/mmcblk1p1
-
-  # Thunderbolt
-  elif [ "$device_name" == "mecha" ]
-  then
-    change_mnt=yes
-
-    param1=ext3
-    param2=EMMC
-
-    sys_mnt=\\\/dev\\\/block\\\/mmcblk0p25
-    cache_mnt=\\\/dev\\\/block\\\/mmcblk0p27
-    boot_mnt=\\\/dev\\\/block\\\/mmcblk0p22
-    data_mnt=\\\/dev\\\/block\\\/mmcblk0p26
-    sdcard_mnt=???
-
-  # myTouch 4G
-  elif [ "$device_name" == "glacier" ]
-  then
-    change_mnt=yes
-
-    # This device requires the boot.img lines to be modified
-    fix_boot=yes
-
-    param1=ext3
-    param2=EMMC
-
-    sys_mnt=\\\/dev\\\/block\\\/mmcblk0p25
-    cache_mnt=\\\/dev\\\/block\\\/mmcblk0p27
-    boot_mnt=\\\/dev\\\/block\\\/mmcblk0p22
-    data_mnt=\\\/dev\\\/block\\\/mmcblk0p26
-    sdcard_mnt=???
-
-  # Desire S
-  elif [ "$device_name" == "saga" ]
-  then
-    change_mnt=yes
-
-    param1=ext4
-    param2=EMMC
-
-    sys_mnt=\\\/dev\\\/block\\\/mmcblk0p25
-    cache_mnt=\\\/dev\\\/block\\\/mmcblk0p27
-    boot_mnt=\\\/dev\\\/block\\\/mmcblk0p22
-    data_mnt=\\\/dev\\\/block\\\/mmcblk0p26
-    sdcard_mnt=???
-
-  # Incredible S
-  elif [ "$device_name" == "vivo" ]
-  then
-    change_mnt=yes
-
-    param1=ext3
-    param2=MMC
-
-    param1_sdcard=vfat
-    param2_sdcard=MTD
-
-    sys_mnt=\\\/dev\\\/block\\\/mmcblk0p25
-    cache_mnt=\\\/dev\\\/block\\\/mmcblk0p27
-    boot_mnt=\\\/dev\\\/block\\\/mmcblk0p22
-    data_mnt=\\\/dev\\\/block\\\/mmcblk0p26
-    sdcard_mnt=\\\/dev\\\/block\\\/mmcblk1p1
-
-  # Samsung Nexus S
-  elif [ "$device_name" == "crespo" ]
-  then
-    change_mnt=yes
-
-    param1=ext4
-    param2=EMMC
-
-    param1_cache=yaffs2
-    param2_cache=MTD
-
-    param1_sdcard=vfat
-    param2_sdcard=MTD
-
-    sys_mnt=\\\/dev\\\/block\\\/platform\\\/s3c-sdhci.0\\\/by-name\\\/system
-    cache_mnt=\\\/dev\\\/block\\\/mtdblock4
-    boot_mnt=???
-    data_mnt=\\\/dev\\\/block\\\/platform\\\/s3c-sdhci.0\\\/by-name\\\/userdata
-    sdcard_mnt=\\\/dev\\\/block\\\/vold\\\/179:3
-
-  # Dell Streak 7
-  elif [ "$device_name" == "streak7" ]
-  then
-    change_mnt_dell=yes
-
-    param_system=ext2
-    param_cache=ext3
-    param_data=ext3
-  fi
-
-
-
-  ##########################
-  # Change them
-  ##########################
-
   if [ "$change_mnt" == "yes" ]
   then
 
-    if [ "$param1_cache" == "" ]
+    if [ "$param1_cache" == "UNKNOWN" ]
     then
       param1_cache=$param1
     fi
-    if [ "$param2_cache" == "" ]
+    if [ "$param2_cache" == "UNKNOWN" ]
     then
       param2_cache=$param2
     fi
-    if [ "$param1_sdcard" == "" ]
+    if [ "$param1_sdcard" == "UNKNOWN" ]
     then
       param1_sdcard=$param1
     fi
-    if [ "$param2_sdcard" == "" ]
+    if [ "$param2_sdcard" == "UNKNOWN" ]
     then
       param2_sdcard=$param2
     fi
 
 
-    #
+    #################
     # updater-script
-    #
+    #################
 
     if [ "$1" == "updater-script" ]
     then
@@ -265,9 +147,9 @@ then
       fi
 
 
-    #
+    ##################
     # update-script
-    #
+    ##################
 
     elif [ "$1" == "update-script" ]
     then
