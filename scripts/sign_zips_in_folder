@@ -30,7 +30,7 @@ then
     echo Signing $filename ...
 
     final_file="signed_$filename"
-    final_file=`echo $final_file | sed -e 's/unsigned/(unsigned)/g'`
+    final_file=`echo $final_file | sed -e 's/unsigned/(u)/g'`
     java -jar signapk.jar testkey.x509.pem testkey.pk8 $filename $final_file
     res=$?
 
