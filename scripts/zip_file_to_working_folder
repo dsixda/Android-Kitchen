@@ -25,20 +25,18 @@ fi
 #
 build_dir=`scripts/set_working_folder_name $2` 
 
+
 #
 # Creating folder structure
 #
+
 echo
 echo "Creating working folder $build_dir ..."
 mkdir $build_dir
 
-echo "Copying $update_file to $build_dir ..."
-cp original_update/$update_file $build_dir
-
 echo
 echo "Extracting ROM ..."
-cd $build_dir
-unzip -q $update_file -x bootloader.img recovery.img recovery_signed.img userdata.img radio.img rcdata.img splash1.nb0 splash2.nb0 android-info.txt 2>/dev/null
+unzip -q original_update/$update_file -d $build_dir -x bootloader.img recovery.img recovery_signed.img userdata.img radio.img rcdata.img splash1.nb0 splash2.nb0 android-info.txt 2>/dev/null
 
 if [ "$?" == "9" ]
 then
@@ -48,8 +46,7 @@ then
   exit 1
 fi
 
-
-rm -f $update_file
+cd $build_dir
 
 
 
@@ -61,6 +58,7 @@ echo
 
 if [ "`find . -maxdepth 1 | grep .img | grep -c system_`" == "1" ]
 then
+  echo "Renaming ..."
   mv -v system_*.img system.img
 fi 
 
@@ -68,6 +66,7 @@ rm -vf hboot*.img
 
 if [ "`find . -maxdepth 1 | grep .img | grep -c boot_`" == "1" ]
 then
+  echo "Renaming ..."
   mv -v boot_*.img boot.img
 fi 
 
@@ -94,7 +93,7 @@ then
     rmdir ../temp_img
 
     cd ..
-    scripts/img_files_to_working_folder no_create
+    scripts/img_files_to_working_folder no_create $2
     exit $?
   else
     echo "Error: No boot.img found"
