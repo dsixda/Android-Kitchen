@@ -91,7 +91,7 @@ if [ -d MY_DEVICE_WORKING/system/lib/modules ]
 then
   mkdir -p MY_KERNEL/system/lib/modules
   echo 
-  echo "Copying wireless ..."
+  echo "Copying wireless (system/lib/modules) ..."
   cp -r MY_DEVICE_WORKING/system/lib/modules/* MY_KERNEL/system/lib/modules/
 fi
 
@@ -99,7 +99,7 @@ if [ -d MY_DEVICE_WORKING/system/usr ]
 then
   mkdir -p MY_KERNEL/system/usr
   echo 
-  echo "Copying buttons ..."
+  echo "Copying buttons (system/usr) ..."
   cp -r MY_DEVICE_WORKING/system/usr/* MY_KERNEL/system/usr/
 fi
 
@@ -107,7 +107,7 @@ if [ -d MY_DEVICE_WORKING/system/lib/hw ]
 then
   mkdir -p MY_KERNEL/system/lib/hw
   echo 
-  echo "Copying lights ..."
+  echo "Copying lights (system/lib/hw) ..."
   cp -r MY_DEVICE_WORKING/system/lib/hw/* MY_KERNEL/system/lib/hw/
 fi
 
@@ -115,7 +115,7 @@ if [ -e MY_DEVICE_WORKING/system/etc/vold.fstab ]
 then
   mkdir -p MY_KERNEL/system/etc
   echo 
-  echo "Copying sdcard mount info ..."
+  echo "Copying sdcard mount info (system/etc/vold.fstab) ..."
   cp -v MY_DEVICE_WORKING/system/etc/vold.fstab MY_KERNEL/system/etc/
 fi
 
@@ -123,7 +123,7 @@ if [ -e MY_DEVICE_WORKING/system/etc/vold.conf ]
 then
   mkdir -p MY_KERNEL/system/etc
   echo 
-  echo "Copying sdcard mount info ..."
+  echo "Copying sdcard mount info (system/etc/vold.conf) ..."
   cp -v MY_DEVICE_WORKING/system/etc/vold.conf MY_KERNEL/system/etc/
 fi
 
@@ -131,7 +131,7 @@ if [ -d MY_DEVICE_WORKING/system/modules ]
 then
   mkdir -p MY_KERNEL/system/modules
   echo 
-  echo "Copying other modules ..."
+  echo "Copying other modules (system/modules) ..."
   cp -r MY_DEVICE_WORKING/system/modules/* MY_KERNEL/system/modules/
 fi
 
