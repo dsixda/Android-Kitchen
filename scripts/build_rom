@@ -389,19 +389,27 @@ then
   echo
   echo "=========================================================================="
   echo
-  echo "Congratulations, your ROM is here:"
-  echo "OUTPUT_ZIP/$final_file" 
+  echo "Congratulations ... your ROM is here:"
+  echo
+  echo "----> OUTPUT_ZIP/$final_file" 
+  echo
   echo
   echo "Copy this to your device and flash from recovery menu."
-  echo 
-  echo "Remember to do a wipe if necessary!"
+  echo
+
+  echo "Remember to do a data and/or cache wipe if necessary!"
+  echo
+  echo "If your ROM does not boot, please refer to the FAQ for troubleshooting."
 
   if [ "$sign_update" == "no" ]
   then
     echo
-    echo "PLEASE NOTE: You will need to disable signature checks in"
-    echo "the recovery menu to flash this ROM!"
+    echo "PLEASE NOTE: You will need to disable signature checks in the recovery"
+    echo "menu to flash this ROM!  If you wish to sign this ROM later, please use"
+    echo "the Sign ZIP option in the Advanced menu of the kitchen."
   fi
+
+  echo
 
 else 
 
