@@ -274,6 +274,7 @@ do
   diffs=`diff temp.log temp.log.old`
   if [ "$diffs" == "" ]
   then
+    echo
     echo "ERROR: Problem converting symlinks"
     rm -f temp.log.old temp.log
     exit 1
