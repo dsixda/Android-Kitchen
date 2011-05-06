@@ -1,21 +1,23 @@
 clear
 
 date_str=`date '+%m%d%y_%H%M%S'`
-zip_dir=sign_zips_$date_str
+files_dir=sign_files_$date_str
 
 echo
-echo "Creating folder `pwd`/$zip_dir ..."
-mkdir $zip_dir
+echo "Creating folder `pwd`/$files_dir ..."
+mkdir $files_dir
 
 echo
-echo "---> Place your ZIP file(s) into the folder mentioned above <--"
+echo "---> Place your APK and/or ZIP file(s) into the folder mentioned above <--"
 
 scripts/press_enter
 
-cd $zip_dir
-grep_cmd=`find . | grep -i \\.zip$ | sort -f`
+cd $files_dir
+grep_apk=`find . | grep -i \\.apk$ | sort -f`
+grep_zip=`find . | grep -i \\.zip$ | sort -f`
+grep_files="$grep_apk $grep_zip"
 
-if [ "$grep_cmd" != "" ]
+if [ "$grep_files" != "" ]
 then
 
   cp ../tools/signapk_files/testkey.* .
@@ -23,7 +25,7 @@ then
 
   echo
 
-  for filename in $grep_cmd
+  for filename in $grep_files
   do
 
     filename=`echo $filename | sed -e 's/\.\///g'`
@@ -37,6 +39,13 @@ then
     if [ "$res" == "0" ]
     then
       rm -f $filename
+
+      # Don't add the 'signed' prefix to APK files
+      if [ "`echo $filename | grep -i \\.apk$`" != "" ]
+      then
+        mv -f $final_file $filename
+      fi
+
     else
       echo "Error signing $filename"
       echo
@@ -58,11 +67,11 @@ then
   cd ..
 
 else
-  echo "Error: No *.zip found!"
+  echo "Error: No *.apk or *.zip found!"
   echo
   cd ..
-  echo "Removing $zip_dir folder"
-  rm -rf $zip_dir
+  echo "Removing $files_dir folder"
+  rm -rf $file_dir
   exit 0
 fi      
   
