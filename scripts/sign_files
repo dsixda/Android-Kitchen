@@ -14,9 +14,9 @@ do
   echo
   echo "Enter a choice:"
   echo 
-  echo "  a = Sign all *.apk in working folder"
-  echo "  s = Sign a single APK or set of APKs"
-  echo "  z = Sign ZIP file(s) inside single folder"
+  echo "  a = Sign all APKs in working folder"
+  echo "  s = Sign a set of APKs in working folder"
+  echo "  z = Sign APKs and/or ZIPs inside a non-working folder"
   echo "  x = Exit"
   echo
   echo -n "? "
@@ -243,7 +243,7 @@ do
 
   elif [ "$enterChoice" == "z" ]
   then
-    scripts/sign_zips_in_folder    
+    scripts/sign_files_in_folder    
     scripts/press_enter
 
   elif [ "$enterChoice" == "x" ]
