@@ -50,7 +50,7 @@ do
   echo -n "Enter option: "
   read opt
 
-  if [ "$opt" != "x" ] && [ "$opt" != "u" ]
+  if [ "$opt" != "x" ] && [ "$opt" != "u" ] && [ "$opt" != "1" ]
   then
     scripts/check_multiple_working
   fi
