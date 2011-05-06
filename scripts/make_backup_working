@@ -1,7 +1,10 @@
 
-scripts/press_enter
+if [ "$1" == "" ]
+then
+  scripts/press_enter
+fi
 
-found_working=`ls | grep -m 1 WORKING_` 
+found_working=`ls | grep WORKING_` 
 
 if [ "$found_working" != "" ]
 then
