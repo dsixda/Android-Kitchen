@@ -19,7 +19,8 @@ cd META-INF/com/google/android
 
 if [ "`grep package_extract_file update-script`" != "" ] || \
     [ "`grep TMP: update-script`" != "" ] || \
-    [ "`grep \"format yaffs2\" update-script`" != "" ]
+    [ "`grep \"format yaffs2\" update-script`" != "" ] || \
+    [ "`grep \"format ext\" update-script`" != "" ]
 then
 
   if [ "$1" == "" ]
