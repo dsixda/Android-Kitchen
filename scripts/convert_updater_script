@@ -420,7 +420,8 @@ then
   echo "of your working folder.  Please review it for potential errors."
   echo ""
   echo "The original updater-script has been renamed to updater-script.orig."
-  echo "It will not be included in your completed ROM's ZIP file."
+  echo "It will not be included in your completed ROM's ZIP file, but please"
+  echo "DO NOT remove it, as it may be required by the kitchen." 
   echo
 
   if [ -e update-binary ]
