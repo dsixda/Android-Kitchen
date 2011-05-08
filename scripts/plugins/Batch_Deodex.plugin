@@ -1,0 +1,64 @@
+
+echo
+echo "Batch De-odexer"
+echo "---------------"
+echo
+echo "This script will grab all the ROMs under the original_update folder,"
+echo "do-odex them, and then move their working folders together to a"
+echo "new folder."
+echo
+echo "---> Place your ROMs in original_update <--"
+
+scripts/press_enter
+
+cd original_update
+
+grep_zip=`find . | grep -i \\.zip$ | sort -f`
+grep_app=`find . | grep -i \\.app$ | sort -f`
+grep_img=`find . | grep system.img$`
+grep_files="$grep_app $grep_zip $grep_img"
+
+cd ..
+
+if [ "$grep_files" != "" ]
+then
+
+  scripts/make_backup_working no_prompt
+
+  date_str=`date '+%m%d%y_%H%M%S'`
+  done_dir="batch_$date_str"
+
+  echo
+  echo "Creating folder $done_dir"
+  echo
+  mkdir $done_dir
+
+  for filename in $grep_files
+  do
+
+    filename=`echo $filename | sed -e 's/\.\///g'`
+  
+    echo
+    echo "================================================================================="
+    echo 
+    scripts/choose_rom name_given $filename
+    scripts/do_deodex_folder "framework app"
+ 
+    echo
+    echo "Moving working folder ..."
+    mv -v WORKING_* $done_dir/WORKING_$filename
+    echo
+
+  done
+
+  echo
+  echo "================================================================================="
+  echo 
+  echo "Done!"
+  echo
+  echo "Completed folders are under $done_dir"
+  echo
+
+else
+  echo "Error: No ROMs found!"
+fi      
