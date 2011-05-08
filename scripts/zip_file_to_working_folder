@@ -2,7 +2,7 @@
 # This script has two arguments:
 #
 # $1 = file name (mandatory)
-# $2 = "kernel_only" (optional)
+# $2 = "kernel_only" or "name_given" (optional)
 #
 
 
@@ -204,7 +204,7 @@ else
   cd ..
   echo
 
-  if [ "$2" != "kernel_only" ]
+  if [ "$2" != "kernel_only" ] && [ "$2" != "name_given" ]
   then
 
     scripts/check_no_update_script

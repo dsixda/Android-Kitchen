@@ -1,13 +1,13 @@
 #
 # This script has one optional argument
 #
-# $1 = "kernel_only"
+# $1 = "kernel_only" or "name_given"
 #
 
 date_str=`date '+%m%d%y_%H%M%S'`
 working_dir=WORKING_$date_str
 
-if [ "$1" != "kernel_only" ]
+if [ "$1" != "kernel_only" ] && [ "$1" != "name_given" ]
   then
 
   echo 1>&2

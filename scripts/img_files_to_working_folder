@@ -3,7 +3,7 @@
 #
 # $1 = "no_create" or "create" or "create_working 
 #         - must specify no_create if working folder already exists
-# $2 = "kernel_only" - if this is specified then $1 is mandatory
+# $2 = "kernel_only" or "name_given" - if this is specified then $1 is mandatory
 #
 
 if [ "$1" == "no_create" ] 
@@ -183,7 +183,7 @@ fi
 
 cd ..
 
-if [ "$2" != "kernel_only" ]
+if [ "$2" != "kernel_only" ] && [ "$2" != "name_given" ]
 then
   scripts/fix_update_script 
 

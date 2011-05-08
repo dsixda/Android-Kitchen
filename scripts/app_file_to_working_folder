@@ -2,7 +2,7 @@
 # This script has two arguments:
 #
 # $1 = file name in original_update (mandatory)
-# $2 = "kernel_only" - if this is specified then $1 is mandatory
+# $2 = "kernel_only" or "name_given" - if this is specified then $1 is mandatory
 #
 
 
