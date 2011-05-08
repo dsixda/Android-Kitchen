@@ -4,7 +4,7 @@ echo "Batch De-odexer"
 echo "---------------"
 echo
 echo "This script will grab all the ROMs under the original_update folder,"
-echo "do-odex them, and then move their working folders together to a"
+echo "de-odex them, and then move their working folders together to a"
 echo "new folder."
 echo
 echo "---> Place your ROMs in original_update <--"
