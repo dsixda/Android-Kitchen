@@ -32,7 +32,7 @@ if [ "$1" == "" ]
 then
 
   echo "Conversion Tool: update-script (Amend) to updater-script (Edify)"
-  echo "-------------------------------------------------------------------"
+  echo "--------------------------------------------------------------------------"
   echo
   echo "This script will convert your update-script into an updater-script"
   echo "and will also add the update-binary file."
@@ -56,7 +56,7 @@ then
     exit 0
   fi
 
-  echo "-------------------------------------------------------------------"
+  echo "--------------------------------------------------------------------------"
   echo
 
 fi
