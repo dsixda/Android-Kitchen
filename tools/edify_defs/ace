@@ -13,5 +13,5 @@ sys_mnt=\/dev\/block\/mmcblk0p25
 cache_mnt=\/dev\/block\/mmcblk0p27
 boot_mnt=\/dev\/block\/mmcblk0p22
 data_mnt=\/dev\/block\/mmcblk0p26
-sdcard_mnt=\/dev\/block\/vold\/179:33
+sdcard_mnt=\/dev\/block\/mmcblk1p1
 
