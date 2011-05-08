@@ -1,0 +1,182 @@
+#
+# This script has one mandatory parameter:
+#
+# $1 = folder(s) to deodex under /system
+#       e.g. framework
+#       e.g. "framework app" 
+#
+
+dir_list=$1
+
+if [ "$dir_list" == "" ]
+then
+  echo "No folders for deodexing specified!"
+  exit 0
+fi
+
+base_dir=`pwd`
+
+cd WORKING_*
+
+num_odex_fr=`find system/framework | grep -c "\.odex$"`
+num_odex_app=`find system/app | grep -c "\.odex$"`
+
+for folder in ${dir_list[@]}
+do
+
+  if [ $folder == framework ]
+  then
+    num_odex_folder=$num_odex_fr
+  elif [ $folder == app ]
+  then
+    num_odex_folder=$num_odex_app
+  else
+    echo
+    echo "Error: Folder $folder not valid!"
+    continue
+  fi
+
+  count=0
+  found_error=0
+  path=system/$folder
+
+  echo
+  echo
+  echo "Going into $path ..."
+  echo
+
+  cd $path
+
+  grep_cmd=`find . | grep "\.odex$" | sed 's/.\///g' | sort -f`
+
+  if [ "$grep_cmd" == "" ]
+  then
+    echo "Nothing found under $path!"
+  else
+
+    #
+    # Finally, deodex each file
+    #
+    echo "Trying this version of baksmali/smali:"
+    ls ../../../tools/deodex_files/*.jar | sed -e 's/.*\///g'
+    echo
+    version=newer
+    cp -f ../../../tools/deodex_files/baksmali*.jar baksmali.jar
+    cp -f ../../../tools/deodex_files/smali*.jar smali.jar
+
+    for odex_file in $grep_cmd
+    do
+
+      count=$(($count+1))
+      echo
+      echo "NOW AT FILE $count OF $num_odex_folder IN $path: $odex_file"
+      try=1
+
+      while [ -e $odex_file ]
+      do
+
+        ../../../scripts/do_deodex_file $odex_file ../framework
+        
+        #
+        # Use brute-force method if it failed
+        #
+
+        if [ -e $odex_file ]
+        then
+
+          current_dir=`pwd`
+          cd ../framework
+
+          # Get a list of all the framework JARs
+          fr_jar_list=`find . | grep "\.jar$" | sed 's/.\///g' | sort -f`
+          fr_jar_list=`echo $fr_jar_list | \
+                      sed \
+                        -e 's/baksmali.jar//' \
+                        -e 's/smali.jar//' \
+                        -e 's/ /:/g' \
+                        -e 's/::/:/g' `
+        
+          cd $current_dir
+
+          echo
+          echo 
+          echo "-> Using brute-force method:"
+          echo
+
+          ../../../scripts/do_deodex_file $odex_file ../framework $fr_jar_list
+           
+          if [ -e $odex_file ] && [ $try == 2 ]
+          then
+
+            if [ $version==older ]
+            then
+              echo
+              echo "Reverting to newer baksmali/smali:"
+              ls ../../../tools/deodex_files/*.jar | sed -e 's/.*\///g'
+              echo
+              version=newer
+              cp -f ../../../tools/deodex_files/baksmali*.jar baksmali.jar
+              cp -f ../../../tools/deodex_files/smali*.jar smali.jar              
+            fi  
+
+            #echo "Trying $odex_file but ignoring error ..."
+            #../../../scripts/do_deodex_file $odex_file ../framework $fr_jar_list yes
+
+            echo "ERROR: Aborting $odex_file"
+            found_error=1
+            
+            break
+
+          elif [ ! -e $odex_file ]
+          then
+            break
+          fi
+
+          if [ $version==newer ]
+          then
+            echo
+            echo "Trying older version of baksmali/smali:"
+            ls ../../../tools/deodex_files/old_version/*.jar | sed -e 's/.*\///g'
+            echo
+            version=older
+            cp -f ../../../tools/deodex_files/old_version/baksmali*.jar baksmali.jar
+            cp -f ../../../tools/deodex_files/old_version/smali*.jar smali.jar
+          else 
+            echo
+            echo "Trying newer version of baksmali/smali:"
+            ls ../../../tools/deodex_files/*.jar | sed -e 's/.*\///g'
+            echo
+            version=newer
+            cp -f ../../../tools/deodex_files/baksmali*.jar baksmali.jar
+            cp -f ../../../tools/deodex_files/smali*.jar smali.jar
+          fi
+
+          try=2
+
+        fi
+      done
+
+    done
+
+    rm -f baksmali.jar
+    rm -f smali.jar
+
+    echo
+    echo "Finished $path"
+
+    if [ "$found_error" == "1" ]
+    then
+      echo "Could not deodex the following (try to deodex these files again):"
+      echo `ls *.odex`
+      echo
+      cd ../..
+      break
+    fi
+
+  fi
+
+  cd ../..
+
+done
+
+cd $base_dir
