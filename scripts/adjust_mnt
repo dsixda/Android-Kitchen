@@ -53,9 +53,9 @@ then
     fi
 
 
-    #################
-    # updater-script
-    #################
+    #################################
+    # change_mnt==yes; updater-script
+    #################################
 
     if [ "$1" == "updater-script" ]
     then
@@ -85,10 +85,20 @@ then
 
 
       #
-      # Certain devices require a special way of flashing the boot.img
+      # Certain devices use/require a special way of flashing the boot.img
       #
       # NOTE: :a;N;$!ba; = reads multi-line pattern as one-line pattern
       #
+
+      if [ -e updater-script.orig ] && [ "$fix_boot" != "yes" ]
+      then
+        grep_boot=`grep -c "^package_extract_file(\"boot.img\", \"$boot_mnt\");" updater-script.orig`
+        if [ $grep_boot != 0 ]
+        then
+          fix_boot=yes
+        fi
+      fi
+
       if [ "$fix_boot" == "yes" ]
       then
         sed -i -e ':a;N;$!ba;s/assert(package_extract_file("boot.img", "\/tmp\/boot.img"),\n[ ]*write_raw_image("\/tmp\/boot.img", "boot"),\n[ ]*delete("\/tmp\/boot.img"));/package_extract_file("boot.img", "'"$boot_mnt"'");/g' updater-script
@@ -147,9 +157,34 @@ then
       fi
 
 
-    ##################
-    # update-script
-    ##################
+      #
+      # Cover the case where the ROM uses a different filesystem from what was defined
+      # above (for both 'format' and 'mount')
+      #
+      # e.g. updater-script uses ext4 in CyanogenMod instead of the expected ext3
+      #
+
+      if [ -e updater-script.orig ]
+      then
+        param1_old=`grep -m 1 "format(.*$sys_mnt" updater-script.orig | \
+                    sed -e 's/format("\([^"]*\).*/\1/g'`
+        param2_old=`grep -m 1 "format(.*$sys_mnt" updater-script.orig | \
+                    sed -e 's/format("[^"]*", "\([^"]*\).*/\1/g'`
+
+        if [ "$param1_old" != "$param1" ]
+        then
+          sed -i -e 's/'"$param1"'/'"$param1_old"'/g' updater-script 
+        fi
+        if [ "$param2_old" != "$param2" ]
+        then
+          sed -i -e 's/'"$param2"'/'"$param2_old"'/g' updater-script
+        fi
+      fi
+
+
+    ################################
+    # change_mnt==yes; update-script
+    ################################
 
     elif [ "$1" == "update-script" ]
     then
@@ -166,6 +201,27 @@ then
         \
         -e 's/package_extract_file boot.img '"$boot_mnt"'/write_raw_image PACKAGE:boot.img BOOT:/g' \
         update-script
+
+
+      #
+      # Cover the case where the ROM uses a different filesystem, such that the update-script
+      # wasn't adjusted in the above code.
+      #
+      # e.g. update-script uses ext4 in CyanogenMod instead of the expected ext3
+      #
+
+      grep_other=`grep "format .* $sys_mnt[ ]*$" update-script`  
+
+      if [ "$grep_other" != "" ]
+      then
+        sed -i \
+          -e 's/format .* '"$sys_mnt"'/format SYSTEM:/g' \
+          -e 's/format .* '"$cache_mnt"'/format CACHE:/g' \
+          -e 's/format .* '"$boot_mnt"'/format BOOT:/g' \
+          -e 's/format .* '"$data_mnt"'/format DATA:/g' \
+          \
+          update-script
+      fi
     fi
 
 
@@ -187,9 +243,11 @@ then
     fi
   fi
 
+ 
 
-
-
+  ################################
+  # All cases; updater-script
+  ################################
 
   #
   # Fix cases where a mount hasn't been fixed yet
