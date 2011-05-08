@@ -18,8 +18,11 @@ else
 fi
 
 cd ..
+echo -n "Please wait ."
 base_addr=`scripts/get_kernel_base_addr`
+echo -n "."
 page_size=`scripts/get_boot_img_page_size`
+echo -n "."
 cmd_line=`scripts/get_cmdline`
 
 
