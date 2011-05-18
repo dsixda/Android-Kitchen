@@ -7,14 +7,11 @@ do
   clear
 
   echo
-  echo "Porting"
-  echo "--------"
+  echo "Porting - For advanced users only!"
+  echo "----------------------------------"
   echo
-  echo "PLEASE NOTE: The porting option is only experimental."
-  echo
-  echo "If your device does not boot up after flashing a ported ROM built by"
-  echo "the kitchen, then refer to the kitchen's FAQ to find out how to debug"
-  echo "the issue by dumping the recovery log file and/or by doing a 'logcat'."
+  echo "PLEASE NOTE: The porting option is only experimental, and may"
+  echo "not always work for your device."
   echo
   echo "Enter a choice:"
   echo 
