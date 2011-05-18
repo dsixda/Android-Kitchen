@@ -22,8 +22,12 @@ fi
 
 clear
 echo
+echo "*************************************************************"
 echo
 echo "--> Obtain a ROM that is currently meant for YOUR DEVICE <--"
+echo
+echo "*************************************************************"
+echo
 
 scripts/check_rom no_info kernel_only
 
