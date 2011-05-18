@@ -70,8 +70,9 @@ do
 
   if [ $found_error == 1 ]
   then
-    echo -n "Ignore and proceed anyway? (y/n)? (default: n): "
-    read proceedCheck
+    #echo -n "Ignore and proceed anyway? (y/n)? (default: n): "
+    #read proceedCheck
+    proceedCheck=n
 
     if [ "$proceedCheck" != "y" ] 
     then
