@@ -29,6 +29,25 @@ then
   do
 
     filename=`echo $filename | sed -e 's/\.\///g'`
+
+    if [ ! -e filename ]
+    then
+
+      echo "Error: file '$filename' not found"
+
+      grep_apk2=`echo $filename | grep -i \\.apk$`
+      grep_zip2=`echo $filename | grep -i \\.zip$`
+
+      if [ "$grep_apk2" == "" ] && [ "$grep_zip2" == "" ]
+      then
+        echo "Error: You have spaces in your filename - the OS does not fully support them"
+      fi
+    
+      break
+
+    fi
+
+
     echo Signing $filename ...
 
     final_file="signed_$filename"
