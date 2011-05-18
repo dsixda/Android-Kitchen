@@ -77,8 +77,9 @@ then
 
   if [ "$do_remove" == "y" ]
   then
-    echo "Removing system/etc/install-recovery.sh ..."
-    rm -f system/etc/install-recovery.sh  
+    echo "Renaming ..."
+    mv -fv system/etc/install-recovery.sh system/etc/install-recovery.sh.bak 
+    echo
   else
     echo "Not removing"
   fi  
@@ -94,8 +95,9 @@ then
 
   if [ "$do_remove" != "n" ]
   then
-    echo "Removing system/recovery-from-boot.p ..."
-    rm -f system/recovery-from-boot.p
+    echo "Renaming ..."
+    mv -fv system/recovery-from-boot.p system/recovery-from-boot.p.bak
+    echo
   else
     echo "Not removing"
   fi  
