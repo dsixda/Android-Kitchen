@@ -30,7 +30,7 @@ then
 
     filename=`echo $filename | sed -e 's/\.\///g'`
 
-    if [ ! -e filename ]
+    if [ ! -e $filename ]
     then
 
       echo "Error: file '$filename' not found"
