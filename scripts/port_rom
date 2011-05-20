@@ -6,6 +6,10 @@ then
   my_device=`scripts/get_build_prop_val ro.product.device MY_DEVICE_WORKING`
   my_board=`scripts/get_build_prop_val ro.product.board MY_DEVICE_WORKING`
   my_platform=`scripts/get_build_prop_val ro.board.platform MY_DEVICE_WORKING`
+
+  #
+  # Note: Don't delete MY_DEVICE_WORKING yet, it will be required later in this script
+  #
 fi
 
 if [ -d MY_KERNEL ] 
@@ -69,6 +73,13 @@ then
 fi
 
 
+clear
+echo
+echo "***************************************************************"
+echo 
+echo " PORTING YOUR ROM"
+echo
+echo "***************************************************************"
 
 #
 # Replace kernel, modify ramdisk and then build new boot.img
@@ -207,6 +218,44 @@ then
   cp -rf ../MY_KERNEL/system/* system/
   cd ..
 fi
+
+
+#
+# We should not check or use the mount points in the original updater-script
+# when we convert the update-script back to updater-script, because they were 
+# only meant for the other device!!
+#
+
+cd WORKING_*
+
+if [ -d META-INF/com/google/android ]
+then
+
+  cd META-INF/com/google/android
+
+  if [ -e updater-script.orig ]
+  then
+    rm -f updater-script.orig
+  fi
+
+  if [ -e update-binary.orig ]
+  then
+    rm -f update-binary.orig
+  fi
+
+  #
+  # Use your device's original updater-script to assist with checking mount points later on
+  #
+  if [ -e ../../../../../MY_DEVICE_WORKING/META-INF/com/google/android/updater-script ]
+  then
+    cp ../../../../../MY_DEVICE_WORKING/META-INF/com/google/android/updater-script updater-script.orig
+  fi
+
+  cd ../../../..
+
+fi
+
+cd ..
 
 
 rm -rf MY_KERNEL
