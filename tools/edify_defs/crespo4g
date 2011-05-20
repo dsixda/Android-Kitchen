@@ -1,0 +1,20 @@
+
+# Samsung Nexus S 4G
+
+change_mnt=yes
+
+param1=ext4
+param2=EMMC
+
+param1_cache=yaffs2
+param2_cache=MTD
+
+param1_sdcard=vfat
+param2_sdcard=MTD
+
+sys_mnt=\/dev\/block\/platform\/s3c-sdhci.0\/by-name\/system
+cache_mnt=\/dev\/block\/mtdblock4
+boot_mnt=???
+data_mnt=\/dev\/block\/platform\/s3c-sdhci.0\/by-name\/userdata
+sdcard_mnt=\/dev\/block\/platform\/s3c-sdhci.0\/by-name\/media
+
