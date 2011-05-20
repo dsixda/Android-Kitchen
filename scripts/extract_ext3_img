@@ -143,11 +143,18 @@ then
 
   user_=`whoami`
   mkdir ../tmp
-  sudo mount -o loop $img_file ../tmp
-  sudo cp -R ../tmp/* .
-  sudo umount ../tmp
-  rmdir ../tmp
-  sudo chown -R $user_ *
+  sudo mount -o loop $img_file ../tmp 2>/dev/null
+  res=$?
+  
+  if [ "$res" == "0" ]
+  then
+    sudo cp -R ../tmp/* .
+    sudo umount ../tmp
+    rmdir ../tmp
+    sudo chown -R $user_ *
+  else
+    echo "Error: Unable to mount $img_file"
+  fi
 
   rm -f unyaffs*stackdump
 
