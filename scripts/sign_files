@@ -11,6 +11,11 @@ do
   echo
   echo "Sign files"
   echo "----------"
+  echo 
+  echo "NOTE: This section is for advanced users.  If you are making simple"
+  echo "customizations to your ROM, then signing APKs is not necessary.  If"
+  echo "you have an unsigned update ZIP file, then you can sign it here."
+  echo 
   echo
   echo "Enter a choice:"
   echo 
