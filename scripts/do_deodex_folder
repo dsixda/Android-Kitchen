@@ -100,7 +100,7 @@ do
 
           echo
           echo 
-          echo "-> Using brute-force method:"
+          echo "-> Using brute-force method (ignore previous warning if successful):"
           echo
 
           ../../../scripts/do_deodex_file $odex_file ../framework $fr_jar_list
