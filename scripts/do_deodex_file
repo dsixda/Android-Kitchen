@@ -619,7 +619,11 @@ then
 
       echo "Put classes.dex into $main_file ..."
       zip -r -q $main_file classes.dex
-      rm classes.dex
+      rm -f classes.dex
+      if [ -e $main_file ]
+      then
+        echo "$main_file has been deodexed"
+      fi
       exit 0
     
     fi
