@@ -76,11 +76,13 @@ echo
 
 echo "- Initial formatting ..."
 
+# The 'strings' command is used in case the ui_print statement has special symbols in it
 more updater-script \
+| strings \
+| sed -e ':a;N;$!ba;s/ui_print("[^"]*");//g' \
 | sed -e ':a;N;$!ba;s/||[ ]*\n//g' \
 | sed -e ':a;N;$!ba;s/,[ ]*\n//g' \
 | sed -e 's/","/", "/g' \
-| sed -e 's/ui_print.*//g' \
 | sed -e 's/^\([a-zA-Z_]*\)[ ]*(/\1(/g' \
 | sed -e 's/package_extract_dir(\"\([^ ]*\)\", \"\/tmp\");/copy_dir PACKAGE:\1 TMP:/g' \
 | sed -e 's/package_extract_dir(\"\([^ ]*\)\", \"\/system\");/copy_dir PACKAGE:\1 SYSTEM:/g' \
