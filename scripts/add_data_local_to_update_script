@@ -13,7 +13,12 @@ else
 
   if [ `grep -c "format .*DATA:" update-script` == 0 ]
   then
-    sed -i -e 's/format\(.*\)SYSTEM:[ ]*[\n]*/format\1SYSTEM:\ndelete DATA:local\n/' update-script
+    if [ `grep -c "format .*SYSTEM:" update-script` == 0 ]
+    then
+      sed -i -e '1i delete DATA:local\n' update-script
+    else
+      sed -i -e 's/format\(.*\)SYSTEM:[ ]*[\n]*/format\1SYSTEM:\ndelete DATA:local\n/' update-script
+    fi      
   else 
     #
     # The 'delete DATA:local' command is redundant because you're formatting the DATA partition,
