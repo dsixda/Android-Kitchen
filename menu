@@ -1,6 +1,26 @@
 #!/bin/bash
  
-version=0.163
+version=0.164
+
+dir_list=( original_update scripts tools )
+error_found=0
+
+for check_dir in ${dir_list[@]}
+do
+  if [ ! -e $check_dir ]
+  then
+    echo "Error: Folder '$check_dir' not found"
+    error_found=1
+  fi
+done
+
+if [ $error_found == 1 ]
+then
+  echo
+  echo "Ensure you have unzipped the folders from the kitchen ZIP file correctly."
+  exit 0
+fi
+
 
 chmod 755 scripts/*
 scripts/check_install_dir
