@@ -1,0 +1,82 @@
+#
+# This script has two arguments:
+#
+# $1 = folder name (mandatory)
+# $2 = "kernel_only" or "name_given" (optional)
+#
+
+
+update_folder=$1
+ 
+echo "Selected $update_folder"
+
+# Trim spaces in folder name
+update_folder2=`echo $update_folder | tr ' ' '_'`
+
+if [ "$update_folder" != "$update_folder2" ]
+then
+  echo "Renaming to $update_folder2"
+  mv "original_update/$update_folder" original_update/$update_folder2
+  update_folder=$update_folder2
+fi
+
+#
+# Working folder name
+#
+build_dir=`scripts/set_working_folder_name $2` 
+
+
+#
+# Creating folder structure
+#
+
+echo
+echo "Creating working folder $build_dir ..."
+mkdir $build_dir
+
+echo
+echo "Copying contents ..."
+cp -fr original_update/$update_folder/* $build_dir 2>/dev/null
+
+if [ "$?" != "0" ]
+then
+  echo
+  echo "Error: Cannot copy folder contents!"
+  cd ..
+  exit 1
+fi
+
+
+if [ "$2" != "kernel_only" ] && [ "$2" != "name_given" ]
+then
+  scripts/check_no_update_script
+  error_code=$?
+fi
+
+echo
+echo "Listing of META-INF/com/google/android:"
+
+cd $build_dir
+cd META-INF/com/google/android
+ls -l 
+cd ../../../../..
+
+
+#
+# Completion
+#
+
+echo
+echo Listing of $build_dir:
+
+cd $build_dir
+ls -l 
+
+cd ..
+
+if [ "$error_code" == "1" ]
+then
+  exit 1
+else
+  exit 0
+fi
