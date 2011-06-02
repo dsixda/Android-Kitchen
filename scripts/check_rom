@@ -7,14 +7,15 @@
 
 
 echo
-echo "Ensure the ROM is under the original_update folder.  The format"
-echo "may be one of the following:"
+echo "Ensure there is at least one ROM under the original_update folder."
+echo "The format for each ROM must be one of the following:"
 echo 
-echo " - A ZIP file for a custom ROM  (e.g. update.zip)"
-echo " - A ZIP file containing *.img  (e.g. rom.zip from shipped ROM)"
-echo " - A ZIP file containing shipped ROM in SYSTEM + BOOT folder format"
-echo " - system.img + boot.img        (e.g. from shipped ROM or Nandroid)"
-echo " - An APP file from Huawei      (e.g. UPDATE.APP from software update)"
+echo " - ZIP file for a custom ROM  (e.g. update.zip)"
+echo " - ZIP file containing *.img  (e.g. rom.zip from shipped ROM)"
+echo " - ZIP file containing shipped ROM in SYSTEM + BOOT folder format"
+echo " - APP file from Huawei       (e.g. UPDATE.APP from software update)"
+echo " - system.img + boot.img      (e.g. from shipped ROM or Nandroid)"
+echo " - Working folder made with this kitchen  (e.g. WORKING_old_rom)"
 echo
 
 scripts/make_backup_working
@@ -29,18 +30,6 @@ then
 
   echo
   echo "Error: Old working folder is in use. Ensure its files or folders are not open."
-
-  if [ -d OLD_WORKING ]
-    then
-    dir_working=`ls OLD_WORKING`
-    if [ "$dir_working" == "" ]
-    then
-      echo
-      echo "Removing empty folder OLD_WORKING"
-      rmdir OLD_WORKING
-    fi
-  fi
-
   scripts/press_enter
   exit 1
 
