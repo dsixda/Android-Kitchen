@@ -20,11 +20,25 @@ if [ "$1" != "kernel_only" ] && [ "$1" != "name_given" ]
   if [ "$change_it" == "y" ]
   then
 
-    echo -n "Enter a new name (using this prefix): WORKING_" 1>&2
-    read newname 
+    name_is_set=no
+
+    while [ $name_is_set == no ]
+    do
+      echo -n "Enter a new name (using this prefix): WORKING_" 1>&2
+      read newname 
    
-    newname=`echo $newname | sed -e 's/ /_/g'`
-    working_dir="WORKING_$newname"
+      newname=`echo $newname | sed -e 's/ /_/g'`
+      working_dir="WORKING_$newname"
+
+      if [ -d original_update/$working_dir ]
+      then
+        echo "Error: Same name already exists under original_update folder" 1>&2
+        echo 1>&2
+      else
+        name_is_set=yes
+      fi
+
+    done
   fi
 fi
 
