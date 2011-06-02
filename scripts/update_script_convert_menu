@@ -17,6 +17,11 @@ do
   echo "Convert update-script/updater-script"
   echo "--------------------------------------"
   echo
+  echo "You should know:"
+  echo "- An update-script is in 'Amend' format"
+  echo "- An updater-script is in 'Edify' format"
+  echo
+  echo
   echo "Enter a choice:"
   echo 
 
