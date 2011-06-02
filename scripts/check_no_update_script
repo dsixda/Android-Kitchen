@@ -62,7 +62,7 @@ else
     else
       echo
       echo "WARNING: The kitchen may have problems without an update-script"
-      exit 2
+      exit 1
     fi
 
   else
