@@ -120,180 +120,175 @@ then
   cd ..
   exit 1
 
-else
+fi
 
-  #
-  # Check for NAND ROM - convert the boot folder to boot.img
-  #
-  if [ ! -e boot.img ]
+#
+# Check for NAND ROM - convert the boot folder to boot.img
+#
+if [ ! -e boot.img ]
+then
+  if [ -e boot/initrd.gz ] && [ -e boot/zImage ]
   then
-    if [ -e boot/initrd.gz ] && [ -e boot/zImage ]
-    then
-      echo
-      echo "NAND ROM detected, converting boot folder to boot.img for"
-      echo "compatibility with kitchen (will be converted back when"
-      echo "ROM is built) ..."
-
-      cd ..
-      scripts/ensure_nand_extracted no_clear
-      scripts/build_boot_img
-      cd WORKING_*
-
-    #
-    # Leaked ROMs with partitions in folder format
-    # 
-    elif [ -e BOOT/kernel ] && [ -e BOOT/base ] && [ -e BOOT/cmdline ] && [ -d BOOT/RAMDISK ]
-    then
-      echo "Partitions are in folder format; BOOT folder will need to be"
-      echo "converted into a boot.img ..."
-     
-      cd ..
-      scripts/build_boot_img_from_folder_form
-      cd WORKING_*
-
-    else
-
-      #
-      # Check if ROM has no boot.img inside
-      #
-
-      build_dir=`pwd`
-      cd ..
-      scripts/check_no_bootimg $build_dir
-      cd $build_dir
-
-      if [ ! -e boot.img ]
-      then
-        echo "Error: No boot.img found, cannot continue"
-        echo
-        cd ..
-        echo "Removing $build_dir ..."
-        rm -rf $build_dir
-        echo
-        exit 1
-      fi
-    fi
-  fi
-
-
-  #
-  # Remove bad symlinks (*.lnk)
-  #
-  if [ -d system/bin ]
-  then
-    rm -fv system/bin/*.lnk
-  fi
-
-  if [ -d system/xbin ]
-  then
-    rm -fv system/xbin/*.lnk
-  fi
-
-
-  if [ -d META-INF ]
-  then
-    cd META-INF 
-    rm -f CERT.RSA CERT.SF MANIFEST.MF
-    cd ..
-  else
     echo
-    echo "Warning: No META-INF folder found under working folder!"
-  fi
+    echo "NAND ROM detected, converting boot folder to boot.img for"
+    echo "compatibility with kitchen (will be converted back when"
+    echo "ROM is built) ..."
 
-
-  cd ..
-  echo
-
-  if [ "$2" != "kernel_only" ] && [ "$2" != "name_given" ]
-  then
-
-    scripts/check_no_update_script
-    error_code=$?
-
+    cd ..
+    scripts/ensure_nand_extracted no_clear
+    scripts/build_boot_img
     cd WORKING_*
-    cd META-INF/com/google/android
 
+  #
+  # Leaked ROMs with partitions in folder format
+  # 
+  elif [ -e BOOT/kernel ] && [ -e BOOT/base ] && [ -e BOOT/cmdline ] && [ -d BOOT/RAMDISK ]
+  then
+    echo "Partitions are in folder format; BOOT folder will need to be"
+    echo "converted into a boot.img ..."
+   
+    cd ..
+    scripts/build_boot_img_from_folder_form
+    cd WORKING_*
+
+  else
 
     #
-    # Check for extra files / folders; e.g in OTA update
+    # Check if ROM has no boot.img inside
     #
 
-    if [ -e updater-script ] && [ -e update-script ]
+    build_dir=`pwd`
+    cd ..
+    scripts/check_no_bootimg $build_dir
+    cd $build_dir
+
+    if [ ! -e boot.img ]
     then
+      echo "Error: No boot.img found, cannot continue"
       echo
-      echo "Warning: Both updater-script and update-script are found."
-      echo -n "Remove updater-script (y/n)? (default: y) "
-
-      read enterRemove
+      cd ..
+      echo "Removing $build_dir ..."
+      rm -rf $build_dir
       echo
-
-      if [ "$enterRemove" == "n" ]
-      then
-        echo "Keeping updater-script, but we must remove update-script"
-        rm -rf update-script
-
-        cd ../../../../..
-        scripts/check_no_update_script
-        error_code=$?
-
-        cd WORKING_*
-        cd META-INF/com/google/android
-
-      else 
-        echo "Removing updater-script"
-        rm -f updater-script
-      fi
-
+      exit 1
     fi
-    if [ -e update-binary ] && [ -e update-script ]
-    then
-      echo
-      echo "Warning: Both update-binary and update-script are found."
-      echo -n "Remove update-binary (y/n)? (default: y) "
-      read enterRemove
-      if [ "$enterRemove" != "n" ]
-      then
-        echo "Removing update-binary"
-        rm -f update-binary
-      else
-        echo "Not removing update-binary"
-      fi
-    fi
-
-
-    if [ -e update-script ]
-    then
-      #
-      # Remove some comments to prevent common issues with kitchen
-      #
-      sed -i \
-        -e 's/#set_perm[^\n]*[\n]*//g' \
-        -e 's/#write[^\n]*[\n]*//g' \
-        update-script
-    fi
-
-    rm -rf update-script.bak
-    cd ../../../../..
-
-    scripts/remove_recovery
   fi
+fi
 
+
+#
+# Remove bad symlinks (*.lnk)
+#
+if [ -d system/bin ]
+then
+  rm -fv system/bin/*.lnk
+fi
+
+if [ -d system/xbin ]
+then
+  rm -fv system/xbin/*.lnk
+fi
+
+
+if [ -d META-INF ]
+then
+  cd META-INF 
+  rm -f CERT.RSA CERT.SF MANIFEST.MF
+  cd ..
+else
   echo
-  echo "Listing of META-INF/com/google/android:"
+  echo "Warning: No META-INF folder found under working folder!"
+fi
+
+
+cd ..
+echo
+
+if [ "$2" != "kernel_only" ] && [ "$2" != "name_given" ]
+then
+
+  scripts/check_no_update_script
+  error_code=$?
 
   cd WORKING_*
   cd META-INF/com/google/android
-  ls -l 
+
+
+  if [ -e updater-script ] && [ -e update-script ]
+  then
+    echo
+    echo "Warning: Both updater-script and update-script are found."
+    echo -n "Remove updater-script (y/n)? (default: y) "
+
+    read enterRemove
+    echo
+
+    if [ "$enterRemove" == "n" ]
+    then
+      echo "Keeping updater-script, but we must remove update-script"
+      rm -rf update-script
+
+      cd ../../../../..
+      scripts/check_no_update_script
+      error_code=$?
+
+      cd WORKING_*
+      cd META-INF/com/google/android
+
+    else 
+      echo "Removing updater-script"
+      rm -f updater-script
+    fi
+
+  fi
+  if [ -e update-binary ] && [ -e update-script ]
+  then
+    echo
+    echo "Warning: Both update-binary and update-script are found."
+    echo -n "Remove update-binary (y/n)? (default: y) "
+    read enterRemove
+    if [ "$enterRemove" != "n" ]
+    then
+      echo "Removing update-binary"
+      rm -f update-binary
+    else
+      echo "Not removing update-binary"
+    fi
+  fi
+
+
+  if [ -e update-script ]
+  then
+    #
+    # Remove some comments to prevent common issues with kitchen
+    #
+    sed -i \
+      -e 's/#set_perm[^\n]*[\n]*//g' \
+      -e 's/#write[^\n]*[\n]*//g' \
+      update-script
+  fi
+
+  rm -rf update-script.bak
   cd ../../../../..
 
+  scripts/remove_recovery
 fi
+
+echo
+echo "Listing of META-INF/com/google/android:"
+
+cd WORKING_*
+cd META-INF/com/google/android
+ls -l 
+cd ../../../../..
+
 
 
 #
 # Completion
 #
 
-cd WORKING_*
+cd $build_dir
 
 echo
 echo Listing of $build_dir:
@@ -304,8 +299,9 @@ echo
 if [ -d system ]
 then
   echo "Finished setting up working folder!"
+  cd ..
 
-  if [ "$error_code" == "2" ]
+  if [ "$error_code" == "1" ]
   then
     exit 1
   else
