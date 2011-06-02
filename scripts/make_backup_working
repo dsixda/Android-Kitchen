@@ -4,7 +4,7 @@ then
   scripts/press_enter
 fi
 
-found_working=`ls | grep WORKING_` 
+found_working=`ls | grep "^WORKING_"` 
 
 if [ "$found_working" != "" ]
 then
@@ -12,13 +12,14 @@ then
   echo
   echo "Before you proceed:"
   echo "The existing working folders under the main folder can be backed up"
-  echo "to the folder OLD_WORKING; otherwise they will be deleted."
+  echo "to the folder 'orignal_update' for later use; otherwise they will be"
+  echo "deleted."
 
   echo
   echo "Found the following:"
   echo $found_working
   echo
-  echo -n "Move to OLD_WORKING? (default: y): "
+  echo -n "Move to original_update? (default: y): "
 
   read do_backup
   echo
@@ -33,26 +34,6 @@ then
       exit 1
     fi
 
-    if [ -d OLD_WORKING ]
-    then
-      echo
-      echo -n "Keep folder OLD_WORKING (y/n)? (default: n): "
-
-      read do_keep
-      echo
-
-      if [ "$do_keep" != "y" ]
-      then
-        echo "Removing ..."
-        rm -rf OLD_WORKING 2>/dev/null
-        if [ "$?" == "1" ]
-        then
-          echo "Warning: folder is in use, cannot delete."
-        fi
-      fi
-    fi
-
-
   else
 
     # Grab this value again, in case the user manually deleted the
@@ -66,18 +47,8 @@ then
       # Make backup 
       #
 
-      if [ -d OLD_WORKING ]
-      then
-        echo
-        echo "Found OLD_WORKING" 
-      else
-        echo
-        echo "Making folder OLD_WORKING ..."
-        mkdir OLD_WORKING
-      fi
-
-      echo "Moving old working folders to OLD_WORKING ..."
-      mv WORKING_* OLD_WORKING 2>/dev/null
+      echo "Moving old working folders to original_update ..."
+      mv WORKING_* original_update 2>/dev/null
     fi
   fi
 
