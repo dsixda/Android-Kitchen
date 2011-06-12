@@ -1,6 +1,6 @@
 #!/bin/bash
  
-version=0.165
+version=0.166
 
 dir_list=( original_update scripts tools )
 error_found=0
