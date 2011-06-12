@@ -109,7 +109,7 @@ else
   cd ..
 
   echo
-  echo -n "Enter file number (default=1, cancel=0): "
+  echo -n "Enter selection number (default=1, cancel=0): "
 
 
   read enterNumber
