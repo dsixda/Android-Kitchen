@@ -183,6 +183,11 @@ fi
 
 cd ..
 
+
+# Wi-fi fix - required for some Huawei devices
+scripts/fix_huawei_wifi
+
+
 if [ "$2" != "kernel_only" ] && [ "$2" != "name_given" ]
 then
   scripts/fix_update_script 
