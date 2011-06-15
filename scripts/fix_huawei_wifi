@@ -1,0 +1,35 @@
+
+cd WORKING_*
+
+if [ -e system/cust/hw/default/wpa_supplicant.conf ] && \
+     [ ! -e /system/etc/wifi/wpa_supplicant.conf ]
+then
+
+  echo
+  cd system
+
+  if [ -d etc ]
+  then
+
+    if [ "`find etc -maxdepth 1 -name wifi -type f`" != "" ] || [ "`find etc -maxdepth 1 -name wifi -type l`" != "" ]
+    then
+      echo "Removing file /system/etc/wifi"
+      rm -f etc/wifi
+    fi
+
+  else
+    echo "Creating folder /system/etc"
+    mkdir etc 
+  fi
+
+  if [ "`find etc -maxdepth 1 -name wifi -type d`" == "" ]
+  then
+    echo "Creating folder /system/etc/wifi"
+    mkdir etc/wifi
+  fi
+
+  echo "Copying /system/cust/hw/default/wpa_supplicant.conf to /system/etc/wifi/"
+  cp -f cust/hw/default/wpa_supplicant.conf etc/wifi/
+
+fi
+
