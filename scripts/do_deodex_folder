@@ -166,7 +166,7 @@ do
 
     if [ "$found_error" == "1" ]
     then
-      echo "Could not deodex the following (try to deodex these files again):"
+      echo "Could not deodex the following (you can try to deodex these files again):"
       echo `ls *.odex`
       echo
       cd ../..
