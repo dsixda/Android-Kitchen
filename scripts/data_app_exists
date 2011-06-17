@@ -1,3 +1,13 @@
+############################################################################
+#
+# Copyright (c) 2010-2011 dsixda - dislam@rocketmail.com
+#
+# Android Kitchen is 100% free.  This script file is intended for personal
+# and/or educational use only.  It may not be duplicated for monetary
+# benefit or any purpose without the permission of the developer.
+#
+############################################################################
+
 cd WORKING_*
 cd META-INF/com/google/android
 grep_data_app=`grep set_perm update-script | grep -c DATA:app`
