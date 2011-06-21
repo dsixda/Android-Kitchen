@@ -155,12 +155,12 @@ then
   scripts/img_files_to_working_folder create_working $1
   exit $?
 
-elif [ "`echo $file_chosen | grep -i \\.zip$`" != "" ] && [ ! -d original_update/$file_chosen ]
+elif [ "`echo $file_chosen | grep -i \\.zip$`" != "" ] && [ ! -d "original_update/$file_chosen" ]
 then
   scripts/zip_file_to_working_folder "$file_chosen" $1
   exit $?
 
-elif [ "`echo $file_chosen | grep -i \\.app$`" != "" ] && [ ! -d original_update/$file_chosen ]
+elif [ "`echo $file_chosen | grep -i \\.app$`" != "" ] && [ ! -d "original_update/$file_chosen" ]
 then
   scripts/app_file_to_working_folder "$file_chosen" $1
   exit $?
