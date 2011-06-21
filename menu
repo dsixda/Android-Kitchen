@@ -10,7 +10,7 @@
 
 #!/bin/bash
  
-version=0.167
+version=0.168
 
 dir_list=( original_update scripts tools )
 error_found=0
