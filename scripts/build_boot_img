@@ -190,14 +190,11 @@ cd BOOT-EXTRACTED
 #
 
 echo 
-echo Building ramdisk-boot ...
-./$mkbootfs_file boot.img-ramdisk | gzip > ramdisk-boot
+echo "Creating ramdisk cpio archive ..."
+./$mkbootfs_file boot.img-ramdisk | gzip > ramdisk.gz
 
 
 
-#
-# Determine kernel base address before running mkbootimg
-#
 
 cd ..
 cd WORKING_*
@@ -208,6 +205,16 @@ then
   cd ..
   echo
 
+  #
+  # Get original size of boot.img
+  #
+  size_orig=`scripts/get_boot_img_size`
+
+
+  #
+  # Determine kernel base address before running mkbootimg
+  #
+
   if [ "$base" == "" ]
   then
     echo "Attempting to determine kernel base address ..."
@@ -216,7 +223,13 @@ then
 
   echo "Using base address of $base"
 
-  if [ "$cmd_line" == "" ]
+  #
+  # If no parameters entered, then find out the command line
+  #
+  # NOTE: Check the first two parameters to determine whether the user set the
+  # command line to an empty string intentionally
+  #
+  if [ "$3" == "" ]  && [ "$1" == "" ]
   then
     echo "Attempting to determine command line parameter ..."
     cmd_line=`scripts/get_cmdline`
@@ -224,7 +237,7 @@ then
 
   if [ "$cmd_line" == "" ]
   then
-    echo "No cmdline found"
+    echo "No cmdline"
   else
     echo "Using cmdline: $cmd_line"
   fi    
@@ -241,20 +254,42 @@ fi
 cd BOOT-EXTRACTED
 
 echo
-echo Building newBoot.img ...
+echo "Building new boot.img ..."
 
-./$mkbootimg_file --kernel zImage --ramdisk ramdisk-boot --cmdline "$cmd_line" -o newBoot.img --base $base
-
+if [ "$cmd_line" == "" ]
+then
+  ./$mkbootimg_file --kernel zImage --ramdisk ramdisk.gz -o newBoot.img --base $base
+else
+  ./$mkbootimg_file --kernel zImage --ramdisk ramdisk.gz --cmdline "$cmd_line" -o newBoot.img --base $base
+fi
 
 if [ -e newBoot.img ]
 then
   echo
-  echo newBoot.img created
+  echo "newBoot.img created"
 
-  echo Copying as boot.img to working folder
+  echo "Moving to working folder as boot.img"
   cd ../WORKING_*
-  rm -f boot.img
-  cp ../BOOT-EXTRACTED/newBoot.img boot.img
+  mv -f ../BOOT-EXTRACTED/newBoot.img boot.img
+
+  if [ "$size_orig" != "" ]
+  then
+
+    #
+    # Get new size of boot.img
+    #
+    cd ..
+    size_new=`scripts/get_boot_img_size`
+    cd WORKING_*
+
+    if [ "$size_new" != "" ]
+    then
+      echo
+      echo "boot.img size"
+      echo "Old: $size_orig"
+      echo "New: $size_new"
+    fi
+  fi
 
   if [ -d boot ] && [ -e boot/initrd.gz ] && [ -e boot/zImage ]
   then
@@ -273,7 +308,7 @@ then
 
 else
   echo
-  echo newBoot.img not created!
+  echo "newBoot.img not created!"
 
   rm $mkbootfs_file
   rm $mkbootimg_file
