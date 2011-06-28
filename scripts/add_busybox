@@ -31,14 +31,14 @@ then
 
   if [ "$do_bb" == "n" ]
   then
-    exit 0
+    exit 1
   fi    
 fi
 
 if [ ! -d WORKING_* ]
 then
   echo No working folder found!
-  exit 0
+  exit 1
 fi
 
 cd WORKING_*
@@ -55,6 +55,30 @@ else
   echo "Found $su_path"
 fi
 
+
+version=`more ../tools/busybox_files/version.txt | sed -e 's/BusyBox \(.*\)$/\1/g'`
+
+if [ -e system/bin/busybox ]
+then
+  echo
+  echo "Working folder already has /system/bin/busybox"
+
+  echo -n "Replace with BusyBox $version (y/n)? (default: y): "
+  read replace_bin_bb
+  echo
+
+  if [ "$replace_bin_bb" == "n" ]
+  then
+    echo "Cancelled"
+  else
+    echo "Replacing /system/bin/busybox"
+    cp -f ../tools/busybox_files/busybox system/bin/
+  fi
+
+  cd ..
+  exit 1
+fi
+
 echo
 
 if [ -d system/xbin ]
@@ -69,13 +93,25 @@ echo
 
 if [ -e system/xbin/busybox ] 
 then
-  echo "/system/xbin/busybox already present"
+
+  echo "Working folder already has /system/xbin/busybox"
+  echo -n "Replace with BusyBox $version (y/n)? (default: y): "
+  read replace_bb
+  echo
+
+  if [ "$replace_bb" == "n" ]
+  then
+    echo "Cancelled"
+    cd ..
+    exit 1
+  fi
+
+  echo "Replacing /system/xbin/busybox"
 else
   echo "Adding /system/xbin/busybox"
-  cp ../tools/busybox_files/busybox system/xbin/
 fi
 
-
+cp -f ../tools/busybox_files/busybox system/xbin/
 cd ..
 
 scripts/add_busybox_to_update_script
