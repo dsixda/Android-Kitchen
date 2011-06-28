@@ -1,0 +1,92 @@
+############################################################################
+#
+# Copyright (c) 2010-2011 dsixda - dislam@rocketmail.com
+#
+# Android Kitchen is 100% free.  This script file is intended for personal
+# and/or educational use only.  It may not be duplicated for monetary
+# benefit or any other purpose without the permission of the developer.
+#
+############################################################################
+
+#
+# This script is normally used after removing the busybox symlinks in the 
+# update(r)-script.
+#
+
+if [ ! -d WORKING_* ]
+then
+  echo No working folder found!
+  exit 1
+fi
+
+cd WORKING_*
+
+echo
+
+if [ -e system/bin/busybox ]
+then
+  echo "Removing /system/bin/busybox"
+  rm -f system/bin/busybox
+fi
+
+if [ -d system/xbin ]
+then
+  echo "Found /system/xbin"
+else
+  echo "Creating /system/xbin"
+  mkdir system/xbin
+fi
+
+if [ ! -e system/xbin/busybox ]
+then
+  echo "Adding /system/xbin/busybox"
+  cp -f ../tools/busybox_files/busybox system/xbin/
+
+else
+
+  version=`more ../tools/busybox_files/version.txt | sed -e 's/BusyBox \(.*\)$/\1/g'`
+
+  echo
+  echo "Working folder already has /system/xbin/busybox"
+  echo -n "Replace with BusyBox $version (y/n)? (default: y): "
+  read replace_bin_bb
+  echo
+
+  if [ "$replace_bin_bb" == "n" ]
+  then
+    echo "Cancelled"
+  else
+    echo "Replacing /system/xbin/busybox"
+    cp -f ../tools/busybox_files/busybox system/xbin/
+  fi
+fi
+
+
+#
+# Now fix update-script
+#
+if [ -e META-INF/com/google/android/update-script ]
+then
+
+  cd META-INF/com/google/android
+
+  search_xbin_busybox=`grep -c "symlink.*xbin/busybox" update-script`
+  search_symlinks=`grep -c "symlink busybox " update-script` 
+
+  if [ $search_xbin_busybox -gt 0 ] || [ $search_symlinks -gt 0 ]
+  then
+    echo
+    echo "Removing existing symlink references to busybox in update-script"
+    sed -i -e '/symlink.*xbin\/busybox/d' update-script
+    sed -i -e '/symlink busybox /d' update-script 
+  fi
+
+  cd ../../../../..
+
+  scripts/add_busybox_to_update_script
+
+else
+  echo "Error: update-script not found!"
+  cd ..
+fi
+
