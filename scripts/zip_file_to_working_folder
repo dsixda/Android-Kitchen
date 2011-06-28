@@ -269,18 +269,53 @@ then
 
   if [ -e update-script ]
   then
+    
     #
-    # Remove some comments to prevent common issues with kitchen
+    # Remove comments to prevent issues with kitchen
     #
-    sed -i \
-      -e 's/#set_perm[^\n]*[\n]*//g' \
-      -e 's/#write[^\n]*[\n]*//g' \
-      update-script
+    sed -i -e '/^#/d' update-script
+
+
+    #
+    # Remove block of busybox symlinks
+    #
+    grep_bb=`grep -c "symlink busybox " update-script`
+
+    if [ $grep_bb -gt 0 ]
+    then
+
+      echo
+      echo "To reduce the size of the update-script, do you want to remove the" 
+      echo "lines containing the busybox symlinks, and instead use a separate"
+      echo "script called 'installbusybox' to create them (y/n)?"
+      echo
+      echo -n "(default: n): "
+      
+      read replace_bb
+      echo
+
+      if [ "$replace_bb" == "y" ]
+      then
+        replace_bb=yes
+        echo "Ok, we will replace the busybox symlinks ..."
+        cd ../../../../..
+        scripts/fix_busybox
+        cd WORKING_*
+        cd META-INF/com/google/android
+      
+      else
+        echo "Not replacing the busybox symlinks"
+      fi
+    fi
   fi
 
-  rm -rf update-script.bak
+  rm -f update-script.bak
+
   cd ../../../../..
 
+  #
+  # Check for stuff related to stock recovery image
+  #
   scripts/remove_recovery
 fi
 
