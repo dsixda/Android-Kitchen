@@ -67,6 +67,7 @@ do
       then
         echo "  w = Extract kernel+ramdisk from boot.img"
         echo "  c = Convert boot.img into NAND boot folder"
+        echo "  p = Change 'command line' parameter in boot.img"
 
       elif [ "$boot_folder" == "true" ]
       then
@@ -113,6 +114,10 @@ do
   then
     scripts/ensure_boot_extracted
     scripts/build_nand_boot
+
+  elif [ "$enterLetter" == "p" ]
+  then
+    scripts/change_cmdline
 
   elif [ "$enterLetter" == "y" ]
   then
