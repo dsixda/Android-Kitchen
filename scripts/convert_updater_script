@@ -79,6 +79,35 @@ else
 fi
 
 
+#
+# Remove block of busybox symlinks
+#
+
+grep_bb=`grep -c "^symlink(\"busybox\"" updater-script`
+
+if [ $grep_bb -gt 0 ]
+then
+  echo "To significantly reduce the time required to convert the updater-" 
+  echo "script, do you want to remove the updater-script's busybox symlinks"
+  echo "and have them created in a separate script called 'installbusybox'?"
+  echo
+  echo -n "(y/n)? (default: y): "
+  
+  read replace_bb
+  echo
+
+  if [ "$replace_bb" != "n" ]
+  then
+    replace_bb=yes
+    echo "Ok, we will replace the busybox symlinks"
+  else
+    echo "Not replacing the busybox symlinks"
+  fi
+  
+  echo
+  echo
+fi
+
 
 echo "Please wait ..."
 echo
@@ -94,9 +123,6 @@ more updater-script \
 | sed -e ':a;N;$!ba;s/,[ ]*\n//g' \
 | sed -e 's/","/", "/g' \
 | sed -e 's/^\([a-zA-Z_]*\)[ ]*(/\1(/g' \
-| sed -e 's/package_extract_dir(\"\([^ ]*\)\", \"\/tmp\");/copy_dir PACKAGE:\1 TMP:/g' \
-| sed -e 's/package_extract_dir(\"\([^ ]*\)\", \"\/system\");/copy_dir PACKAGE:\1 SYSTEM:/g' \
-| sed -e 's/package_extract_dir(\"\([^ ]*\)\", \"\/sdcard\");/copy_dir PACKAGE:\1 SDCARD:/g' \
 > temp.log
 
 
@@ -118,7 +144,7 @@ sed -i -e '/^#/d' temp.log
 # assert
 #
 echo "- assert ..."
-line_num=`grep -n -m 1 "assert(" temp.log | sed 's/:.*//g'`
+line_num=`sed -n -e '/assert(/{=;q}' temp.log`
 
 while [ "$line_num" != "" ]
 do
@@ -146,7 +172,7 @@ do
     -e 's/^;$//g' \
     temp.log
 
-  line_num=`grep -n -m 1 "assert(" temp.log | sed 's/:.*//g'`
+  line_num=`sed -n -e '/assert(/{=;q}' temp.log`
 done
 
 
@@ -195,11 +221,12 @@ else
   sed -i -e ':a;N;$!ba;s/package_extract_file("blob", "\/tmp\/blob");\n[ ]*write_blob_raw_image("\/tmp\/blob", "staging");\n[ ]*delete("\/tmp\/blob");//g' temp.log
 fi
 
+
 #
 # run_program
 #
 echo "- run_program ..."
-line_num=`grep -n -m 1 "run_program(" temp.log | sed 's/:.*//g'`
+line_num=`sed -n -e '/run_program(/{=;q}' temp.log`
 
 while [ "$line_num" != "" ]
 do
@@ -213,7 +240,7 @@ do
     -e ''$line_num' s/run_program PACKAGE:\//run_program \//g' \
     temp.log
 
-  line_num=`grep -n -m 1 "run_program(" temp.log | sed 's/:.*//g'`
+  line_num=`sed -n -e '/run_program(/{=;q}' temp.log`
 done
 
 
@@ -222,7 +249,7 @@ done
 # delete
 #
 echo "- delete ..."
-line_num=`grep -n -m 1 "delete(" temp.log | sed 's/:.*//g'`
+line_num=`sed -n -e '/delete(/{=;q}' temp.log`
 
 while [ "$line_num" != "" ]
 do
@@ -234,7 +261,7 @@ do
     -e ''$line_num' s/;//g' \
     temp.log
 
-  line_num=`grep -n -m 1 "delete(" temp.log | sed 's/:.*//g'`
+  line_num=`sed -n -e '/delete(/{=;q}' temp.log`
 done
 
 
@@ -250,9 +277,14 @@ sed -i -e 's/apply_patch.*[;]//g' temp.log
 #
 echo -n "- symlink (may take a few minutes) "
 
-line_num=`grep -n "symlink(" temp.log | grep -m 1 ";" | sed 's/:.*//g'`
+# Remove busybox symlinks if requested
+if [ "$replace_bb" == "yes" ]
+then
+  sed -i -e '/symlink("busybox".*);/d' temp.log
+fi
 
-iterations=0
+
+line_num=`sed -n -e '/symlink(/{=;q}' temp.log`
 
 while [ "$line_num" != "" ]
 do
@@ -261,24 +293,14 @@ do
 
   cp temp.log temp.log.old
 
-  # The formatting code near the top of the script may have removed some commas
-  sed -i -e ''$line_num' s/"[ ]*"/", "/g' temp.log
-
-  # If line only has one symlink, then delimit it by removing the semi-colon, and then
-  # convert line to update-script when this 'while' loop is finished
-  count_dest=`grep "symlink(" temp.log | grep -m 1 ";" | grep -o , | wc -w`
-
-  if [ $count_dest == 1 ]
-  then
-    # Only one symlink left on this line
-    sed -i -e ''$line_num' s/;//g' temp.log
-
-  else
-    # Multiple symlinks on one line will be separated to their own lines
-    sed -i \
-      -e ''$line_num' s/symlink\(([^,]*\),[ \t]*\("[^"]*"\)\(.*\)/symlink\1, \2)\nsymlink\1\3/g' \
-    temp.log  
-  fi      
+  # sed 1: The formatting code near the top of the script may have removed some commas
+  # sed 2: Multiple symlinks on one line will be separated to their own lines
+  # sed 3: Fix to remove duplicate symlink at end, caused by 2nd sed
+  sed -i \
+    -e ''$line_num' s/"[ ]*"/", "/g' \
+    -e ''$line_num' s/symlink(\([^,]*\),[ \t]*\("[^"]*"\)\(.*\)/symlink \1 \2\nsymlink(\1\3/g' \
+    -e ''$line_num' s/symlink(\([^,]*\));//g' \
+  temp.log 
 
   #
   # Ensure we are not stuck in an endless loop doing nothing
@@ -294,7 +316,7 @@ do
 
   rm -f temp.log.old
 
-  line_num=`grep -n "symlink(" temp.log | grep -m 1 ";" | sed 's/:.*//g'`
+  line_num=`sed -n -e '/symlink(/{=;q}' temp.log`
 
 done
 
@@ -338,6 +360,8 @@ sed -i \
   -e 's/\"DATA:\"/DATA:/g' \
   -e 's/\" DATA/ DATA/g' \
   -e 's/"userdata"/DATA:/g' \
+  -e 's/\"DATA:\([^\"]*\)\"/DATA:\1/g' \
+  -e 's/symlink DATA:/symlink \/data\//g' \
   \
   -e 's/\/sdcard\//SDCARD:/g' \
   -e 's/ \/sdcard/ SDCARD:/g' \
@@ -423,6 +447,19 @@ echo
 
 if [ -e update-script ]
 then
+
+  #
+  # Add busybox files and update the update-script
+  #
+  if [ "$replace_bb" == "yes" ]
+  then
+    cd ../../../../..
+    scripts/fix_busybox
+    echo
+    cd WORKING_*
+    cd META-INF/com/google/android
+  fi
+
 
   mv -f updater-script updater-script.orig
 
