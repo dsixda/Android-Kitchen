@@ -10,7 +10,7 @@
 
 #!/bin/bash
  
-version=0.168
+version=0.169
 
 dir_list=( original_update scripts tools )
 error_found=0
@@ -27,7 +27,10 @@ done
 if [ $error_found == 1 ]
 then
   echo
-  echo "Ensure you have unzipped the folders from the kitchen ZIP file correctly."
+  echo "Ensure you have unzipped the folders from the kitchen ZIP file correctly,"
+  echo "and also that you have run this file from the SAME folder as where it"
+  echo "resides.  Start the kitchen with the ./menu command, NOT with any other"
+  echo "command or method!"
   exit 0
 fi
 
