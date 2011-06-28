@@ -35,7 +35,12 @@ page_size=`scripts/get_boot_img_page_size`
 echo -n "."
 cmd_line=`scripts/get_cmdline`
 
-
+if [ "$cmd_line" == "" ]
+then
+  cmd_line="(None)"
+else
+  cmd_line="\"$cmd_line\""
+fi
 
 clear
 
@@ -46,7 +51,7 @@ echo
 echo " Kernel Base Address  : $base_addr"
 echo " Page Size            : $page_size bytes"
 echo
-echo " Command Line: \"$cmd_line\""
+echo " Command Line: $cmd_line"
 echo
 
 
