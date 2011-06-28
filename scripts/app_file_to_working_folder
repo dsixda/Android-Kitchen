@@ -44,12 +44,11 @@ mkdir $build_dir
 
 echo "Copying $update_file to $build_dir ..."
 cp original_update/$update_file $build_dir
-
-echo "Moving to destination folder as UPDATA.APP ..."
 cd $build_dir
 
 if [ "$update_file" != "UPDATA.APP" ]
 then
+  echo "Renaming to UPDATA.APP ..."
   mv -f $update_file UPDATA.APP
 fi  
 
