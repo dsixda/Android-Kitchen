@@ -11,7 +11,7 @@
 #
 # This script has two optional arguments:
 #
-# $1 = "for_zip"
+# $1 = "for_zip" - use this option after update.zip created
 # $2 = yes/no (express build mode) - relies on $1 being present
 #
 
@@ -50,7 +50,7 @@ then
   echo "This option will also be given when you build your ROM, so it is"
   echo "not necessary to convert your update-script now.  The kitchen is NOT"
   echo "compatible with updater-scripts, so only the 'Build ROM' option "
-  echo "should be used afterwards."
+  echo "should be used afterwards if you have an updater-script."
   echo
   echo "Ensure you have an update-script under META-INF/com/google/android"
   echo "of your working folder."
@@ -98,17 +98,69 @@ then
   scripts/fix_pre_build 
 fi
 
-echo
-echo "--------------------------------------------------------------------------"
-echo
-echo "Converting to updater-script, please wait ..."
-echo
+
 
 cd WORKING_*
 cd META-INF/com/google/android
 
+
+#
+# Remove block of busybox symlinks
+#
+
+grep_bb=`grep -c "symlink busybox " update-script`
+
+if [ $grep_bb -gt 0 ]
+then
+
+  cp update-script update-script.bak
+
+  echo
+  echo "To significantly reduce the time required to convert the update-" 
+  echo "script, do you want to remove the update-script's busybox symlinks"
+  echo "and instead use a separate script called 'installbusybox' (y/n)?"
+  echo
+  echo -n "(default: y): "
+  
+  read replace_bb
+  echo
+
+  if [ "$replace_bb" != "n" ]
+  then
+    replace_bb=yes
+    echo "Ok, we will replace the busybox symlinks ..."
+    cd ../../../../..
+    scripts/fix_busybox
+    cd WORKING_*
+    cd META-INF/com/google/android
+  
+  else
+    echo "Not replacing the busybox symlinks"
+  fi
+  
+  echo
+fi
+
+
+echo
+echo "--------------------------------------------------------------------------"
+echo
+
+echo "Converting to updater-script, please wait ..."
+echo
+
 cp update-script updater-script
 
+# Restore the original file after busybox fixed
+if [ -e update-script.bak ]
+then
+  if [ "$replace_bb" == "yes" ]
+  then
+    mv -f update-script.bak update-script
+  else
+    rm -f update-script.bak
+  fi
+fi
 
 
 orig_list=( DATA SYSTEM CACHE SDEXT BOOT SDCARD )
@@ -169,7 +221,7 @@ fi
 # copy_dir 
 #
 echo "- copy_dir ..."
-line_num=`grep -n -m 1 "copy_dir " updater-script | sed -e 's/:.*//g'`
+line_num=`sed -n -e '/copy_dir /{=;q}' updater-script`
 
 while [ "$line_num" != "" ]
 do
@@ -185,7 +237,7 @@ do
     -e ''$line_num' s/CACHE:\([^)]*\))/\/cache\/\1)/g' \
     updater-script
 
-  line_num=`grep -n -m 1 "copy_dir " updater-script | sed -e 's/:.*//g'`
+  line_num=`sed -n -e '/copy_dir /{=;q}' updater-script`  
 done
 
 # Add mount before it
@@ -210,7 +262,7 @@ done
 # set_perm_recursive
 #
 echo "- set_perm_recursive ..."
-line_num=`grep -n -m 1 "set_perm_recursive " updater-script | sed -e 's/:.*//g'`
+line_num=`sed -n -e '/set_perm_recursive /{=;q}' updater-script`
 
 while [ "$line_num" != "" ]
 do
@@ -224,7 +276,7 @@ do
     -e ''$line_num' s/CACHE:\([^)]*\))/\"\/cache\/\1\")/g' \
     updater-script
 
-  line_num=`grep -n -m 1 "set_perm_recursive " updater-script | sed -e 's/:.*//g'`
+  line_num=`sed -n -e '/set_perm_recursive /{=;q}' updater-script`
 done
 
 
@@ -232,7 +284,7 @@ done
 # set_perm
 #
 echo "- set_perm ..."
-line_num=`grep -n -m 1 "set_perm " updater-script | sed -e 's/:.*//g'`
+line_num=`sed -n -e '/set_perm /{=;q}' updater-script`
 
 while [ "$line_num" != "" ]
 do
@@ -245,7 +297,7 @@ do
     -e ''$line_num' s/CACHE:\([^)]*\))/\"\/cache\/\1\")/g' \
     updater-script
 
-  line_num=`grep -n -m 1 "set_perm " updater-script | sed -e 's/:.*//g'`
+  line_num=`sed -n -e '/set_perm /{=;q}' updater-script`  
 done
 
 
@@ -253,7 +305,7 @@ done
 # run_program
 #
 echo "- run_program ..."
-line_num=`grep -n -m 1 "run_program " updater-script | sed -e 's/:.*//g'`
+line_num=`sed -n -e '/run_program /{=;q}' updater-script`
 
 while [ "$line_num" != "" ]
 do
@@ -273,7 +325,7 @@ do
     -e ''$line_num' s/run_program("\/\([^\/^\"]*\)"\(.*\)/package_extract_file("\1", "\/tmp\/\1");\nrun_program("\/tmp\/\1"\2/g' \
     updater-script
 
-  line_num=`grep -n -m 1 "run_program " updater-script | sed -e 's/:.*//g'`
+  line_num=`sed -n -e '/run_program /{=;q}' updater-script`
 done
 
 #
@@ -290,7 +342,7 @@ sed -i \
 # package_extract_file
 #
 echo "- package_extract_file ..."
-line_num=`grep -n -m 1 "package_extract_file " updater-script | sed -e 's/:.*//g'`
+line_num=`sed -n -e '/package_extract_file /{=;q}' updater-script`
 
 while [ "$line_num" != "" ]
 do
@@ -305,7 +357,7 @@ do
     -e ''$line_num' s/TMP:\([^)]*\))/\/tmp\/\1)/g' \
     updater-script
 
-  line_num=`grep -n -m 1 "package_extract_file " updater-script | sed -e 's/:.*//g'`
+  line_num=`sed -n -e '/package_extract_file /{=;q}' updater-script`  
 done
 
 
@@ -313,7 +365,7 @@ done
 # show_progress
 #
 echo "- show_progress ..."
-line_num=`grep -n -m 1 "show_progress " updater-script | sed -e 's/:.*//g'`
+line_num=`sed -n -e '/show_progress /{=;q}' updater-script`
 
 while [ "$line_num" != "" ]
 do
@@ -322,7 +374,7 @@ do
     -e ''$line_num' s/ /, /g' \
     updater-script
 
-  line_num=`grep -n -m 1 "show_progress " updater-script | sed -e 's/:.*//g'`
+  line_num=`sed -n -e '/show_progress /{=;q}' updater-script`  
 done
 
 
@@ -330,7 +382,7 @@ done
 # delete
 #
 echo "- delete ..."
-line_num=`grep -n -m 1 "delete " updater-script | sed -e 's/:.*//g'`
+line_num=`sed -n -e '/delete /{=;q}' updater-script`
 
 while [ "$line_num" != "" ]
 do
@@ -343,7 +395,7 @@ do
     -e ''$line_num' s/TMP:\([^)]*\))/\/tmp\/\1)/g' \
     updater-script
 
-  line_num=`grep -n -m 1 "delete " updater-script | sed -e 's/:.*//g'`
+  line_num=`sed -n -e '/delete /{=;q}' updater-script`
 done
 
 
@@ -351,7 +403,7 @@ done
 # delete_recursive
 #
 echo "- delete_recursive ..."
-line_num=`grep -n -m 1 "delete_recursive " updater-script | sed -e 's/:.*//g'`
+line_num=`sed -n -e '/delete_recursive /{=;q}' updater-script`
 
 while [ "$line_num" != "" ]
 do
@@ -364,7 +416,7 @@ do
     -e ''$line_num' s/SDEXT:/\/sdext\//g' \
     updater-script
 
-  line_num=`grep -n -m 1 "delete_recursive " updater-script | sed -e 's/:.*//g'`
+  line_num=`sed -n -e '/delete_recursive /{=;q}' updater-script`
 done
 
 
@@ -372,7 +424,7 @@ done
 # symlink
 #
 echo -n "- symlink (may take a few minutes) "
-line_num=`grep -n -m 1 "symlink " updater-script | sed -e 's/:.*//g'`
+line_num=`sed -n -e '/symlink /{=;q}' updater-script`
 
 while [ "$line_num" != "" ]
 do
@@ -382,9 +434,10 @@ do
     -e ''$line_num' s/symlink \(.*\)/symlink(\"\1\");/g' \
     -e ''$line_num' s/ /", "/g' \
     -e ''$line_num' s/SYSTEM:/\/system\//g' \
+    -e ''$line_num' s/DATA:/\/data\//g' \
     updater-script
 
-  line_num=`grep -n -m 1 "symlink " updater-script | sed -e 's/:.*//g'`
+  line_num=`sed -n -e '/symlink /{=;q}' updater-script`
 done
 
 echo
@@ -393,7 +446,7 @@ echo
 # write_raw_image
 #
 echo "- write_raw_image ..."
-line_num=`grep -n -m 1 "write_raw_image " updater-script | sed -e 's/:.*//g'`
+line_num=`sed -n -e '/write_raw_image /{=;q}' updater-script`
 
 while [ "$line_num" != "" ]
 do
@@ -405,7 +458,7 @@ do
     -e ''$line_num' s/TMP:\([^)]*\))/\/tmp\/\1)/g' \
     updater-script
 
-  line_num=`grep -n -m 1 "write_raw_image " updater-script | sed -e 's/:.*//g'`
+  line_num=`sed -n -e '/write_raw_image /{=;q}' updater-script`
 done
 
 
@@ -500,7 +553,7 @@ done
 #
 # Look for any other 'format' commands that were not covered above
 #
-line_num=`grep -n -m 1 "format " updater-script | sed -e 's/:.*//g'`
+line_num=`sed -n -e '/format /{=;q}' updater-script`
 
 while [ "$line_num" != "" ]
 do
@@ -510,7 +563,7 @@ do
     -e ''$line_num' s/format\(.*\));/format\1);\nmount\1, "???");/g' \
     updater-script
 
-  line_num=`grep -n -m 1 "format " updater-script | sed -e 's/:.*//g'`
+  line_num=`sed -n -e '/format /{=;q}' updater-script`
 done
 
 
@@ -519,7 +572,7 @@ done
 #
 if [ -e updater-script.orig ]
 then
-  line_num=`grep -n "^mount(" updater-script | grep -m 1 ??? | sed -e 's/:.*//g'`
+  line_num=`sed -n -e '/^mount(.*???/{=;q}' updater-script`
 
   while [ "$line_num" != "" ]
   do
@@ -543,8 +596,8 @@ then
       # We don't want to be stuck in an infinite loop
       break
     fi
-    
-    line_num=`grep -n "^mount(" updater-script | grep -m 1 ??? | sed -e 's/:.*//g'`
+
+    line_num=`sed -n -e '/^mount(.*???/{=;q}' updater-script` 
   done
 fi
 
