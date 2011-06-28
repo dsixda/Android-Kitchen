@@ -44,18 +44,6 @@ then
       sed -i -e 's/copy_dir PACKAGE:data DATA:/delete DATA:app\ncopy_dir PACKAGE:data DATA:/' update-script
     fi
 
-    # Insert file before a certain line
-    #cp ../../../../../tools/apps2sd_files/apps2sd_delete .
-    #line_num=`grep -n -m 1 "copy_dir PACKAGE:data DATA:" update-script | sed 's/:.*//g'`
-    #line_num=$(($line_num-1))
-    #sed -i -e ''$line_num' r apps2sd_delete' update-script
-    #rm apps2sd_delete
-
-    # Insert file after a certain pattern
-    #cp ../../../../../tools/apps2sd_files/apps2sd_perm_data .
-    #sed -i -e '/copy_dir PACKAGE:data DATA:/r apps2sd_perm_data' update-script
-    #rm apps2sd_perm_data
-
     # Insert file after a certain pattern
     cp ../../../../../tools/apps2sd_files/apps2sd_system .
     sed -i -e '/etc\/init.goldfish.sh/r apps2sd_system' update-script
@@ -63,7 +51,8 @@ then
 
     # Insert file before a certain line
     cp ../../../../../tools/apps2sd_files/apps2sd_run_program .
-    line_num=`grep -n -m 1 "write_raw_image .*:boot.img BOOT:" update-script | sed 's/:.*//g'`
+    line_num=`sed -n -e '/write_raw_image .*:boot.img BOOT:/{=;q}' update-script`    
+
     if [ "$line_num" != "" ]
     then
       line_num=$(($line_num-1))
