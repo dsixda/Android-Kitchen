@@ -30,9 +30,6 @@ then
     
     else
 
-      echo "Updating update-script with BusyBox entries"
-      perl -pi -e 's/format\(.*\)SYSTEM:/format\1SYSTEM:\n\ndelete SYSTEM:xbin\/busybox\ndelete_recursive SYSTEM:xbin\n/' update-script
-
       echo "Adding installbusybox to working folder"
       cp ../../../../../tools/busybox_files/installbusybox ../../../../
 
