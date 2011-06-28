@@ -72,13 +72,17 @@ then
 
   search_xbin_busybox=`grep -c "symlink.*xbin/busybox" update-script`
   search_symlinks=`grep -c "symlink busybox " update-script` 
+  search_perm=`grep -c "set_perm.*xbin/busybox" update-script`
 
-  if [ $search_xbin_busybox -gt 0 ] || [ $search_symlinks -gt 0 ]
+  if [ $search_xbin_busybox -gt 0 ] || [ $search_symlinks -gt 0 ] || [ $search_perm -gt 0 ]
   then
     echo
-    echo "Removing existing symlink references to busybox in update-script"
-    sed -i -e '/symlink.*xbin\/busybox/d' update-script
-    sed -i -e '/symlink busybox /d' update-script 
+    echo "Removing existing references to /system/xbin/busybox in update-script"
+    sed -i \
+      -e '/symlink.*xbin\/busybox/d' \
+      -e '/symlink busybox /d' \
+      -e '/set_perm.*xbin\/busybox/d' \
+    update-script 
   fi
 
   cd ../../../../..
