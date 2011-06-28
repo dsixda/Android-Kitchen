@@ -170,7 +170,7 @@ then
     echo -n "Do you want the script to fix this for you (y/n)? (default: y): "
     
     read proceed_fix
-    if [ "$proceed_fix" == "" ] || [ "$proceed_fix" == "y" ]
+    if [ "$proceed_fix" != "n" ]
     then
       scripts/add_busybox
     else
