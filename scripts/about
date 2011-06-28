@@ -41,14 +41,14 @@ echo "Searching for updates ..."
 notes=`scripts/get_latest_notes`
 latest_ver=`echo $notes | sed -e 's/.*Version[ ]*\([0-9]*.[0-9]*\) .*/\1/g' -e 's/[ ]*//g'`
 
-curr_major=`echo $current_ver | sed 's/\([0-9]*\).[0-9]*/\1/'`
-curr_minor=`echo $current_ver | sed 's/[0-9]*.//'`
-
 if [ "$latest_ver" == "" ]
 then
   echo "Error: Unable to find update"
 
 else
+
+  curr_major=`echo $current_ver | sed 's/\([0-9]*\).[0-9]*/\1/'`
+  curr_minor=`echo $current_ver | sed 's/[0-9]*.//'`
 
   latest_major=`echo $latest_ver | sed 's/\([0-9]*\).[0-9]*/\1/'`
   latest_minor=`echo $latest_ver | sed 's/[0-9]*.//'`
