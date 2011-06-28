@@ -1,0 +1,113 @@
+############################################################################
+#
+# Copyright (c) 2010-2011 dsixda - dislam@rocketmail.com
+#
+# Android Kitchen is 100% free.  This script file is intended for personal
+# and/or educational use only.  It may not be duplicated for monetary
+# benefit or any other purpose without the permission of the developer.
+#
+############################################################################
+
+clear
+
+
+if [ ! -d WORKING_* ]
+then
+  echo "No working folder found!"
+  exit 0
+fi
+
+cd WORKING_*
+
+if [ ! -e boot.img ]
+then
+  echo "No boot.img found!"
+  exit 0
+fi
+
+
+cd ..
+current_cmd=`scripts/get_cmdline`
+
+if [ "$current_cmd" == "" ]
+then
+  current_cmd2="(None)"
+else
+  current_cmd2=$current_cmd
+fi
+
+echo
+echo "The current command line value in the boot.img is:"
+echo
+echo "$current_cmd2"
+echo
+echo
+echo "NOTE: You normally should NOT change this value in your ROM."
+echo "This feature is intended for *advanced* users who want to"
+echo "experiment with different values."
+echo
+echo -n "Would you like to change it (y/n)? (default: y): "
+
+read do_change
+echo
+
+if [ "$do_change" == "n" ]
+then
+  echo "Ok, command line will not be changed"
+
+else 
+
+  echo -n "Please enter the new command line (or press Enter to clear): "
+  read new_cmd
+  echo
+
+  if [ "$new_cmd" == "" ]
+  then
+   echo "Warning: Empty string entered for command line"
+
+  elif [ ${#new_cmd} -lt 3 ]
+  then
+    echo "Error: String must be more than 2 characters long"
+    echo
+    exit 0
+  fi
+
+  if [ "$new_cmd" == "$current_cmd" ]
+  then
+    echo "Your value is the same as the original command line value"
+    echo
+    exit 0
+  fi
+
+
+  base_addr=`scripts/get_kernel_base_addr`
+  page_size=`scripts/get_boot_img_page_size`
+
+  scripts/ensure_boot_extracted
+  scripts/build_boot_img $page_size $base_addr "$new_cmd"
+
+  current_cmd=`scripts/get_cmdline`
+  if [ "$current_cmd" == "" ]
+  then
+    current_cmd2="(None)"
+  else
+    current_cmd2=$current_cmd
+  fi
+
+  echo
+  echo "------------------------------------------------------------"
+  echo
+  echo "In boot.img, command line is now set to:"
+  echo
+  echo "$current_cmd2"
+
+  if [ "$current_cmd" != "$new_cmd" ]
+  then
+    echo
+    echo "Warning: Command line is not the same as specified"
+  fi
+
+fi
+
+echo
+
