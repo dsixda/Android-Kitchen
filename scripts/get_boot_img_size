@@ -1,0 +1,38 @@
+############################################################################
+#
+# Copyright (c) 2010-2011 dsixda - dislam@rocketmail.com
+#
+# Android Kitchen is 100% free.  This script file is intended for personal
+# and/or educational use only.  It may not be duplicated for monetary
+# benefit or any other purpose without the permission of the developer.
+#
+############################################################################
+
+
+#
+# This script has one optional parameter:
+#
+# $1 = folder containing boot.img
+#
+
+base_dir=`pwd`
+
+if [ "$1" == "" ]
+then
+  if [ ! -d WORKING_* ]
+  then
+    echo Working folder not found!
+    exit 0
+  fi
+  cd WORKING_*
+else
+  cd $1
+fi
+
+
+boot_img_size=`ls -lh boot.img | sed -e 's/.* [ ]*\([0-9]*\.[0-9]*M\) .*/\1/g'`
+
+cd $base_dir
+
+echo $boot_img_size
+
