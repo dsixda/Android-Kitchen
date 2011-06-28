@@ -45,6 +45,13 @@ then
       if [ `grep -c installbusybox update-script` == 0 ]
       then
         echo "Error: installbusybox not added to update-script!"
+      else
+
+        if [ ! -e ../../../../system/bin/busybox ]
+        then
+          echo "Adding symlink to /system/bin/busybox"
+          sed -i -e 's/set_perm 0 1000 0755 SYSTEM:xbin\/busybox/set_perm 0 1000 0755 SYSTEM:xbin\/busybox\nsymlink \/system\/xbin\/busybox SYSTEM:bin\/busybox/g' update-script
+        fi
       fi
     fi
   fi
