@@ -18,7 +18,7 @@ dec_offset=$1
 
 if [ "$dec_offset" == "" ]
 then
-  echo "Error: No offset specified"
+  echo "Error: No kernel offset (page size) specified"
   exit 1
 fi
 
