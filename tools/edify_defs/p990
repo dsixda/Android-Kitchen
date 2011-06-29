@@ -1,0 +1,16 @@
+
+# LG Optimus 2X
+
+change_mnt=yes
+
+fix_boot=yes
+
+param1=ext3
+param2=EMMC
+
+sys_mnt=\/dev\/block\/mmcblk0p1
+cache_mnt=\/dev\/block\/mmcblk0p2
+boot_mnt=\/dev\/block\/mmcblk0p5
+data_mnt=\/dev\/block\/mmcblk0p8
+sdcard_mnt=\/dev\/block\/mmcblk0p9
+
