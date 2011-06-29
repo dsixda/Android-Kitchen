@@ -44,13 +44,20 @@ then
 
   if [ "$dec_offset" != "" ]
   then
+
+    if [ "$dec_offset" == "0" ]
+    then
+      echo "Error: kernel offset (page size) is 0"
+      exit 1
+    fi
+
     echo "Kernel found at offset $dec_offset in boot.img"
 
     scripts/set_kernel_offset_files $dec_offset
     exit $?
 
   else
-    echo "Error: kernel offset not found in boot.img!"
+    echo "Error: kernel offset (page size) not found in boot.img!"
     exit 1
   fi
 
