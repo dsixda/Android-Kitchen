@@ -34,9 +34,15 @@ then
       cp ../../../../../tools/busybox_files/installbusybox ../../../../
 
       echo "Adding installbusybox to update-script"
-      if [ `grep -c "write_raw_image .*:boot.img BOOT:" update-script` != 0 ]
+
+      if [ `grep -c "set_perm_recursive.*SYSTEM:xbin[ ]*$" update-script` != 0 ]
+      then
+        sed -i -e 's/set_perm_recursive\(.*\)SYSTEM:xbin[ ]*$/set_perm_recursive\1SYSTEM:xbin\nset_perm 0 1000 0755 SYSTEM:xbin\/busybox\nrun_program PACKAGE:installbusybox/' update-script
+
+      elif [ `grep -c "write_raw_image .*:boot.img BOOT:" update-script` != 0 ]
       then
         sed -i -e 's/write_raw_image \(.*:boot.img\) BOOT:/set_perm 0 1000 0755 SYSTEM:xbin\/busybox\nrun_program PACKAGE:installbusybox\nwrite_raw_image \1 BOOT:/' update-script
+      
       else
         echo "set_perm 0 1000 0755 SYSTEM:xbin/busybox" >> update-script      
         echo "run_program PACKAGE:installbusybox" >> update-script
