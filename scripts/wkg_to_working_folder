@@ -45,7 +45,7 @@ echo "Creating working folder $build_dir ..."
 mkdir $build_dir
 
 echo
-echo "Copying contents ..."
+echo "Copying contents of $update_folder ..."
 cp -fr original_update/$update_folder/* $build_dir 2>/dev/null
 
 if [ "$?" != "0" ]
