@@ -9,7 +9,7 @@ param2=EMMC
 param1_sdcard=fat
 param2_sdcard=EMMC
 
-no_tmp=yes
+use_cache_not_tmp=yes
 
 sys_mnt=\/dev\/block\/mmcblk0p12
 cache_mnt=\/dev\/block\/mmcblk0p15
