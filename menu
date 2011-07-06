@@ -10,7 +10,7 @@
 
 #!/bin/bash
  
-version=0.169
+version=0.170
 
 
 if [ ! -e menu ]
