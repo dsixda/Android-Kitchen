@@ -8,12 +8,20 @@
 #
 ############################################################################
 
+cd WORKING_*
 
+if [ ! -e META-INF/com/google/android/update-script ]
+then
+  echo "Error: update-script not found!"
+  cd ..
+  exit 0
+fi
+
+cd ..
 scripts/data_app_exists
 
 if [ "$?" == 1 ]
 then
-
   echo "update-script already has /data/app content"
   exit 0
 
