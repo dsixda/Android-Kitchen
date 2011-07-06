@@ -12,6 +12,13 @@
 cd WORKING_*
 cd META-INF/com/google/android
 
+if [ ! -e update-script ]
+then
+  echo "Error: update-script not found"
+  cd ../../../../..
+  exit 0
+fi
+
 grep_data_local=`grep -c "0771 DATA:local" update-script`
 
 if [ "$grep_data_local" == "1" ]
