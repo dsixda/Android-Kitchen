@@ -48,6 +48,8 @@ then
 
 else
   echo "Error: No update-script found!"
+  cd ../../../../..
+  exit 1
 fi
 
 cd ../../../../..
