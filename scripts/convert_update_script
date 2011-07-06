@@ -76,10 +76,21 @@ then
   
   if [ -e updater-script ]
   then
-    echo "Error: Although you have an update-script, you also have an"
-    echo "       updater-script in the same folder. Remove one of them."
-    cd ../../../../..
-    exit 0
+    echo "Error: Although you have an update-script, you also have an updater-script"
+    echo "       in the same folder. Remove one of them."
+    echo
+
+    echo -n "Remove updater-script and continue conversion (y/n)? (default: y): "
+    read remove_it
+    echo
+    if [ "$remove_it" != "n" ]
+    then
+      rm -vf updater-script
+      echo
+    else
+      cd ../../../../..
+      exit 0
+    fi
   fi
 
 else
@@ -94,7 +105,7 @@ cd ../../../../..
 
 if [ "$1" != "for_zip" ]
 then
-  echo "Checking for final modifications to the update-script before conversion ..."
+  echo "Checking for final modifications to update-script before conversion ..."
   scripts/fix_pre_build 
 fi
 
@@ -102,44 +113,6 @@ fi
 
 cd WORKING_*
 cd META-INF/com/google/android
-
-
-#
-# Remove block of busybox symlinks
-#
-
-grep_bb=`grep -c "symlink busybox " update-script`
-
-if [ $grep_bb -gt 0 ]
-then
-
-  cp update-script update-script.bak
-
-  echo
-  echo "To significantly reduce the time required to convert the update-" 
-  echo "script, do you want to remove the update-script's busybox symlinks"
-  echo "and instead use a separate script called 'installbusybox' (y/n)?"
-  echo
-  echo -n "(default: y): "
-  
-  read replace_bb
-  echo
-
-  if [ "$replace_bb" != "n" ]
-  then
-    replace_bb=yes
-    echo "Ok, we will replace the busybox symlinks ..."
-    cd ../../../../..
-    scripts/fix_busybox
-    cd WORKING_*
-    cd META-INF/com/google/android
-  
-  else
-    echo "Not replacing the busybox symlinks"
-  fi
-  
-  echo
-fi
 
 
 echo
@@ -150,18 +123,6 @@ echo "Converting to updater-script, please wait ..."
 echo
 
 cp update-script updater-script
-
-# Restore the original file after busybox fixed
-if [ -e update-script.bak ]
-then
-  if [ "$replace_bb" == "yes" ]
-  then
-    mv -f update-script.bak update-script
-  else
-    rm -f update-script.bak
-  fi
-fi
-
 
 orig_list=( DATA SYSTEM CACHE SDEXT BOOT SDCARD )
 new_list=( userdata system cache sdext boot sdcard )
@@ -195,8 +156,37 @@ for (( i = 0 ; i < ${#img_list[@]} ; i++ ))
 do
   img_name=${img_list[${i}]}
   str="write_raw_image PACKAGE:$img_name.img"
+
+  #
+  # Check to see if image file is written in a different manner;
+  # e.g. in CyanogenMod for Galaxy S they use run_program instead of
+  # write_raw_image for the boot.img in the updater-script.
+  #
+  line_num=`sed -n -e '/'"$str"'/{=;q}' updater-script`
+
+  if [ "$line_num" != "" ]
+  then
+    str2="package_extract_file $img_name.img TMP:$img_name.img"
+    str3="delete TMP:$img_name.img"
+    line_num3=`sed -n -e '/'"$str3"'/{=;q}' updater-script`
+
+    if [ "$line_num3" != "" ]
+    then
+      line_num_temp2=$(($line_num3-2))
+      str_temp=`sed -n -e ''"$line_num_temp2"'p' updater-script`
+
+      if [ "$str_temp" == "$str2" ] && [ $line_num3 -lt $line_num ]
+      then
+        sed -i -e ''"$line_num"'d' updater-script
+        continue
+      fi
+    fi
+  fi
+
   sed -i -e 's/'"$str"'.*$/assert(package_extract_file("'"$img_name"'.img", "\/tmp\/'"$img_name"'.img"),\n       write_raw_image("\/tmp\/'"$img_name"'.img", "'"$img_name"'"),\n       delete("\/tmp\/'"$img_name"'.img"));/g' updater-script
+
 done
+
 
 #
 # radio.img
@@ -221,24 +211,20 @@ fi
 # copy_dir 
 #
 echo "- copy_dir ..."
-line_num=`sed -n -e '/copy_dir /{=;q}' updater-script`
 
-while [ "$line_num" != "" ]
-do
-  sed -i \
-    -e ''$line_num' s/copy_dir \(.*\)/package_extract_dir(\"\1\");/g' \
-    -e ''$line_num' s/ /", "/g' \
-    -e ''$line_num' s/PACKAGE://g' \
-    -e ''$line_num' s/SYSTEM:\([^)]*\))/\/system\/\1)/g' \
-    -e ''$line_num' s/DATA:\([^)]*\))/\/data\/\1)/g' \
-    -e ''$line_num' s/TMP:\([^)]*\))/\/tmp\/\1)/g' \
-    -e ''$line_num' s/SDCARD:\([^)]*\))/\/sdcard\/\1)/g' \
-    -e ''$line_num' s/BOOT:\([^)]*\))/\/boot\/\1)/g' \
-    -e ''$line_num' s/CACHE:\([^)]*\))/\/cache\/\1)/g' \
-    updater-script
+sed -i \
+  -e 's/copy_dir \(.*\)/package_extract_dir(\"\1\");/g' \
+  -e 's/\(package_extract_dir.*\) \(.*\)/\1", "\2/g' \
+  -e 's/\(package_extract_dir.*\)PACKAGE:/\1/g' \
+  -e 's/\(package_extract_dir.*\)SYSTEM:\([^)]*\))/\1\/system\/\2)/g' \
+  -e 's/\(package_extract_dir.*\)DATA:\([^)]*\))/\1\/data\/\2)/g' \
+  -e 's/\(package_extract_dir.*\)TMP:\([^)]*\))/\1\/tmp\/\2)/g' \
+  -e 's/\(package_extract_dir.*\)SDCARD:\([^)]*\))/\1\/sdcard\/\2)/g' \
+  -e 's/\(package_extract_dir.*\)BOOT:\([^)]*\))/\1\/boot\/\2)/g' \
+  -e 's/\(package_extract_dir.*\)CACHE:\([^)]*\))/\1\/cache\/\2)/g' \
+  updater-script
 
-  line_num=`sed -n -e '/copy_dir /{=;q}' updater-script`  
-done
+
 
 # Add mount before it
 for i in $new_list_str
@@ -262,43 +248,32 @@ done
 # set_perm_recursive
 #
 echo "- set_perm_recursive ..."
-line_num=`sed -n -e '/set_perm_recursive /{=;q}' updater-script`
 
-while [ "$line_num" != "" ]
-do
-  sed -i \
-    -e ''$line_num' s/set_perm_recursive \(.*\)/set_perm_recursive(\1);/g' \
-    -e ''$line_num' s/ /, /g' \
-    -e ''$line_num' s/SYSTEM:)/\"\/system\")/g' \
-    -e ''$line_num' s/SYSTEM:\([^)]*\))/\"\/system\/\1\")/g' \
-    -e ''$line_num' s/DATA:\([^)]*\))/\"\/data\/\1\")/g' \
-    -e ''$line_num' s/TMP:\([^)]*\))/\"\/tmp\/\1\")/g' \
-    -e ''$line_num' s/CACHE:\([^)]*\))/\"\/cache\/\1\")/g' \
-    updater-script
+sed -i \
+  -e 's/set_perm_recursive \(.*\)/set_perm_recursive(\1);/g' \
+  -e 's/\(set_perm_recursive.*[0-9]*\) \([0-9]*\) \([0-9]*\) \([0-9]*\) /\1, \2, \3, \4, /g' \
+  -e 's/\(set_perm_recursive.*\)SYSTEM:)/\1\"\/system\")/g' \
+  -e 's/\(set_perm_recursive.*\)SYSTEM:\([^)]*\))/\1\"\/system\/\2\")/g' \
+  -e 's/\(set_perm_recursive.*\)DATA:\([^)]*\))/\1\"\/data\/\2\")/g' \
+  -e 's/\(set_perm_recursive.*\)TMP:\([^)]*\))/\1\"\/tmp\/\2\")/g' \
+  -e 's/\(set_perm_recursive.*\)CACHE:\([^)]*\))/\1\"\/cache\/\2\")/g' \
+  updater-script
 
-  line_num=`sed -n -e '/set_perm_recursive /{=;q}' updater-script`
-done
 
 
 #
 # set_perm
 #
 echo "- set_perm ..."
-line_num=`sed -n -e '/set_perm /{=;q}' updater-script`
 
-while [ "$line_num" != "" ]
-do
-  sed -i \
-    -e ''$line_num' s/set_perm \(.*\)/set_perm(\1);/g' \
-    -e ''$line_num' s/ /, /g' \
-    -e ''$line_num' s/SYSTEM:\([^)]*\))/\"\/system\/\1\")/g' \
-    -e ''$line_num' s/DATA:\([^)]*\))/\"\/data\/\1\")/g' \
-    -e ''$line_num' s/TMP:\([^)]*\))/\"\/tmp\/\1\")/g' \
-    -e ''$line_num' s/CACHE:\([^)]*\))/\"\/cache\/\1\")/g' \
-    updater-script
-
-  line_num=`sed -n -e '/set_perm /{=;q}' updater-script`  
-done
+sed -i \
+  -e 's/set_perm \(.*\)/set_perm(\1);/g' \
+  -e 's/\(set_perm.*[0-9]*\) \([0-9]*\) \([0-9]*\) /\1, \2, \3, /g' \
+  -e 's/\(set_perm.*\)SYSTEM:\([^)]*\))/\1\"\/system\/\2\")/g' \
+  -e 's/\(set_perm.*\)DATA:\([^)]*\))/\1\"\/data\/\2\")/g' \
+  -e 's/\(set_perm.*\)TMP:\([^)]*\))/\1\"\/tmp\/\2\")/g' \
+  -e 's/\(set_perm.*\)CACHE:\([^)]*\))/\1\"\/cache\/\2\")/g' \
+  updater-script
 
 
 #
@@ -320,146 +295,102 @@ do
     updater-script
 
   # Check for scripts that are at the root of the ROM; move them to /tmp; 
-  # otherwise they won't run!!
+  # otherwise they won't run!!  Set permissions before you run them from /tmp.
+ 
   sed -i \
     -e ''$line_num' s/run_program("\/\([^\/^\"]*\)"\(.*\)/package_extract_file("\1", "\/tmp\/\1");\nrun_program("\/tmp\/\1"\2/g' \
     updater-script
 
+  # First check if permission already exists before adding it
+  prog_name=`sed -n -e ''$line_num' s/package_extract_file("[^\"]*",[ ]*"\([^\"]*\)");/\1/p' updater-script`
+
+  if [ "$prog_name" != "" ]
+  then
+    sed -i \
+      -e ''$line_num' s/package_extract_file("\([^\"]*\)",[ ]*"\([^\"]*\)");/package_extract_file("\1", "\2");\nset_perm(0, 0, 0777, "\2");/g' \
+      updater-script
+  fi
+
   line_num=`sed -n -e '/run_program /{=;q}' updater-script`
 done
 
-#
-# Add permissions to run_program.
-# If the permission already exists, then unfortunately a duplicate line will be created;
-# however this script will clean up duplicates later.
-#
-sed -i \
-  -e ''$line_num' s/run_program("\([^\"]*\)"/set_perm(0, 0, 0777, "\1");\nrun_program("\1"/g' \
-  updater-script
+
 
 
 #
 # package_extract_file
 #
 echo "- package_extract_file ..."
-line_num=`sed -n -e '/package_extract_file /{=;q}' updater-script`
 
-while [ "$line_num" != "" ]
-do
-  sed -i \
-    -e ''$line_num' s/package_extract_file \(.*\)/package_extract_file(\"\1\");/g' \
-    -e ''$line_num' s/ /", "/g' \
-    -e ''$line_num' s/(\"SYSTEM:\([^)]*\))/(\"system\/\1)/g' \
-    -e ''$line_num' s/(\"DATA:\([^)]*\))/(\"data\/\1)/g' \
-    -e ''$line_num' s/(\"TMP:\([^)]*\))/(\"tmp\/\1)/g' \
-    -e ''$line_num' s/SYSTEM:\([^)]*\))/\/system\/\1)/g' \
-    -e ''$line_num' s/DATA:\([^)]*\))/\/data\/\1)/g' \
-    -e ''$line_num' s/TMP:\([^)]*\))/\/tmp\/\1)/g' \
-    updater-script
-
-  line_num=`sed -n -e '/package_extract_file /{=;q}' updater-script`  
-done
+sed -i \
+  -e 's/package_extract_file \(.*\)/package_extract_file(\"\1\");/g' \
+  -e 's/\(package_extract_file[^,]*\) \(.*\)/\1", "\2/g' \
+  -e 's/\(package_extract_file.*\)(\"SYSTEM:\([^)]*\))/\1(\"system\/\2)/g' \
+  -e 's/\(package_extract_file.*\)(\"DATA:\([^)]*\))/\1(\"data\/\2)/g' \
+  -e 's/\(package_extract_file.*\)(\"TMP:\([^)]*\))/\1(\"tmp\/\2)/g' \
+  -e 's/\(package_extract_file.*\)SYSTEM:\([^)]*\))/\1\/system\/\2)/g' \
+  -e 's/\(package_extract_file.*\)DATA:\([^)]*\))/\1\/data\/\2)/g' \
+  -e 's/\(package_extract_file.*\)TMP:\([^)]*\))/\1\/tmp\/\2)/g' \
+  updater-script
 
 
 #
 # show_progress
 #
 echo "- show_progress ..."
-line_num=`sed -n -e '/show_progress /{=;q}' updater-script`
 
-while [ "$line_num" != "" ]
-do
-  sed -i \
-    -e ''$line_num' s/show_progress \(.*\)/show_progress(\1);/g' \
-    -e ''$line_num' s/ /, /g' \
-    updater-script
+sed -i \
+  -e 's/show_progress \(.*\)/show_progress(\1);/g' \
+  -e 's/\(show_progress.*\) \(.*\)/\1, \2/g' \
+  updater-script
 
-  line_num=`sed -n -e '/show_progress /{=;q}' updater-script`  
-done
 
 
 #
-# delete
+# delete / delete_recursive
 #
-echo "- delete ..."
-line_num=`sed -n -e '/delete /{=;q}' updater-script`
+echo "- delete/delete_recursive ..."
 
-while [ "$line_num" != "" ]
-do
-  sed -i \
-    -e ''$line_num' s/delete \(.*\)/delete(\"\1\");/g' \
-    -e ''$line_num' s/ /", "/g' \
-    -e ''$line_num' s/SYSTEM:/\/system\//g' \
-    -e ''$line_num' s/DATA:/\/data\//g' \
-    -e ''$line_num' s/CACHE:/\/cache\//g' \
-    -e ''$line_num' s/TMP:\([^)]*\))/\/tmp\/\1)/g' \
-    updater-script
+sed -i \
+  -e 's/delete \(.*\)/delete(\"\1\");/g' \
+  -e 's/delete_recursive \(.*\)/delete_recursive(\"\1\");/g' \
+  -e 's/\(delete.*\)SYSTEM:/\1\/system\//g' \
+  -e 's/\(delete.*\)DATA:/\1\/data\//g' \
+  -e 's/\(delete.*\)CACHE:/\1\/cache\//g' \
+  -e 's/\(delete.*\)TMP:\([^)]*\))/\1\/tmp\/\2)/g' \
+  -e 's/\(delete.*\)TMP:/\1\/tmp\//g' \
+  -e 's/\(delete.*\)SDEXT:/\1\/sdext\//g' \
+  updater-script
 
-  line_num=`sed -n -e '/delete /{=;q}' updater-script`
-done
-
-
-#
-# delete_recursive
-#
-echo "- delete_recursive ..."
-line_num=`sed -n -e '/delete_recursive /{=;q}' updater-script`
-
-while [ "$line_num" != "" ]
-do
-  sed -i \
-    -e ''$line_num' s/delete_recursive \(.*\)/delete_recursive(\"\1\");/g' \
-    -e ''$line_num' s/ /", "/g' \
-    -e ''$line_num' s/SYSTEM:/\/system\//g' \
-    -e ''$line_num' s/DATA:/\/data\//g' \
-    -e ''$line_num' s/CACHE:/\/cache\//g' \
-    -e ''$line_num' s/SDEXT:/\/sdext\//g' \
-    updater-script
-
-  line_num=`sed -n -e '/delete_recursive /{=;q}' updater-script`
-done
 
 
 #
 # symlink
 #
-echo -n "- symlink (may take a few minutes) "
-line_num=`sed -n -e '/symlink /{=;q}' updater-script`
+echo "- symlink ..."
 
-while [ "$line_num" != "" ]
-do
-  echo -n "."
+sed -i \
+  -e 's/symlink \(.*\)/symlink(\"\1\");/g' \
+  -e 's/\(symlink("[^\ ]*\)[ ]*\([^\"]*");\)/\1", "\2/g' \
+  -e 's/\(symlink.*\)SYSTEM:\(.*\)/\1\/system\/\2/g' \
+  -e 's/\(symlink.*\)DATA:\(.*\)/\1\/data\/\2/g' \
+  updater-script
 
-  sed -i \
-    -e ''$line_num' s/symlink \(.*\)/symlink(\"\1\");/g' \
-    -e ''$line_num' s/ /", "/g' \
-    -e ''$line_num' s/SYSTEM:/\/system\//g' \
-    -e ''$line_num' s/DATA:/\/data\//g' \
-    updater-script
 
-  line_num=`sed -n -e '/symlink /{=;q}' updater-script`
-done
-
-echo
 
 #
 # write_raw_image
 #
 echo "- write_raw_image ..."
-line_num=`sed -n -e '/write_raw_image /{=;q}' updater-script`
+  
+sed -i \
+  -e 's/write_raw_image \(.*\)/write_raw_image(\"\1\");/g' \
+  -e 's/\(write_raw_image.*"\) \(.*\)/\1, "\2/g' \
+  -e 's/\(write_raw_image.*\)PACKAGE:/\1/g' \
+  -e 's/\(write_raw_image.*\)BOOT:/\1boot/g' \
+  -e 's/\(write_raw_image.*\)TMP:\([^)]*\))/\1\/tmp\/\2)/g' \
+  updater-script
 
-while [ "$line_num" != "" ]
-do
-  sed -i \
-    -e ''$line_num' s/write_raw_image \(.*\)/write_raw_image(\"\1\");/g' \
-    -e ''$line_num' s/ /", "/g' \
-    -e ''$line_num' s/PACKAGE://g' \
-    -e ''$line_num' s/BOOT:/boot/g' \
-    -e ''$line_num' s/TMP:\([^)]*\))/\/tmp\/\1)/g' \
-    updater-script
-
-  line_num=`sed -n -e '/write_raw_image /{=;q}' updater-script`
-done
 
 
 #
@@ -702,16 +633,16 @@ then
   if [ "$2" != "yes" ]
   then
     echo "An updater-script has been created under META-INF/com/google/android of"
-    echo "your working folder.  Please review it and make any necessary changes."
-    echo "An update-binary has also been added."
+    echo "your working folder. Please review it and make any necessary changes. An"
+    echo "update-binary has also been added."
     echo ""
   fi      
 
   if [ "$1" != "for_zip" ]
   then
     mv -f update-script update-script.orig
-    echo "The original update-script has been renamed to update-script.orig -"
-    echo "it will not be included in your completed ROM's ZIP file."
+    echo "The original update-script has been renamed to update-script.orig - it"
+    echo "will not be included in your completed ROM's ZIP file."
   else
 
     if [ "$2" == "no" ]
@@ -730,9 +661,9 @@ then
     echo
     echo "--------------------------------------------------------------------------"
     echo
-    echo "NOTE: Ensure you fix the unknown reference(s) at the line number(s)"
-    echo "      below. Compare with the original version of the updater-script,"
-    echo "      if you have one."
+    echo "NOTE: Ensure you fix the unknown reference(s) at the line number(s) below."
+    echo "      Compare with the original version of the updater-script, if you have"
+    echo "      one."
     echo
     echo $grep_huh | sed -e 's/;[ ]*/;\n/g'    
     echo
