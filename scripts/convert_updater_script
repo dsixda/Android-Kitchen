@@ -77,6 +77,10 @@ then
     then
       rm -vf update-script
       echo
+      echo
+      echo "--------------------------------------------------------------------"
+      echo
+
     else
       cd ../../../../..
       exit 0
@@ -406,34 +410,67 @@ sed -i \
   -e 's/ boot\// BOOT:/g' \
 temp.log
 
-
-#
-# Replace the 3 consecutive lines created in updater-script when a script from the
-# *base directory* of ROM is used in run_program.  e.g. /tmp/myscript
-#
-# Ok, for some reason this doesn't work if the lines are at the *start* of the file.
-# So as a hack I'll add a blank line beforehand.
-#
-temp_list=( tmp cache )
-temp_big_list=( TMP CACHE )
-
-for (( t = 0 ; t < ${#temp_list[@]} ; t++ ))
-do
-  temp_name=${temp_list[${t}]}
-  temp_big_name=${temp_big_list[${t}]}
-
-  sed -i \
-    -e 's/\(package_extract_file [^\/]* '"$temp_big_name"':.*\)/\n\1/g' \
-    -e '$!N;{N;N;};s/package_extract_file [^\/]* '"$temp_big_name"':.*\nset_perm 0 0 .* '"$temp_big_name"':.*\nrun_program PACKAGE:'"$temp_name"'\/\(.*\)$/run_program PACKAGE:\1/g;P;D' \
-    temp.log
-
-done
-
-
 #
 # Remove blank lines
 #
 sed -i -e '/^$/d' temp.log
+
+
+#
+# Replace the 3 consecutive lines created in updater-script when a script from the
+# *base directory* of ROM is used in run_program.  
+#
+# e.g.
+#
+#   package_extract_file("backuptool.sh", "/tmp/backuptool.sh");
+#   set_perm(0, 0, 0777, "/tmp/backuptool.sh");
+#   run_program("/tmp/backuptool.sh", "backup");
+#
+# (Ensure there are no blank lines in file)
+#
+
+line_list=`grep -n package_extract_file temp.log`
+line_num_list=`echo "$line_list" | sed -e 's/\([0-9]*\).*/\1/g'`
+
+for line_num in $line_num_list
+do
+
+  curr_line=`sed -n -e ''$line_num'p' temp.log`
+  src=`echo "$curr_line" | sed -e 's/package_extract_file \(.*\) .*/\1/'`
+
+  test_src=`echo "$src" | grep -c ":"`
+  if [ $test_src == 1 ]
+  then
+    continue
+  fi
+
+  partition=`echo "$curr_line" | sed -e 's/package_extract_file .* \([^:]*\):\(.*\)/\1/'`
+  filename=`echo "$curr_line" | sed -n -e ''$line_num'p' temp.log | sed -e 's/package_extract_file .* \([^:]*\):\(.*\)/\2/'`
+
+  if [ "$partition" == "TMP" ] || [ "$partition" == "CACHE" ]
+  then
+  
+    line_num2=$(($line_num+1))
+    expect_line2="set_perm 0 0 0777 $partition:$filename"
+    actual_line2=`sed -n -e ''$line_num2'p' temp.log`
+
+    if [ "$actual_line2" == "$expect_line2" ]
+    then
+      line_num3=$(($line_num2+1))
+      small_partition=`echo $partition | sed 's/\([A-Z]*\)/\L\1/g'`
+      expect_line3="run_program PACKAGE:$small_partition/$filename "
+      actual_line3=`sed -n -e ''$line_num3'p' temp.log`
+
+      res=`echo $actual_line3 | grep -c "$expect_line3"`
+      if [ $res == 1 ]
+      then
+        sed -i -e ''"$line_num"','"$line_num2"'d' temp.log
+        sed -i -e ''$line_num' s/run_program PACKAGE:'"$small_partition"'\/\(.*\)/run_program PACKAGE:\1/g' temp.log
+      fi
+    fi
+  fi
+done
+
 
 
 #
