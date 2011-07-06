@@ -36,7 +36,8 @@ then
   if [ "$1" == "" ]
   then
     echo
-    echo "NOTE: update-script must be converted to an updater-script before flashing"
+    echo "NOTE: update-script must be converted to an updater-script before" 
+    echo "      flashing."
   fi
 
   cd $base_dir
