@@ -116,5 +116,9 @@ fi
 
 cd ..
 scripts/add_nano_to_update_script
-scripts/add_sysrorw_to_update_script
+res=$?
 
+if [ "$res" != "1" ]
+then
+  scripts/add_sysrorw_to_update_script
+fi
