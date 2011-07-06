@@ -35,8 +35,8 @@ do
   echo "Enter a choice:"
   echo 
 
-  echo "  1 = Convert updater-script to update-script"
-  echo "  2 = Convert update-script to updater-script"
+  echo "  1 = Convert updater-script to update-script (Amend)"
+  echo "  2 = Convert update-script to updater-script (Edify)"
   echo "  0 = Exit"
   echo
   echo -n "? "
