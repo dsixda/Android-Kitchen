@@ -10,7 +10,7 @@
 
 #
 # This script is normally used after removing the busybox symlinks in the 
-# update(r)-script.
+# update(r)-script.  It then repairs the busybox installation.
 #
 
 if [ ! -d WORKING_* ]
@@ -63,6 +63,17 @@ fi
 
 
 #
+# Remove 'installbusybox' so that the 'add_busybox_to_update_script' script
+# will run completely.
+#
+
+if [ -e installbusybox ]
+then
+  rm -f installbusybox
+fi
+
+
+#
 # Now fix update-script
 #
 if [ -e META-INF/com/google/android/update-script ]
@@ -82,6 +93,8 @@ then
       -e '/symlink.*xbin\/busybox/d' \
       -e '/symlink busybox /d' \
       -e '/set_perm.*xbin\/busybox/d' \
+      -e '/set_perm.*installbusybox/d' \
+      -e '/run_program.*installbusybox/d' \
     update-script 
   fi
 
