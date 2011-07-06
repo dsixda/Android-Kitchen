@@ -66,10 +66,21 @@ then
   
   if [ -e update-script ]
   then
-    echo "Error: Although you have an updater-script, you also have an"
-    echo "       update-script in the same folder. Remove one of them."
-    cd ../../../../..
-    exit 0
+    echo "Error: Although you have an updater-script, you also have an update-"
+    echo "       script in the same folder. Remove one of them."
+    echo
+
+    echo -n "Remove update-script and continue conversion (y/n)? (default: y) "
+    read remove_it
+    echo
+    if [ "$remove_it" != "n" ]
+    then
+      rm -vf update-script
+      echo
+    else
+      cd ../../../../..
+      exit 0
+    fi
   fi
 
 else
@@ -79,37 +90,9 @@ else
 fi
 
 
-#
-# Remove block of busybox symlinks
-#
-
-grep_bb=`grep -c "^symlink(\"busybox\"" updater-script`
-
-if [ $grep_bb -gt 0 ]
-then
-  echo "To significantly reduce the time required to convert the updater-" 
-  echo "script, do you want to remove the updater-script's busybox symlinks"
-  echo "and have them created in a separate script called 'installbusybox'?"
-  echo
-  echo -n "(y/n)? (default: y): "
-  
-  read replace_bb
-  echo
-
-  if [ "$replace_bb" != "n" ]
-  then
-    replace_bb=yes
-    echo "Ok, we will replace the busybox symlinks"
-  else
-    echo "Not replacing the busybox symlinks"
-  fi
-  
-  echo
-  echo
-fi
 
 
-echo "Please wait ..."
+echo "Converting to update-script, please wait ..."
 echo
 
 
@@ -117,12 +100,13 @@ echo "- Initial formatting ..."
 
 # The 'strings' command is used in case the ui_print statement has special symbols in it
 more updater-script \
-| strings \
-| sed -e ':a;N;$!ba;s/ui_print("[^"]*");//g' \
-| sed -e ':a;N;$!ba;s/||[ ]*\n//g' \
-| sed -e ':a;N;$!ba;s/,[ ]*\n//g' \
-| sed -e 's/","/", "/g' \
-| sed -e 's/^\([a-zA-Z_]*\)[ ]*(/\1(/g' \
+  | strings \
+  | sed -e ':a;N;$!ba;s/ui_print("[^"]*");//g' \
+  | sed -e ':a;N;$!ba;s/||[ ]*\n//g' \
+  | sed -e ':a;N;$!ba;s/,[ ]*\n//g' \
+  | sed -e 's/","/", "/g' \
+        -e 's/\([0-9]*\),[ ]*\([0-9]*\)/\1, \2/g' \
+        -e 's/^\([a-zA-Z_]*\)[ ]*(/\1(/g' \
 > temp.log
 
 
@@ -149,7 +133,7 @@ line_num=`sed -n -e '/assert(/{=;q}' temp.log`
 while [ "$line_num" != "" ]
 do
   sed -i \
-    -e ''$line_num' s/assert(\(.*\));/\1;/g' \
+    -e ''$line_num' s/assert(\(.*\)").*);/\1");/g' \
     -e ''$line_num' s/^.*getprop.*;//g' \
     temp.log
 
@@ -182,23 +166,31 @@ done
 echo "- write_raw_image ..."
 
 img_list=( boot radio bootloader )
+temp_list=( tmp cache )
 
-for (( i = 0 ; i < ${#img_list[@]} ; i++ ))
+
+for (( t = 0 ; t < ${#temp_list[@]} ; t++ ))
 do
 
-  #
-  # Replace 3 consecutive lines if they match the required strings
-  #
+  temp_name=${temp_list[${t}]}
 
-  img_name=${img_list[${i}]}
+  for (( i = 0 ; i < ${#img_list[@]} ; i++ ))
+  do
 
-  if [ -e ../../../../$img_name.img ]
-  then
-    sed -i -e ':a;N;$!ba;s/package_extract_file("'"$img_name"'.img", "\/tmp\/'"$img_name"'.img");\n[ ]*write_raw_image("\/tmp\/'"$img_name"'.img", "'"$img_name"'");\n[ ]*delete("\/tmp\/'"$img_name"'.img");/write_raw_image PACKAGE:'"$img_name"'.img/g' temp.log
-  else
-    sed -i -e ':a;N;$!ba;s/package_extract_file("'"$img_name"'.img", "\/tmp\/'"$img_name"'.img");\n[ ]*write_raw_image("\/tmp\/'"$img_name"'.img", "'"$img_name"'");\n[ ]*delete("\/tmp\/'"$img_name"'.img");//g' temp.log
-  fi
+    #
+    # Replace 3 consecutive lines if they match the required strings
+    #
 
+    img_name=${img_list[${i}]}
+
+    if [ -e ../../../../$img_name.img ]
+    then
+      sed -i -e ':a;N;$!ba;s/package_extract_file("'"$img_name"'.img", "\/'"$temp_name"'\/'"$img_name"'.img");\n[ ]*write_raw_image("\/'"$temp_name"'\/'"$img_name"'.img", "[^"]*");\n[ ]*delete("\/'"$temp_name"'\/'"$img_name"'.img");/write_raw_image PACKAGE:'"$img_name"'.img/g' temp.log
+    else
+      sed -i -e ':a;N;$!ba;s/package_extract_file("'"$img_name"'.img", "\/'"$temp_name"'\/'"$img_name"'.img");\n[ ]*write_raw_image("\/'"$temp_name"'\/'"$img_name"'.img", "[^"]*");\n[ ]*delete("\/'"$temp_name"'\/'"$img_name"'.img");//g' temp.log
+    fi
+
+  done
 done
 
 sed -i -e 's/write_raw_image("boot.img", "boot");/write_raw_image PACKAGE:boot.img BOOT:/g' temp.log
@@ -272,41 +264,40 @@ sed -i -e 's/apply_patch.*[;]//g' temp.log
 
 
 
+
 #
 # symlink
 #
-echo -n "- symlink (may take a few minutes) "
+echo "- symlink ..."
 
-# Remove busybox symlinks if requested
-if [ "$replace_bb" == "yes" ]
-then
-  sed -i -e '/symlink("busybox".*);/d' temp.log
-fi
-
+# If the symlink command consists of only target file, then use this
+sed -i -e 's/symlink("\([^\"]*\)", "\([^\"]*\)");/symlink \1 \2/g' temp.log
 
 line_num=`sed -n -e '/symlink(/{=;q}' temp.log`
 
 while [ "$line_num" != "" ]
 do
 
-  echo -n "."
+  cp -f temp.log temp.log.old
 
-  cp temp.log temp.log.old
+  src=`sed -ne ''$line_num' s/symlink("\([^"]*\)".*/\1/pg' temp.log`
 
-  # sed 1: The formatting code near the top of the script may have removed some commas
-  # sed 2: Multiple symlinks on one line will be separated to their own lines
-  # sed 3: Fix to remove duplicate symlink at end, caused by 2nd sed
+  # sed1 : The formatting code near the top of this conversion script may have removed some commas
+  # sed2 : All targets will be moved to their own line
+  # sed3 : Fix up last line
   sed -i \
     -e ''$line_num' s/"[ ]*"/", "/g' \
-    -e ''$line_num' s/symlink(\([^,]*\),[ \t]*\("[^"]*"\)\(.*\)/symlink \1 \2\nsymlink(\1\3/g' \
-    -e ''$line_num' s/symlink(\([^,]*\));//g' \
+    -e ''$line_num' s/", "/\nsymlink '"$src"' /g' \
+    -e ''$line_num' s/");//g' \
   temp.log 
+
+  # No longer need first line after all targets moved to other lines
+  sed -i -e ''$line_num'd' temp.log
 
   #
   # Ensure we are not stuck in an endless loop doing nothing
   #
-  diffs=`diff temp.log temp.log.old`
-  if [ "$diffs" == "" ]
+  if [ "`diff temp.log temp.log.old`" == "" ]
   then
     echo
     echo "ERROR: Problem converting symlinks"
@@ -314,14 +305,12 @@ do
     exit 1
   fi
 
-  rm -f temp.log.old
-
   line_num=`sed -n -e '/symlink(/{=;q}' temp.log`
 
 done
 
+rm -rf temp.log.old
 
-echo
 echo "- Final formatting ..."
 
 #
@@ -418,6 +407,28 @@ sed -i \
 temp.log
 
 
+#
+# Replace the 3 consecutive lines created in updater-script when a script from the
+# *base directory* of ROM is used in run_program.  e.g. /tmp/myscript
+#
+# Ok, for some reason this doesn't work if the lines are at the *start* of the file.
+# So as a hack I'll add a blank line beforehand.
+#
+temp_list=( tmp cache )
+temp_big_list=( TMP CACHE )
+
+for (( t = 0 ; t < ${#temp_list[@]} ; t++ ))
+do
+  temp_name=${temp_list[${t}]}
+  temp_big_name=${temp_big_list[${t}]}
+
+  sed -i \
+    -e 's/\(package_extract_file [^\/]* '"$temp_big_name"':.*\)/\n\1/g' \
+    -e '$!N;{N;N;};s/package_extract_file [^\/]* '"$temp_big_name"':.*\nset_perm 0 0 .* '"$temp_big_name"':.*\nrun_program PACKAGE:'"$temp_name"'\/\(.*\)$/run_program PACKAGE:\1/g;P;D' \
+    temp.log
+
+done
+
 
 #
 # Remove blank lines
@@ -448,19 +459,6 @@ echo
 if [ -e update-script ]
 then
 
-  #
-  # Add busybox files and update the update-script
-  #
-  if [ "$replace_bb" == "yes" ]
-  then
-    cd ../../../../..
-    scripts/fix_busybox
-    echo
-    cd WORKING_*
-    cd META-INF/com/google/android
-  fi
-
-
   mv -f updater-script updater-script.orig
 
   echo "--------------------------------------------------------------------"
@@ -485,10 +483,11 @@ then
   if [ "$?" == "1" ]
   then
     echo
-    echo "WARNING:  Due to incompatibilities between Edify and Amend, this"
-    echo "          update-script will automatically be converted back to an"
-    echo "          updater-script in the final ROM's update.zip.  However,"
-    echo "          your working folder will still have the update-script."
+    echo "NOTE: Because we cannot fully convert Edify syntax into Amend"
+    echo "      format, this update-script will automatically be converted"
+    echo "      back to an updater-script in the final ROM's update.zip."
+    echo "      However, your working folder will still contain the update-"
+    echo "      script."
     echo
   fi
 
