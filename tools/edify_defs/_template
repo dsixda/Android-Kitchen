@@ -1,6 +1,7 @@
 #
-# The following values should be set in each file in this folder
-# (each file represents a device name set in ro.product.device of
+# The values below should be set in each file in this folder.
+#
+# Each file represents a device name (set in ro.product.device of
 # build.prop)
 #
 
@@ -12,6 +13,22 @@ change_mnt=no
 # If yes, the device is by Dell and requires changing the mount
 # point names in the new updater-script or update-script
 change_mnt_dell=no
+
+#
+# NOTE: The update-script will be converted to updater-script if the 
+#       definition file for the device exists.  If 'change_mnt' or 
+#       'change_mnt_dell' are set to 'yes' then the mount names will 
+#       also be changed.
+#
+
+# Mention the mount point names if change_mnt=yes
+# Use '\/' instead of '/'
+# e.g. sys_mnt=\/dev\/block\/mcblk0p25
+sys_mnt=
+cache_mnt=
+boot_mnt=
+data_mnt=
+sdcard_mnt=
 
 # Filesystem info for SYSTEM/DATA/CACHE/etc.
 # e.g. param1=ext3, param2=EMMC
@@ -30,12 +47,7 @@ param2_cache=
 # flashing the boot.img in the updater-script
 fix_boot=no
 
-# Mention the mount point names if change_mnt=yes
-# Use '\/' instead of '/'
-# e.g. sys_mnt=\/dev\/block\/mcblk0p25
-sys_mnt=
-cache_mnt=
-boot_mnt=
-data_mnt=
-sdcard_mnt=
+# Device uses /cache instead of /tmp, e.g. when writing boot.img
+use_cache_not_tmp=no
+
 
