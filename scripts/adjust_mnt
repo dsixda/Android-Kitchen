@@ -31,6 +31,7 @@ then
     param1_cache=`scripts/get_edify_def_val $device_name param1_cache`
     param2_cache=`scripts/get_edify_def_val $device_name param2_cache`
     fix_boot=`scripts/get_edify_def_val $device_name fix_boot`
+    use_cache_not_tmp=`scripts/get_edify_def_val $device_name use_cache_not_tmp`
     sys_mnt=`scripts/get_edify_def_val $device_name sys_mnt`
     cache_mnt=`scripts/get_edify_def_val $device_name cache_mnt`
     boot_mnt=`scripts/get_edify_def_val $device_name boot_mnt`
@@ -181,14 +182,40 @@ then
         param2_old=`grep -m 1 "format(.*$sys_mnt" updater-script.orig | \
                     sed -e 's/format("[^"]*", "\([^"]*\).*/\1/g'`
 
-        if [ "$param1_old" != "$param1" ]
+        if [ "$param1_old" != "" ] && [ "$param2_old" != "" ]
         then
-          sed -i -e 's/'"$param1"'/'"$param1_old"'/g' updater-script 
+
+          if [ "$param1_old" != "$param1" ]
+          then
+            sed -i -e 's/'"$param1"'/'"$param1_old"'/g' updater-script 
+          fi
+          if [ "$param2_old" != "$param2" ]
+          then
+            sed -i -e 's/'"$param2"'/'"$param2_old"'/g' updater-script
+          fi
         fi
-        if [ "$param2_old" != "$param2" ]
+
+        #
+        # Check if the updater-script uses /cache instead of /tmp for run_program
+        # or writing images.
+        #
+        
+        if [ `grep -c "/cache/boot.img" updater-script.orig` -gt 0 ] && \
+            [ `grep -c "\"/tmp/" updater-script` -gt 0 ]
         then
-          sed -i -e 's/'"$param2"'/'"$param2_old"'/g' updater-script
+          use_cache_not_tmp=yes
+        elif [ `grep -c "\"/tmp/" updater-script` -gt 0 ]
+        then
+          use_cache_not_tmp=no
         fi
+      fi
+
+      #
+      # use_cache_not_tmp can be set to 'yes' in either edify_defs file or from updater-script.orig
+      #
+      if [ "$use_cache_not_tmp" == "yes" ]
+      then
+        sed -i -e 's/\/tmp\//\/cache\//g' updater-script
       fi
 
 
