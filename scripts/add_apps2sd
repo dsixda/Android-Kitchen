@@ -37,7 +37,21 @@ then
 
 fi
 
-echo -n "Proceed with Apps2SD (y/n)? (default: y): "
+device_name=`scripts/get_device_name`
+change_mnt=`scripts/get_edify_def_val $device_name change_mnt`
+change_mnt_dell=`scripts/get_edify_def_val $device_name change_mnt_dell`
+
+if [ -e tools/edify_defs/$device_name ]
+then
+  if [ "$change_mnt" != "UNKNOWN" ] || [ "$change_mnt_dell" != "UNKNOWN" ]
+  then
+    echo "WARNING: This device ($device_name) most likely will NOT support Apps2SD!"
+    echo
+  fi
+fi
+
+
+echo -n "Proceed with installing Apps2SD (y/n)? (default: y): "
 read do_apps2sd
 
 if [ "$do_apps2sd" == "n" ]
@@ -51,6 +65,13 @@ if [ -d WORKING_* ]
 then
 
   cd WORKING_*
+
+  if [ ! -e META-INF/com/google/android/update-script ]
+  then
+    echo "Error: update-script not found!"
+    cd ..
+    exit 0
+  fi
 
   su_path=`find . -name su`
 
@@ -160,30 +181,34 @@ fi
 
 scripts/add_apps2sd_files
 scripts/add_apps2sd_to_update_script
+res=$?
 
-#
-# apps2sd may have included Bash binary
-#
-find_cmd=`find tools/apps2sd_files -name bash`
-if [ "$find_cmd" != "" ]
+if [ "$res" == "0" ]
 then
-  scripts/add_bash_to_update_script
+
+  #
+  # apps2sd may have included Bash binary
+  #
+  find_cmd=`find tools/apps2sd_files -name bash`
+  if [ "$find_cmd" != "" ]
+  then
+    scripts/add_bash_to_update_script
+  fi
+
+  #
+  # Prompt for busybox run-parts method
+  #
+  if [ "$test_sysinit" == "0" ] 
+  then
+    scripts/add_busybox_run_parts for_apps2sd
+  fi
+
+  #
+  # Dalvik-cache to SD
+  #
+  scripts/add_cachesd_to_update_script
+
+  echo
+  echo Finished
+
 fi
-
-#
-# Prompt for busybox run-parts method
-#
-
-if [ "$test_sysinit" == "0" ] 
-then
-  scripts/add_busybox_run_parts for_apps2sd
-fi
-
-#
-# Dalvik-cache to SD
-#
-scripts/add_cachesd_to_update_script
-
-echo
-echo Finished
-
