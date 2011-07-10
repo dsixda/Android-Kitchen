@@ -52,9 +52,15 @@ rm -f signed*.zip
 find . -name '*.DS_Store' -type f -delete
 
 #
-# Cleanup stackdump files
+# Clean up stackdump files
 #
 find . -name sh.exe.stackdump -type f -delete
+
+
+#
+# Clean up temp files left behind by interrupted Amend/Edify conversion scripts
+#
+find META-INF/com/google/android/ -name 'sed*' -type f -delete
 
 
 #
@@ -299,7 +305,9 @@ else
   if [ -e META-INF/com/google/android/update-script ]
   then
     echo "update-script (Amend) found"
-  elif [ -e META-INF/com/google/android/updater-script ]
+  fi
+  
+  if [ -e META-INF/com/google/android/updater-script ]
   then
     echo "updater-script (Edify) found"
   fi
