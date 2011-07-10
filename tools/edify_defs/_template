@@ -24,6 +24,8 @@ change_mnt_dell=no
 # Mention the mount point names if change_mnt=yes
 # Use '\/' instead of '/'
 # e.g. sys_mnt=\/dev\/block\/mcblk0p25
+#
+# If unknown, set to: ???
 sys_mnt=
 cache_mnt=
 boot_mnt=
