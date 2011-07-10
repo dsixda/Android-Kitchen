@@ -76,13 +76,20 @@ then
   
   if [ -e updater-script ]
   then
-    echo "Error: Although you have an update-script, you also have an updater-script"
-    echo "       in the same folder. Remove one of them."
-    echo
 
-    echo -n "Remove updater-script and continue conversion (y/n)? (default: y): "
-    read remove_it
-    echo
+    if [ "$2" == "yes" ]
+    then
+      remove_it=y
+    else
+      echo "Error: Although you have an update-script, you also have an updater-script"
+      echo "       in the same folder. Remove one of them."
+      echo
+
+      echo -n "Remove updater-script and continue conversion (y/n)? (default: y): "
+      read remove_it
+      echo
+    fi
+
     if [ "$remove_it" != "n" ]
     then
       rm -vf updater-script
@@ -227,10 +234,8 @@ sed -i \
 
 
 # Add mount before it
-for i in $new_list_str
+for new in ${new_list[@]}
 do
-  new=${new_list[${i}]}
-
   if [ "$new" == "userdata" ]
   then
     new2=data
@@ -537,10 +542,8 @@ fi
 # unmount
 #
 echo "- unmount ..."
-for i in $new_list_str
+for new in ${new_list[@]}
 do
-
-  new=${new_list[${i}]}
 
   if [ "$new" == "userdata" ]
   then
@@ -574,6 +577,43 @@ fi
 
 
 echo "- Final formatting ..."
+
+#
+# Fix up run_program parameters that contain special characters
+#
+
+sed -i \
+  -e 's/\[sp\]/ /g' \
+  -e 's/\[cr\]/\n/g' \
+  -e 's/\[sc\]/;/g' \
+  -e 's/\[co\]/,/g' \
+  updater-script
+
+#
+# Check if shell script had already unmounted the partition
+#
+
+if [ `grep -c "run_program.*umount" updater-script` ]
+then
+
+  for new in ${new_list[@]}
+  do
+    if [ "$new" == "userdata" ]
+    then
+      new=data
+    fi
+
+    grep_mnt=`grep "mount(.* \"/$new\");" updater-script`
+    grep_umnt=`grep -c "umount /$new" updater-script`
+    
+    if [ $grep_umnt -gt 0 ] && [ "$grep_mnt" != "" ]
+    then
+      sed -i -e '/unmount("\/'"$new"'");/d' updater-script      
+    fi
+  done
+
+fi
+
 
 #
 # Other commands 
