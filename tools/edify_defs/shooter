@@ -1,0 +1,16 @@
+# HTC Evo 3D
+
+change_mnt=yes
+
+param1=ext4
+param2=EMMC
+
+param1_sdcard=vfat
+param2_sdcard=MTD
+
+sys_mnt=\/dev\/block\/mmcblk0p23
+cache_mnt=\/dev\/block\/mmcblk0p25
+boot_mnt=???
+data_mnt=\/dev\/block\/mmcblk0p24
+sdcard_mnt=\/dev\/block\/vold\/179:65
+
