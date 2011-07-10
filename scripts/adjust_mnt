@@ -219,6 +219,39 @@ then
       fi
 
 
+      #
+      # Fix case where a shell script was used for mounting instead of the 'mount' command
+      #
+      if [ `grep -c "mount(\".*$sys_mnt\", \".*\"" updater-script` -gt 0 ]
+      then
+        if [ `grep -c "auto \\$PARTITION \\$ANDROID_ROOT" updater-script` -gt 0 ]
+        then
+          sed -i -e '/mount(".*'"$sys_mnt"'", ".*"/d' updater-script
+        fi
+      fi
+
+      if [ `grep -c "mount(\".*$data_mnt\", \".*\"" updater-script` -gt 0 ]
+      then
+        if [ `grep -c "auto \\$PARTITION \\$ANDROID_DATA" updater-script` -gt 0 ]
+        then
+          sed -i -e '/mount(".*'"$data_mnt"'", ".*"/d' updater-script
+        fi
+      fi
+
+      mnt_list=( $data_mnt $sys_mnt $cache_mnt $boot_mnt $sdcard_mnt )
+      
+      for mnt in ${mnt_list[@]}
+      do
+        if [ `grep -c "mount(\".*$mnt\", \".*\""  updater-script` -gt 0 ]
+        then
+          if [ `grep -c "mount $mnt" updater-script` -gt 0 ]
+          then
+            sed -i -e '/mount(".*'"$mnt"'", ".*"/d' updater-script
+          fi
+        fi
+      done
+
+
     ################################
     # change_mnt==yes; update-script
     ################################
