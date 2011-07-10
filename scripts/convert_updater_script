@@ -218,6 +218,7 @@ else
 fi
 
 
+
 #
 # run_program
 #
@@ -226,14 +227,28 @@ line_num=`sed -n -e '/run_program(/{=;q}' temp.log`
 
 while [ "$line_num" != "" ]
 do
+
+  # run_program spans multiple lines
+  has_end=`sed -n -e ''$line_num'p' temp.log | grep -c "\");[ ]*$"`
+  
+  # Combine the next line
+  while [ $has_end == 0 ]
+  do
+    # N = read next line
+    sed -i -e ''$line_num'N;s/\n/[cr]/g' temp.log
+
+    has_end=`sed -n -e ''$line_num'p' temp.log | grep -c "\");[ ]*$"`
+  done
+
   sed -i \
-    -e ''$line_num' s/run_program(/run_program /g' \
-    -e ''$line_num' s/"//g' \
-    -e ''$line_num' s/,//g' \
-    -e ''$line_num' s/)//g' \
-    -e ''$line_num' s/;//g' \
+    -e ''$line_num' s/ /\[sp\]/g' \
+    -e ''$line_num' s/",\[sp\]"/ /g' \
+    -e ''$line_num' s/,/\[co\]/g' \
+    -e ''$line_num' s/run_program("/run_program /g' \
     -e ''$line_num' s/run_program \/\([a-zA-Z]*\)/run_program PACKAGE:\1/g' \
     -e ''$line_num' s/run_program PACKAGE:\//run_program \//g' \
+    -e ''$line_num' s/);//g' \
+    -e ''$line_num' s/;/\[sc\]/g' \
     temp.log
 
   line_num=`sed -n -e '/run_program(/{=;q}' temp.log`
@@ -314,6 +329,9 @@ do
 done
 
 rm -rf temp.log.old
+
+
+
 
 echo "- Final formatting ..."
 
@@ -408,6 +426,20 @@ sed -i \
   -e 's/ cache\// CACHE:/g' \
   -e 's/ sdext\// SDEXT:/g' \
   -e 's/ boot\// BOOT:/g' \
+  -e 's/\(symlink [^ ]*\)SYSTEM:/\1\/system\//g'  \
+  -e 's/\(symlink [^ ]*\)DATA:/\1\/data\//g'  \
+  -e 's/\(symlink [^ ]*\)CACHE:/\1\/cache\//g'  \
+  -e 's/\(symlink [^ ]*\)TMP:/\1\/tmp\//g'  \
+  -e 's/\(symlink [^ ]*\)SDCARD:/\1\/sdcard\//g'  \
+  -e 's/\(symlink [^ ]*\)SDEXT:/\1\/sdext\//g'  \
+  -e 's/\(symlink [^ ]*\)BOOT:/\1\/boot\//g'  \
+  -e 's/\(package_extract_file\) SYSTEM:/\1 system\//g'  \
+  -e 's/\(package_extract_file\) DATA:/\1 data\//g'  \
+  -e 's/\(package_extract_file\) CACHE:/\1 cache\//g'  \
+  -e 's/\(package_extract_file\) TMP:/\1 tmp\//g'  \
+  -e 's/\(package_extract_file\) SDCARD:/\1 sdcard\//g'  \
+  -e 's/\(package_extract_file\) SDEXT:/\1 sdext\//g'  \
+  -e 's/\(package_extract_file\) BOOT:/\1 boot\//g'  \
 temp.log
 
 #
@@ -438,7 +470,7 @@ do
   curr_line=`sed -n -e ''$line_num'p' temp.log`
   src=`echo "$curr_line" | sed -e 's/package_extract_file \(.*\) .*/\1/'`
 
-  test_src=`echo "$src" | grep -c ":"`
+  test_src=`echo "$src" | grep -c "/"`
   if [ $test_src == 1 ]
   then
     continue
