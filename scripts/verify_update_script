@@ -227,6 +227,12 @@ do
     "run_program") \
       expect_path=`echo $curr_line | \
            sed -e 's/run_program[ ]*\([^ ]*\)[ ]*.*/\1/'`
+
+      if [ `echo $expect_path | grep -c "^sbin/"` == 1 ]
+      then
+        continue
+      fi
+
       ;;
 
     "write_raw_image") \
