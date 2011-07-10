@@ -37,21 +37,24 @@ then
   
 else
 
+  cd original_update
+
   #
   # Check for any ZIP files in original_update
   #
-  zip_cmd=`ls -l original_update | grep ^-r | grep -i -m 1 \\.zip$`
+  zip_cmd=`find . ! -name . -prune -type f | grep -i -m 1 \\.zip$`
 
   #
   # Check for *.APP or *.app in original_update
   #
-  app_cmd=`ls -l original_update | grep ^-r | grep -i -m 1 \\.app$`
+  app_cmd=`find . ! -name . -prune -type f | grep -i -m 1 \\.app$`
 
   #
   # Check for WORKING_* folder in original_update
   #
-  wkg_cmd=`ls -l original_update | grep ^d | grep " WORKING_"`
+  wkg_cmd=`find . ! -name . -prune -type d | grep "WORKING_"`
 
+  cd ..
 
   if [ "$zip_cmd" == "" ] && [ "$app_cmd" == "" ] && [ "$wkg_cmd" == "" ]
   then
