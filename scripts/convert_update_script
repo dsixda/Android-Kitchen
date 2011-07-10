@@ -328,6 +328,7 @@ done
 echo "- package_extract_file ..."
 
 sed -i \
+  -e 's/package_extract_file PACKAGE:/package_extract_file /g' \
   -e 's/package_extract_file \(.*\)/package_extract_file(\"\1\");/g' \
   -e 's/\(package_extract_file[^,]*\) \(.*\)/\1", "\2/g' \
   -e 's/\(package_extract_file.*\)(\"SYSTEM:\([^)]*\))/\1(\"system\/\2)/g' \
