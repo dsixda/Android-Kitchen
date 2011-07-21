@@ -1,0 +1,17 @@
+
+# LG Optimus 3D
+
+change_mnt=yes
+
+param1=ext3
+param2=EMMC
+
+param1_sdcard=vfat
+param2_sdcard=MTD
+
+sys_mnt=\/dev\/block\/mmcblk0p7
+cache_mnt=\/dev\/block\/mmcblk0p10
+boot_mnt=???
+data_mnt=\/dev\/block\/mmcblk0p8
+sdcard_mnt=\/dev\/block\/mmcblk0p15
+
