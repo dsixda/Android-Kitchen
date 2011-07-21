@@ -173,7 +173,7 @@ do
 
   if [ "$line_num" != "" ]
   then
-    str2="package_extract_file $img_name.img TMP:$img_name.img"
+    str2="package_extract_file PACKAGE:$img_name.img TMP:$img_name.img"
     str3="delete TMP:$img_name.img"
     line_num3=`sed -n -e '/'"$str3"'/{=;q}' updater-script`
 
@@ -278,6 +278,7 @@ sed -i \
   -e 's/\(set_perm.*\)DATA:\([^)]*\))/\1\"\/data\/\2\")/g' \
   -e 's/\(set_perm.*\)TMP:\([^)]*\))/\1\"\/tmp\/\2\")/g' \
   -e 's/\(set_perm.*\)CACHE:\([^)]*\))/\1\"\/cache\/\2\")/g' \
+  -e 's/\(set_perm.*\) \/webtop\([^)]*\))/\1\ "\/webtop\2\")/g' \
   updater-script
 
 
@@ -352,6 +353,16 @@ sed -i \
   updater-script
 
 
+#
+# set_progress
+#
+echo "- set_progress ..."
+
+sed -i \
+  -e 's/set_progress \(.*\)/set_progress(\1);/g' \
+  updater-script
+
+
 
 #
 # delete / delete_recursive
@@ -393,7 +404,7 @@ echo "- write_raw_image ..."
   
 sed -i \
   -e 's/write_raw_image \(.*\)/write_raw_image(\"\1\");/g' \
-  -e 's/\(write_raw_image.*"\) \(.*\)/\1, "\2/g' \
+  -e 's/\(write_raw_image.*"[^,]*\) \(.*\)/\1", "\2/g' \
   -e 's/\(write_raw_image.*\)PACKAGE:/\1/g' \
   -e 's/\(write_raw_image.*\)BOOT:/\1boot/g' \
   -e 's/\(write_raw_image.*\)TMP:\([^)]*\))/\1\/tmp\/\2)/g' \
