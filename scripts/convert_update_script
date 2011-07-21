@@ -337,6 +337,7 @@ sed -i \
   -e 's/\(package_extract_file.*\)SYSTEM:\([^)]*\))/\1\/system\/\2)/g' \
   -e 's/\(package_extract_file.*\)DATA:\([^)]*\))/\1\/data\/\2)/g' \
   -e 's/\(package_extract_file.*\)TMP:\([^)]*\))/\1\/tmp\/\2)/g' \
+  -e 's/\(package_extract_file.*\)CACHE:\([^)]*\))/\1\/cache\/\2)/g' \
   updater-script
 
 
@@ -362,6 +363,7 @@ sed -i \
   -e 's/delete_recursive \(.*\)/delete_recursive(\"\1\");/g' \
   -e 's/\(delete.*\)SYSTEM:/\1\/system\//g' \
   -e 's/\(delete.*\)DATA:/\1\/data\//g' \
+  -e 's/\(delete.*\)SDCARD:/\1\/sdcard\//g' \
   -e 's/\(delete.*\)CACHE:/\1\/cache\//g' \
   -e 's/\(delete.*\)TMP:\([^)]*\))/\1\/tmp\/\2)/g' \
   -e 's/\(delete.*\)TMP:/\1\/tmp\//g' \
@@ -395,6 +397,7 @@ sed -i \
   -e 's/\(write_raw_image.*\)PACKAGE:/\1/g' \
   -e 's/\(write_raw_image.*\)BOOT:/\1boot/g' \
   -e 's/\(write_raw_image.*\)TMP:\([^)]*\))/\1\/tmp\/\2)/g' \
+  -e 's/\(write_raw_image.*\)CACHE:\([^)]*\))/\1\/cache\/\2)/g' \
   updater-script
 
 
