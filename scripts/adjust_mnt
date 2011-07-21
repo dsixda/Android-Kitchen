@@ -180,11 +180,10 @@ then
         param1_old=`grep -m 1 "format(.*$sys_mnt" updater-script.orig | \
                     sed -e 's/format("\([^"]*\).*/\1/g'`
         param2_old=`grep -m 1 "format(.*$sys_mnt" updater-script.orig | \
-                    sed -e 's/format("[^"]*", "\([^"]*\).*/\1/g'`
-
+                    sed -e 's/format("[^"]*"[ ]*,[ ]*"\([^"]*\).*/\1/g'`
+        
         if [ "$param1_old" != "" ] && [ "$param2_old" != "" ]
         then
-
           if [ "$param1_old" != "$param1" ]
           then
             sed -i -e 's/'"$param1"'/'"$param1_old"'/g' updater-script 
@@ -194,6 +193,7 @@ then
             sed -i -e 's/'"$param2"'/'"$param2_old"'/g' updater-script
           fi
         fi
+
 
         #
         # Check if the updater-script uses /cache instead of /tmp for run_program
@@ -215,7 +215,10 @@ then
       #
       if [ "$use_cache_not_tmp" == "yes" ]
       then
-        sed -i -e 's/\/tmp\//\/cache\//g' updater-script
+        sed -i \
+          -e 's/\/tmp\//\/cache\//g' \
+          -e 's/\("\/cache\/boot.img", \)"boot"/\1"'"$boot_mnt"'"/g' \
+          updater-script
       fi
 
 
