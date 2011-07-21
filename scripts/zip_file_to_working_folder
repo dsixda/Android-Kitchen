@@ -81,7 +81,7 @@ then
 fi 
 
 
-if [ -e system.img ]
+if [ -e system.img ] && [ ! -d system ]
 then
 
   echo
