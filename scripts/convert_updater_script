@@ -426,20 +426,28 @@ sed -i \
   -e 's/ cache\// CACHE:/g' \
   -e 's/ sdext\// SDEXT:/g' \
   -e 's/ boot\// BOOT:/g' \
-  -e 's/\(symlink [^ ]*\)SYSTEM:/\1\/system\//g'  \
-  -e 's/\(symlink [^ ]*\)DATA:/\1\/data\//g'  \
-  -e 's/\(symlink [^ ]*\)CACHE:/\1\/cache\//g'  \
-  -e 's/\(symlink [^ ]*\)TMP:/\1\/tmp\//g'  \
-  -e 's/\(symlink [^ ]*\)SDCARD:/\1\/sdcard\//g'  \
-  -e 's/\(symlink [^ ]*\)SDEXT:/\1\/sdext\//g'  \
-  -e 's/\(symlink [^ ]*\)BOOT:/\1\/boot\//g'  \
-  -e 's/\(package_extract_file\) SYSTEM:/\1 system\//g'  \
-  -e 's/\(package_extract_file\) DATA:/\1 data\//g'  \
-  -e 's/\(package_extract_file\) CACHE:/\1 cache\//g'  \
-  -e 's/\(package_extract_file\) TMP:/\1 tmp\//g'  \
-  -e 's/\(package_extract_file\) SDCARD:/\1 sdcard\//g'  \
-  -e 's/\(package_extract_file\) SDEXT:/\1 sdext\//g'  \
-  -e 's/\(package_extract_file\) BOOT:/\1 boot\//g'  \
+  -e 's/\(symlink [^ ]*\)SYSTEM:/\1\/system\//g' \
+  -e 's/\(symlink [^ ]*\)DATA:/\1\/data\//g' \
+  -e 's/\(symlink [^ ]*\)CACHE:/\1\/cache\//g' \
+  -e 's/\(symlink [^ ]*\)TMP:/\1\/tmp\//g' \
+  -e 's/\(symlink [^ ]*\)SDCARD:/\1\/sdcard\//g' \
+  -e 's/\(symlink [^ ]*\)SDEXT:/\1\/sdext\//g' \
+  -e 's/\(symlink [^ ]*\)BOOT:/\1\/boot\//g' \
+  -e 's/\(set_perm.*\/.*\)SYSTEM:/\1\/system\//g' \
+  -e 's/\(set_perm.*\/.*\)DATA:/\1\/data\//g' \
+  -e 's/\(set_perm.*\/.*\)CACHE:/\1\/cache\//g' \
+  -e 's/\(set_perm.*\/.*\)TMP:/\1\/tmp\//g' \
+  -e 's/\(set_perm.*\/.*\)SDCARD:/\1\/sdcard\//g' \
+  -e 's/\(set_perm.*\/.*\)SDEXT:/\1\/sdext\//g' \
+  -e 's/\(set_perm.*\/.*\)BOOT:/\1\/boot\//g' \
+  -e 's/\(package_extract_file\) SYSTEM:/\1 system\//g' \
+  -e 's/\(package_extract_file\) DATA:/\1 data\//g' \
+  -e 's/\(package_extract_file\) CACHE:/\1 cache\//g' \
+  -e 's/\(package_extract_file\) TMP:/\1 tmp\//g' \
+  -e 's/\(package_extract_file\) SDCARD:/\1 sdcard\//g' \
+  -e 's/\(package_extract_file\) SDEXT:/\1 sdext\//g' \
+  -e 's/\(package_extract_file\) BOOT:/\1 boot\//g' \
+  -e 's/^format[ ]*\([^ ]*\)[ ]*\(.*\)/format \1 \2/g' \
 temp.log
 
 
