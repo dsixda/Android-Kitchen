@@ -16,4 +16,4 @@ cache_mnt=\/dev\/block\/mmcblk0p15
 boot_mnt=\/dev\/block\/mmcblk0p11
 data_mnt=\/dev\/block\/mmcblk0p16
 sdcard_mnt=\/dev\/block\/mmcblk0p18
-
+webtop_mnt=\/dev\/block\/mmcblk0p13
