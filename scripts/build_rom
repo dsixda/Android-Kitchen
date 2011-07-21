@@ -172,11 +172,10 @@ if [ "$cmd_line" == "dsixda Null" ]
 then
   zip -r -y -q update * -x *.cvs* *.git* *.svn* \
       *updater-script.orig* *update-binary.orig* *update-script.orig* \
-      boot.img *system.img*
+      boot.img 
 else
   zip -r -y -q update * -x *.cvs* *.git* *.svn* \
-      *updater-script.orig* *update-binary.orig* *update-script.orig* \
-      *system.img*
+      *updater-script.orig* *update-binary.orig* *update-script.orig* 
 fi      
 
 echo
