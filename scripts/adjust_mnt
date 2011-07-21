@@ -37,6 +37,7 @@ then
     boot_mnt=`scripts/get_edify_def_val $device_name boot_mnt`
     data_mnt=`scripts/get_edify_def_val $device_name data_mnt`
     sdcard_mnt=`scripts/get_edify_def_val $device_name sdcard_mnt`
+    webtop_mnt=`scripts/get_edify_def_val $device_name webtop_mnt`
   fi
 
   cd WORKING_*
@@ -92,8 +93,15 @@ then
         -e 's/mount("'"$param1"'", "MTD", "boot"/mount("'"$param1"'", "'"$boot_mnt"'"/g' \
         -e 's/mount("'"$param1"'", "MTD", "userdata"/mount("'"$param1"'", "'"$data_mnt"'"/g' \
         -e 's/mount("'"$param1_sdcard"'", "MTD", "sdcard"/mount("'"$param1_sdcard"'", "'"$sdcard_mnt"'"/g' \
+        \
+        -e 's/\('"$webtop_mnt"'", "\)???"/\1\/webtop"/g' \
         updater-script
 
+
+      if [ `grep -c "^mount.*webtop" updater-script` -gt 0 ]
+      then
+        echo "unmount(\"/webtop\");" >> updater-script
+      fi
 
       #
       # Certain devices use/require a special way of flashing the boot.img
