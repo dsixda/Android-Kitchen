@@ -32,6 +32,9 @@ boot_mnt=
 data_mnt=
 sdcard_mnt=
 
+# Set this mount point if you know what it is (e.g. on Motorola Atrix)
+webtop_mnt=
+
 # Filesystem info for SYSTEM/DATA/CACHE/etc.
 # e.g. param1=ext3, param2=EMMC
 param1=
