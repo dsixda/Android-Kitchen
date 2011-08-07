@@ -262,6 +262,7 @@ sed -i \
   -e 's/\(set_perm_recursive.*\)DATA:\([^)]*\))/\1\"\/data\/\2\")/g' \
   -e 's/\(set_perm_recursive.*\)TMP:\([^)]*\))/\1\"\/tmp\/\2\")/g' \
   -e 's/\(set_perm_recursive.*\)CACHE:\([^)]*\))/\1\"\/cache\/\2\")/g' \
+  -e 's/\(set_perm_recursive.*\) \/\(.*\)\([^)]*\))/\1\ "\/\2\3\")/g' \
   updater-script
 
 
@@ -278,7 +279,7 @@ sed -i \
   -e 's/\(set_perm.*\)DATA:\([^)]*\))/\1\"\/data\/\2\")/g' \
   -e 's/\(set_perm.*\)TMP:\([^)]*\))/\1\"\/tmp\/\2\")/g' \
   -e 's/\(set_perm.*\)CACHE:\([^)]*\))/\1\"\/cache\/\2\")/g' \
-  -e 's/\(set_perm.*\) \/webtop\([^)]*\))/\1\ "\/webtop\2\")/g' \
+  -e 's/\(set_perm.*\) \/\(.*\)\([^)]*\))/\1\ "\/\2\3\")/g' \
   updater-script
 
 
