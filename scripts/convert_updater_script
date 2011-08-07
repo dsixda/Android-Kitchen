@@ -301,12 +301,18 @@ do
 
   src=`sed -ne ''$line_num' s/symlink("\([^"]*\)".*/\1/pg' temp.log`
 
+  # Fix sed issue where backslashes in $src are misinterpreted as part of the sed syntax 
+  # rather than the string
+  src=`echo $src | sed -e 's/\//dsixda_slash/g'`
+
   # sed1 : The formatting code near the top of this conversion script may have removed some commas
   # sed2 : All targets will be moved to their own line
-  # sed3 : Fix up last line
+  # sed3 : Substitute back the backslashes, if any
+  # sed4 : Fix up last line of symlink set
   sed -i \
     -e ''$line_num' s/"[ ]*"/", "/g' \
-    -e ''$line_num' s/", "/\nsymlink '"$src"' /g' \
+    -e ''$line_num' s/", [ ]*"/\nsymlink '"$src"' /g' \
+    -e ''$line_num' s/dsixda_slash/\//g' \
     -e ''$line_num' s/");//g' \
   temp.log 
 
