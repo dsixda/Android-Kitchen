@@ -153,8 +153,17 @@ then
 
   user_=`whoami`
   mkdir ../tmp
-  sudo mount -o loop $img_file ../tmp 2>/dev/null
+
+  # For ext4 (To prevent hanging when unmounting, use: ro,noexec,noload)
+  sudo mount -o loop,ro,noexec,noload $img_file ../tmp 2>/dev/null  
   res=$?
+
+  if [ "$res" != "0" ]
+  then
+    # For ext3
+    sudo mount -o loop $img_file ../tmp 2>/dev/null
+    res=$?
+  fi
   
   if [ "$res" == "0" ]
   then
