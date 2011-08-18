@@ -42,7 +42,6 @@ echo
 echo "--> Obtain a ROM that you want to port from ANOTHER DEVICE <--"
 echo
 echo "***************************************************************"
-echo
 
 scripts/check_rom no_info
 
@@ -227,6 +226,19 @@ then
   echo "Copying modules/drivers ..."
   cp -rf ../MY_KERNEL/system/* system/
   cd ..
+fi
+
+
+#
+# Copy the zImage by itself if it's a Galaxy S2 or equivalent
+#
+
+scripts/check_galaxy_s
+if [ "$?" == "1" ]
+then
+  echo 
+  echo "Copying kernel ..."
+  cp -vf MY_KERNEL/zImage WORKING_*/
 fi
 
 
