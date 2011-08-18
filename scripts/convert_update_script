@@ -135,18 +135,38 @@ orig_list=( DATA SYSTEM CACHE SDEXT BOOT SDCARD )
 new_list=( userdata system cache sdext boot sdcard )
 new_list_str="0 1 2 3 4 5"
 
+
 echo "- Initial formatting ..."
 
+#
+# In Samsung Galaxy S2 and equivalent, convert 'format' back to delete_recursive, 
+# which was changed earlier
+#
+cd ../../../../..
+scripts/check_galaxy_s
+res=$?
+cd WORKING_*
+cd META-INF/com/google/android
+
+if [ "$res" == "1" ]
+then
+  sed -i -e 's/format /delete_recursive /g' updater-script
+fi
+
+
+
+
+# 3rd line: remove leading and trailing whitespace on each line
 sed -i \
 -e ':a;N;$!ba;s/,\n//g' \
 -e 's/assert[^\n]*[\n]*//g' \
 updater-script
 
 #
-# Remove leading whitespace and tabs
+# Remove leading/trailing whitespace and tabs
 # Not sure why this requires a separate statement from the above, to work!
 #
-sed -i -e 's/^[ \t]*//g' updater-script
+sed -i -e 's/^[ \t]*//;s/[ \t]*$//g' updater-script
 
 #
 # Remove lines with comments
@@ -214,6 +234,7 @@ then
 fi
 
 
+
 #
 # copy_dir 
 #
@@ -232,21 +253,6 @@ sed -i \
   updater-script
 
 
-
-# Add mount before it
-for new in ${new_list[@]}
-do
-  if [ "$new" == "userdata" ]
-  then
-    new2=data
-  else
-    new2=$new
-  fi
-
-  sed -i \
-    -e 's/package_extract_dir(\([^,]*\), "\/'"$new2"'\(.*\)")/mount("MTD", "'"$new"'", "\/'"$new2"'");\npackage_extract_dir(\1, "\/'"$new2"'\2")/g' \
-    updater-script
-done
 
 
 #
@@ -384,6 +390,7 @@ sed -i \
 
 
 
+
 #
 # symlink
 #
@@ -418,6 +425,64 @@ sed -i \
 # format, mount
 #
 echo "- format and mount ..."
+
+# Add 'mount' before package_extract_dir and delete.*
+for new in ${new_list[@]}
+do
+  if [ "$new" == "userdata" ]
+  then
+    new2=data
+  else
+    if [ "$new" == "sdcard" ]
+    then
+      continue
+    fi
+    new2=$new
+  fi
+
+  # Find which ones comes first
+  line_num_del=`sed -n -e '/delete.*("\/'"$new2"'.*")/{=;q}' updater-script`
+  line_num_pkg=`sed -n -e '/package_extract_dir([^,]*, "\/'"$new2"'.*")/{=;q}' updater-script`
+
+  use_pkg=0
+  use_del=0
+
+  if [ "$line_num_del" == "" ] && [ "$line_num_pkg" == "" ]
+  then
+    continue
+  fi
+
+  if [ "$line_num_del" == "" ]
+  then
+    use_pkg=1
+  else
+    if [ "$line_num_pkg" == "" ]
+    then
+      use_del=1
+    else
+      if [ "$line_num_del" -lt "$line_num_pkg" ]
+      then
+        use_del=1
+      else
+        use_pkg=1
+      fi
+    fi
+  fi
+
+  # Replace only the first occurrence
+  if [ $use_del == 1 ]
+  then
+    sed -i \
+      -e '0,/\(delete.*\)("\/'"$new2"'\(.*\)")/s//mount("MTD", "'"$new"'", "\/'"$new2"'");\n\1("\/'"$new2"'\2")/' \
+      updater-script
+  else
+    sed -i \
+      -e '0,/package_extract_dir(\([^,]*\), "\/'"$new2"'\(.*\)")/s//mount("MTD", "'"$new"'", "\/'"$new2"'");\npackage_extract_dir(\1, "\/'"$new2"'\2")/' \
+      updater-script
+  fi
+done
+
+
 
 for i in $new_list_str
 do
@@ -594,6 +659,17 @@ fi
 
 echo "- Final formatting ..."
 
+sed -i \
+  -e 's/SYSTEM:/\/system\//g' \
+  -e 's/TMP:/\/tmp\//g' \
+  -e 's/DATA:/\/data\//g' \
+  -e 's/SDCARD:/\/sdcard\//g' \
+  -e 's/CACHE:/\/cache\//g' \
+  -e 's/SDEXT:/\/sdext\//g' \
+  -e 's/BOOT:/\/boot\//g' \
+  updater-script
+
+
 #
 # Fix up run_program parameters that contain special characters
 #
@@ -671,6 +747,9 @@ cd ../../../../..
 scripts/adjust_mnt updater-script
 cd WORKING_*
 cd META-INF/com/google/android
+
+sed -i -e '/^$/d' updater-script
+
 
 
 
