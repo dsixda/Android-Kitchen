@@ -76,7 +76,7 @@ else
       # Store file names in an array
       file_array[$count]=$plugin_file
 
-      no_ext=`echo $plugin_file | sed 's/.plugin[.]*[a-zA-Z0-9]*//'`
+      no_ext=`echo $plugin_file | sed -e 's/.plugin[.]*[a-zA-Z0-9]*//' -e 's/_/ /g'`
       echo "  ($count) $no_ext"
 
     done
