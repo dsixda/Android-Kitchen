@@ -32,6 +32,9 @@ boot_mnt=
 data_mnt=
 sdcard_mnt=
 
+# Set this mount point for the modem.bin in Samsung devices like the Galaxy S2
+modem_mnt=
+
 # Set this mount point if you know what it is (e.g. on Motorola Atrix)
 webtop_mnt=
 
@@ -41,6 +44,7 @@ param1=
 param2=
 
 # If SDCARD filesystem is different from above, then mention it
+# e.g. param1_sdcard=vfat, param2_sdcard=MTD
 param1_sdcard=
 param2_sdcard=
 
