@@ -44,7 +44,7 @@ rm -f *.zip
 rm -f testkey.*
 rm -f signapk.jar
 rm -f signed*.zip
-
+rm -f *smali.jar
 
 #
 # Clean up *.DS_Store hidden files
