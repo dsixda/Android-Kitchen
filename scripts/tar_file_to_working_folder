@@ -1,0 +1,136 @@
+############################################################################
+#
+# Copyright (c) 2010-2011 dsixda - dislam@rocketmail.com
+#
+# Android Kitchen is 100% free.  This script file is intended for personal
+# and/or educational use only.  It may not be duplicated for monetary
+# benefit or any other purpose without the permission of the developer.
+#
+############################################################################
+
+#
+# This script has two arguments:
+#
+# $1 = file name (mandatory)
+# $2 = "kernel_only" or "name_given" (optional)
+#
+
+
+update_file=$1
+ 
+echo "Selected $update_file"
+
+# Trim spaces in file name
+update_file2=`echo $update_file | tr ' ' '_'`
+
+if [ "$update_file" != "$update_file2" ]
+then
+  echo "Renaming to $update_file2"
+  mv "original_update/$update_file" original_update/$update_file2
+  update_file=$update_file2
+fi
+
+#
+# Working folder name
+#
+build_dir=`scripts/set_working_folder_name $2` 
+
+
+#
+# Creating folder structure
+#
+
+echo
+echo "Creating working folder $build_dir ..."
+mkdir $build_dir
+
+echo
+echo "Extracting ROM ..."
+
+tar xvf original_update/$update_file -C $build_dir -x factoryfs.img cache.img modem.bin zImage
+
+if [ "$?" != "0" ]
+then
+  echo
+  echo "Error: Cannot extract ROM!"
+  cd ..
+  exit 1
+fi
+
+cd $build_dir
+
+
+echo
+
+if [ -e factoryfs.img ]
+then
+
+  if [ -e zImage ]
+  then
+    echo
+    echo "NOTE: Ensure you use a rooted kernel, such as CF-Root, to allow"
+    echo "future flashing of custom ROMs.  If you flash a non-rooted kernel"
+    echo "then you must use Odin afterwards to flash back the rooted kernel."
+    echo      
+  fi
+
+  cd ..
+  scripts/simg_files_to_working_folder no_create $2
+  exit $?
+
+else
+  echo "Error: No image files found in TAR archive!"
+  echo 
+  cd ..
+  exit 1
+fi
+
+
+
+if [ ! -d system ] && [ ! -d SYSTEM ]
+then
+
+  echo
+  echo "Error: No system folder found!"
+  cd ..
+  exit 1
+
+fi
+
+
+echo
+echo "Listing of META-INF/com/google/android:"
+
+cd WORKING_*
+cd META-INF/com/google/android
+ls -l 
+cd ../../../../..
+
+
+
+#
+# Completion
+#
+
+cd $build_dir
+
+echo
+echo Listing of $build_dir:
+ls -l 
+
+echo
+
+if [ -d system ]
+then
+  echo "Finished setting up working folder!"
+  cd ..
+
+else
+  echo "Error: Setup failed"
+  cd ..
+  scripts/press_enter
+  exit 1
+fi
+
+cd ..
+
