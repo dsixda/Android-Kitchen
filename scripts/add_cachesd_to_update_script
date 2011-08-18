@@ -17,7 +17,7 @@ then
   if [ ! -e move_cache_sd ]
   then
 
-    echo -n "Do you want to move dalvik-cache to SD card? (y/n)? (default: y): "
+    echo -n "Do you want to move dalvik-cache to SD card (y/n)? (default: y): "
     read do_cachesd
 
     if [ "$do_cachesd" != "n" ]
