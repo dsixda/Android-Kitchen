@@ -21,22 +21,16 @@ do
   echo "ROM and convert them into classes.dex files, which will then be" 
   echo "zipped into their *.apk or framework *.jar files."
   echo ""
-  echo "The intent is to improve the performance of all apps. It also"
-  echo "puts certain *.apk files into a state where they can be used for"
-  echo "themes, icons, trackball/trackpad modifications, etc."
+  echo "The intent of deodexing is to allow for theming, customization"
+  echo "and portability of the ROM.  It puts your files into a state"
+  echo "where they can be used for themes, icons, trackball/trackpad"
+  echo "modifications, etc."
   echo
   echo "The process usually takes several minutes and does NOT require"
   echo "you to sign any of the files afterwards."
   echo
   echo "----------------------------------------------------------------"
   echo
-
-  if [ `ls tools/deodex_files | grep -c smali` -gt 2 ]
-  then
-    echo "Error: tools/deodex_files has multiple versions of smali/baksmali!"
-    scripts/press_enter
-    exit 0
-  fi
 
   if [ ! -d WORKING_* ]
   then
@@ -178,10 +172,34 @@ do
   fi
 
 
+  sgs2_fix=no
+
+  if [ `echo $dir_list | grep -c app` -gt 0 ] && \
+      [ -e system/framework/com.samsung.device.jar ] && [ ! -e system/framework/java.awt.jar ]
+  then
+    if [ -e system/app/Email.apk ] || [ -e system/app/MobilePrint.apk ] 
+    then
+
+      sgs2_fix=yes
+
+      echo
+      echo
+      echo "--> Adding custom java.awt.jar to framework folder (Email.apk/MobilePrint.apk fix)"
+      echo "    ** Thanks to xeudoxus for this fix **"
+      
+      cp -f ../tools/samsung_files/java.awt.jar system/framework/
+    fi
+  fi
+
   cd ..
   scripts/do_deodex_folder "$dir_list"
 
   cd WORKING_*
+
+  if [ "$sgs2_fix" == "yes" ]
+  then
+    rm -f system/framework/java.awt.jar
+  fi
 
   num_odex_app=`find system/app | grep -c "\.odex$"`
   num_odex_fr=`find system/framework | grep -c "\.odex$"`
