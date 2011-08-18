@@ -23,9 +23,11 @@ echo
 echo " - ZIP file for a custom ROM  (e.g. update.zip)"
 echo " - ZIP file containing *.img  (e.g. rom.zip from shipped ROM)"
 echo " - ZIP file containing shipped ROM in SYSTEM + BOOT folder format"
-echo " - APP file from Huawei       (e.g. UPDATE.APP from software update)"
 echo " - system.img + boot.img      (e.g. from shipped ROM or Nandroid)"
-echo " - Working folder made with this kitchen  (e.g. WORKING_old_rom)"
+echo " - APP file from Huawei       (e.g. UPDATE.APP from software update)"
+echo " - TAR file containing factoryfs.img and more (e.g. SGS2 stock ROM)"
+echo " - factoryfs.img + optional cache.img/zImage  (e.g. SGS2 stock ROM)"
+echo " - Working folder made with this kitchen      (e.g. WORKING_old_rom)"
 echo
 
 scripts/make_backup_working
