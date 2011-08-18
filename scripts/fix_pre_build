@@ -245,6 +245,67 @@ else
 fi
 
 
+#
+# Fix entries in update-script for zImage
+#
+grep_zimage=`grep -c "flash_zimage" META-INF/com/google/android/update-script`
+
+if [ -e zImage ]
+then
+
+  if [ $grep_zimage == 0 ]
+  then
+    echo
+    echo "zImage found."
+    echo "Modifying update-script with syntax for flashing zImage ..."
+    echo "flash_zimage" >> META-INF/com/google/android/update-script
+    echo
+  fi
+
+  if [ ! -e flash_image ]
+  then
+    echo "Adding flash_image to ROM ..."
+    cp ../tools/samsung_files/flash_image .
+  fi
+
+elif [ $grep_zimage != 0 ]
+then
+  echo
+  echo "Removing entry in update-script for zImage ..."
+  sed -i -e '/flash_zimage/d' META-INF/com/google/android/update-script
+fi
+
+
+#
+# Fix entries in update-script for modem.bin
+#
+grep_modem=`grep -c "flash_modem" META-INF/com/google/android/update-script`
+
+if [ -e modem.bin ]
+then
+  if [ $grep_modem == 0 ]
+  then
+    echo
+    echo "modem.bin found."
+    echo "Modifying update-script with syntax for flashing modem.bin ..."
+    echo "flash_modem" >> META-INF/com/google/android/update-script
+    echo
+  fi
+
+  if [ ! -e flash_image ]
+  then
+    echo "Adding flash_image to ROM ..."
+    cp ../tools/samsung_files/flash_image .
+  fi
+
+elif [ $grep_modem != 0 ]
+then
+  echo
+  echo "Removing entry in update-script for modem.bin ..."
+  sed -i -e '/flash_modem/d' META-INF/com/google/android/update-script
+fi
+
+
 
 #
 # Check for /system/bin/reboot in working folder, and then modify the update-script if required.
@@ -343,6 +404,7 @@ else
   cd ..
 fi
 
+
 scripts/fix_update_script_blanks
 cd WORKING_*
 
@@ -357,7 +419,6 @@ then
 fi
 
 echo
-
 
 cd ..
 
