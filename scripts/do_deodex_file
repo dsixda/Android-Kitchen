@@ -422,11 +422,18 @@ then
   #
   # Samsung TouchWiz
   #
-
+  # Notes about baksmali errors in Galaxy S2 
+  # (and possibly other Samsung devices):
+  #
+  # - com/sec/android/touchwiz/*widget refers to twframework.jar
+  # - javax/swing/table/* refers to java.awt.jar
+  #
   if [ -e ../framework/twframework.jar ]
   then
 
-    if [ "$odex_file" == "BluetoothOPP.odex" ]
+    if [ "$odex_file" == "BluetoothOPP.odex" ] || \
+       [ "$odex_file" == "BluetoothOpp.odex" ] || \
+       [ "$odex_file" == "BluetoothPbap.odex" ]
     then
       classfile=javax.obex.jar
 
@@ -439,20 +446,51 @@ then
          [ "$odex_file" == "Contacts.odex" ] || \
          [ "$odex_file" == "DialerTabActivity.odex" ] || \
          [ "$odex_file" == "Dlna.odex" ] || \
-         [ "$odex_file" == "Email.odex" ] ||
          [ "$odex_file" == "InfoAlarm.odex" ] || \
          [ "$odex_file" == "MusicPlayer.odex" ] || \
          [ `echo $odex_file | grep -c SamsungWidget_` == 1 ] || \
          [ "$odex_file" == "SoundPlayer.odex" ] || \
          [ "$odex_file" == "VideoPlayer.odex" ] || \
+         [ "$odex_file" == "AnalogClock.odex" ] || \
+         [ "$odex_file" == "Browser.odex" ] || \
+         [ "$odex_file" == "DualClock.odex" ] || \
+         [ "$odex_file" == "FmRadio.odex" ] || \
+         [ "$odex_file" == "JobManager.odex" ] || \
+         [ "$odex_file" == "Settings.odex" ] || \
+         [ "$odex_file" == "TwCalendarAppWidget.odex" ] || \
          [ "$odex_file" == "VoiceRecorder.odex" ] 
     then
       classfile=twframework.jar
+  
+      if [ "$odex_file" == "SamsungWidget_WeatherClock.odex" ]
+      then
+        classfile=$classfile:com.google.android.maps.jar
+      fi
 
-    elif [ "$odex_file" == "Camera.odex" ] || \
-         [ "$odex_file" == "FactoryTest.odex" ]
+    elif [ "$odex_file" == "MobilePrint.odex" ]
+    then
+      classfile=java.awt.jar
+
+    elif [ "$odex_file" == "Phone.odex" ]
+    then
+      classfile=libvtmanagerjar.jar
+
+    elif [ "$odex_file" == "FactoryTest.odex" ]
     then
       classfile=seccamera.jar
+
+    elif [ "$odex_file" == "Camera.odex" ] 
+    then
+      classfile=seccamera.jar:secmediarecorder.jar
+   
+    elif [ "$odex_file" == "MiniDiary.odex" ] || \
+         [ "$odex_file" == "Mms.odex" ] 
+    then
+      classfile=twframework.jar:com.google.android.maps.jar
+
+    elif [ "$odex_file" == "Email.odex" ]
+    then
+      classfile=twframework.jar:com.google.android.maps.jar:java.awt.jar
     fi
   fi
 
@@ -639,12 +677,12 @@ then
     fi
 
   else
-    echo "WARNING: Unable to produce classes.dex, not good!"
+    echo "WARNING: Unable to produce classes.dex!"
     exit 1
   fi          
 
 else
-  echo "WARNING: Cannot deodex $odex_file"
+  #echo "WARNING: Cannot deodex $odex_file"
   rm -rf out
   exit 1
 fi
