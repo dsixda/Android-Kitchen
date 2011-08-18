@@ -19,7 +19,7 @@ rm -f tools/ext2read_windows/ext2*.log
 rm -f ext2*.log
 rm -f sh.exe.stackdump
 
-bin_list=( mkbootfs mkbootfs.exe mkbootimg mkbootimg.exe mkbootimg_4k_offset mkbootimg_4k_offset.exe )
+bin_list=( mkbootfs mkbootfs.exe mkbootimg mkbootimg.exe )
 
 for mkboot_bin in ${bin_list[@]}
 do
@@ -40,4 +40,14 @@ do
   fi
 done
 
+
+bin_list=( simg2img simg2img.exe )
+
+for simg_bin in ${bin_list[@]}
+do
+  if [ -e tools/samsung_files/simg2img_files/$simg_bin ]
+  then
+    rm tools/samsung_files/simg2img_files/$simg_bin
+  fi
+done
 
