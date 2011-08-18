@@ -47,7 +47,8 @@ else
     echo
     echo "Found an updater-script but not an update-script. For"
     echo "compatibility with the kitchen scripts, only update-"
-    echo "scripts are used in the kitchen."
+    echo "scripts are used in the kitchen. (See the kitchen's FAQ"
+    echo "at xda-developers.com for a detailed explanation.)"
     echo
     echo "Choose an option number:"
     echo 
@@ -55,8 +56,8 @@ else
     echo "  2 = Do nothing, keep the updater-script"
     echo
     echo "- Option #1 will do a conversion of the updater-script"
-    echo "  (Edify) into an update-script (Amend).  It can be"
-    echo "  changed back to Edify format when you build the ROM."
+    echo "  (Edify) into an update-script (Amend). NOTE: It can"
+    echo "  be changed back to Edify format when ROM is built."
     echo
     echo "- Option #2 should only be used if you wish not to use"
     echo "  any of the options in the kitchen other than to"
