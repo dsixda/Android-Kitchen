@@ -18,7 +18,7 @@
 
 if [ "$1" == "no_create" ] 
 then
-  build_dir=`ls | grep -m 1 WORKING_`
+  build_dir=`ls | grep -m 1 ^WORKING_`
 
   mkdir $build_dir/system
   mv $build_dir/system.img $build_dir/system
@@ -79,17 +79,12 @@ fi
 #
 # Directory tree
 #
+
 mkdir -p $build_dir/META-INF/com/google/android
 echo
 echo "Adding an update-script ..."
 cp tools/update_files/update-script $build_dir/META-INF/com/google/android/
 
-
-#
-# Check for location of Android header in boot.img so that it can be
-# added to working folder correctly
-#
-scripts/check_bootimg_header
 
 
 #
@@ -192,6 +187,38 @@ then
 fi
 
 cd ..
+
+
+
+
+#
+# Check for location of Android header in boot.img so that it can be
+# added to working folder correctly
+#
+
+scripts/check_bootimg_header
+
+# Not a valid boot.img
+if [ "$?" == "1" ]
+then
+  scripts/check_galaxy_s
+  
+  if [ "$?" == "1" ]
+  then
+    echo
+    echo "NOTE: The boot.img may actually be a kernel (zImage) instead.  We will"
+    echo "rename it to zImage."
+    echo
+
+    cd WORKING_*
+    mv -v boot.img zImage
+    cp -v ../tools/samsung_files/flash_image .
+    echo "flash_zimage" >> META-INF/com/google/android/update-script
+    cd ..
+    scripts/check_no_bootimg 
+  fi
+fi
+
 
 
 # Wi-fi fix - required for some Huawei devices
