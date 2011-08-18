@@ -49,12 +49,16 @@ then
     echo "uses an EXT filesystem. You might find that one option works"
     echo "better than the other."
     echo
-    echo "e.g.  EXT3: HTC Desire HD, HTC Thunderbolt"
-    echo "      EXT4: HTC Desire S"
+    echo "e.g.  EXT3: Older devices such as HTC Desire HD"
+    echo "      EXT4: Newer devices such as HTC Desire S"
     echo 
-    echo "  1 - Run Explore2fs  (Best choice for EXT2/EXT3)"
-    echo "  2 - Run Ext2Explore (EXT2/EXT3/EXT4)"
+    echo "  1 - Run Explore2fs  (Best choice for EXT3)"
+    echo "  2 - Run Ext2Explore (EXT3/EXT4)"
     echo "  3 - I'm finished unpacking / Abort"
+    echo
+    echo
+    echo "NOTE: If any of the tools listed above have problems with"
+    echo "      extraction, then try the other option(s) listed."
     echo
     echo -n "Select number: "
 
@@ -62,71 +66,12 @@ then
 
     if [ "$enterNumber" == "1" ]
     then
-
-      echo
-      echo "####################################################################"
-      echo 
-      echo " PLEASE FOLLOW INSTRUCTIONS BELOW TO EXTRACT FILES FROM $img_file:"
-      echo 
-      echo " 1) When Explore2fs appears, use 'File->Open Image File' to open:"
-      echo "    $dos_path\\$img_file"
-      echo
-      echo " 2) After it loads, right-click on the hard disk icon in the left"
-      echo "    frame, and select Export Directory"
-      echo
-      echo " 3) Select $dos_path"
-      echo
-      echo " 4) Wait for extraction to finish and then close Explore2fs"
-      echo
-      echo "NOTE: If the tool has problems with extraction, then close it,"
-      echo "      return to the menu and try the other option listed."      
-      echo 
-      echo "####################################################################"
-      echo
-
-      tools/explore2fs_windows/explore2fs.exe &
-
-      echo 
-      echo ">>>> PERFORM THE STEPS ABOVE BEFORE PRESSING ENTER! <<<<"
-      echo
-
-      scripts/press_enter
+      scripts/show_explore2fs $img_dir $img_file
 
     elif [ "$enterNumber" == "2" ]
     then
-
-      echo 
-      echo "#####################################################################"
-      echo 
-      echo " PLEASE FOLLOW INSTRUCTIONS BELOW TO EXTRACT FILES FROM $img_file:"
-      echo 
-      echo " 1) Ignore the 'Cannot Read Disk' warning dialog (press 'OK') if it"
-      echo "    appears!"
-      echo 
-      echo " 2) When Ext2Explore appears, use 'File->Open Image' to open:"
-      echo "    $dos_path\\$img_file"
-      echo
-      echo " 3) After it loads, right-click on the new icon displayed in the left"
-      echo "    frame, and select Save"
-      echo
-      echo " 4) Select $dos_path"
-      echo
-      echo " 5) Wait for extraction to finish and then close Ext2Explore"
-      echo
-      echo "NOTE: If the tool has problems with extraction, then close it,"
-      echo "      return to the menu and try the other option listed."      
-      echo      
-      echo "#####################################################################"
-      echo
-
-      tools/ext2read_windows/ext2explore.exe &
-
-      echo 
-      echo ">>>> PERFORM THE STEPS ABOVE BEFORE PRESSING ENTER! <<<<"
-      echo
-
-      scripts/press_enter
-
+      scripts/show_ext2explore $img_dir $img_file
+    
     elif [ "$enterNumber" == "3" ]
     then
       break
@@ -167,7 +112,14 @@ then
   
   if [ "$res" == "0" ]
   then
-    sudo cp -R ../tmp/* .
+    
+    if [ "$img_file" == "ext4_cache.img" ]
+    then
+      sudo cp ../tmp/recovery/sec_csc.zip .
+    else
+      sudo cp -R ../tmp/* .
+    fi
+
     sudo umount ../tmp
     rmdir ../tmp
     sudo chown -R $user_ *
@@ -209,10 +161,17 @@ then
     then
 
       echo "Copying files"
-      cp -R /tmp/for_kitchen/ system/
+
+      if [ "$img_file" == "ext4_cache.img" ]
+      then
+        cp /tmp/for_kitchen/recovery/sec_csc.zip .
+      else
+        cp -R /tmp/for_kitchen/ $img_dir/
+      fi
+
       umount /tmp/for_kitchen/
       rmdir /tmp/for_kitchen/
-      mv $img_file system/$img_file
+      mv $img_file $img_dir/$img_file
       cd system
 
       rm -f unyaffs*stackdump
