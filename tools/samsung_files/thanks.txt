@@ -1,0 +1,1 @@
+Thanks to xeudoxus for the custom java.awt.jar that allows Email.apk and MobilePrint.apk to de-odex successfully.
