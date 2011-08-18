@@ -12,14 +12,21 @@
 dest_dir=$1
 kitchen_dir=`pwd`
 
-cd $dest_dir
+if [ "$dest_dir" == "" ]
+then
+  cd WORKING_*
+  dest_dir=`pwd`
+else
+  cd $dest_dir
+fi
 
 if [ ! -e boot.img ]
 then
 
   echo
-  echo  "Warning: A boot.img is not found.  You have the option to add a 'fake'"
-  echo  "         boot.img so that the kitchen can still function."
+  echo  "Warning: A valid boot.img is not found.  You have the option to add a"
+  echo  "         'fake' boot.img so that the features of the kitchen can still"
+  echo  "         function normally."
   echo 
   echo  "         This boot.img will be automatically removed from your ROM's"
   echo  "         ZIP file when it is built."
