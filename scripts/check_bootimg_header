@@ -54,10 +54,12 @@ then
     mv newboot.img boot.img
     echo
     cd $base_dir
-    exit 1
+    exit 0
 
   else
     echo "Warning: Android header not located anywhere in boot.img"
+    cd $base_dir
+    exit 1
   fi
 fi
 
