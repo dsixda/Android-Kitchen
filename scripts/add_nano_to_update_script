@@ -26,18 +26,18 @@ then
     #
     # Do this to prevent conflicts with the update-script in ROMs that already have the binary
     #
-    if [ -e ../../../../system/xbin/nano ]
+    if [ -e ../../../../system/bin/nano ]
     then
 
-      if [ "`find ../../../../system/bin -name nano`" == "" ]
+      if [ "`find ../../../../system/xbin -name nano`" == "" ]
       then
-        echo "Copying system/xbin/nano to system/bin/nano"
-        cp -f ../../../../system/xbin/nano ../../../../system/bin/nano
+        echo "Copying system/bin/nano to system/xbin/nano"
+        cp -f ../../../../system/bin/nano ../../../../system/xbin/nano
       fi
     fi
 
     echo "Updating update-script with nano entries"
-    sed -i -e 's/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh\nset_perm 0 0 04755 SYSTEM:bin\/nano\n/g' update-script
+    sed -i -e 's/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh\nset_perm 0 0 04755 SYSTEM:xbin\/nano\n/g' update-script
 
 
     if [ "`grep -om 1 nano update-script`" != "nano" ]
