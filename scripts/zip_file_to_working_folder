@@ -111,7 +111,41 @@ then
     cd ..
     exit 1
   fi
+
+
+# Check for Samsung stock ROM
+else
+
+  if [ -e factoryfs.img ]
+  then
+    echo Found factoryfs.img
+
+    if [ -e cache.img ]
+    then
+      echo Found cache.img
+    else
+      echo "Warning: No cache.img found"
+    fi
+
+    if [ -e zImage ]
+    then
+      echo "Found zImage"
+      echo
+      echo "NOTE: Ensure you use a rooted kernel, such as CF-Root, to allow"
+      echo "future flashing of custom ROMs.  If you flash a non-rooted kernel"
+      echo "then you must use Odin afterwards to flash back the rooted kernel."
+      echo      
+    else
+      echo "Warning: No zImage found"
+    fi
+
+    cd ..
+    scripts/simg_files_to_working_folder no_create $2
+    exit $?
+  fi
+
 fi
+
 
 
 if [ -d patch ]
