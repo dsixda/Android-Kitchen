@@ -1,0 +1,71 @@
+############################################################################
+#
+# Copyright (c) 2010-2011 dsixda - dislam@rocketmail.com
+#
+# Android Kitchen is 100% free.  This script file is intended for personal
+# and/or educational use only.  It may not be duplicated for monetary
+# benefit or any other purpose without the permission of the developer.
+#
+############################################################################
+
+
+img_dir=$1
+img_file=$2
+
+dos_path=`cygpath -wp $img_dir`
+
+echo 
+echo "#####################################################################"
+echo 
+echo " READ INSTRUCTIONS BELOW TO EXTRACT FILES FROM $img_file:"
+echo 
+echo " 1) Ensure you have installed DiskInternals Linux Reader, found"
+echo "    under tools/diskinternals_windows/Linux_Reader.exe"
+echo 
+echo " 2) Launch Linux Reader and use 'Drives->Mount Image' to mount:"
+echo "    $dos_path\\$img_file"
+echo
+echo " 3) From the Linux Reader explorer, double-click 'Linux native"
+echo "    Volume 1' so that the image's folders are now shown"
+echo
+
+if [ "$img_file" == "ext4_cache.img" ]
+then
+  echo " 4) Open the 'recovery' folder so that sec_csc.zip is shown"
+  echo
+  echo " 5) Right-click on sec_csc.zip, select 'Save' and then click 'Next'."
+  echo
+  echo " 6) UNCHECK the box for 'Save directory structure' and choose folder"
+  echo "    $dos_path"
+
+else
+  echo " 4) Right-click on these folders and choose 'Select All'"
+  echo 
+  echo " 5) Right-click again and select 'Save'.  Click on 'Next'"
+  echo
+  echo " 6) Check the box for 'Save directory structure' and choose folder"
+  echo "    $dos_path"
+fi
+
+echo
+echo "    NOTE: The program will show the last used path if you don't change"
+echo "          the folder. Thus ensure an old working folder isn't used!"
+echo
+echo " 7) Click on 'Next' twice, wait for extraction to finish and then"
+echo "    close Linux Reader"
+echo      
+echo "NOTE: This program adds Administrator ownership to the extracted"
+echo "      files, so the kitchen -might- have problems moving or"
+echo "      deleting your ROM's working folder afterwards (unless you do"
+echo "      this manually with Windows explorer)!"
+echo      
+echo "#####################################################################"
+echo
+
+echo 
+echo ">>>> PERFORM THE STEPS ABOVE BEFORE PRESSING ENTER! <<<<"
+echo
+
+scripts/press_enter
+
+

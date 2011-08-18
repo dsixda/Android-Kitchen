@@ -1,0 +1,43 @@
+############################################################################
+#
+# Copyright (c) 2010-2011 dsixda - dislam@rocketmail.com
+#
+# Android Kitchen is 100% free.  This script file is intended for personal
+# and/or educational use only.  It may not be duplicated for monetary
+# benefit or any other purpose without the permission of the developer.
+#
+############################################################################
+
+
+img_dir=$1
+img_file=$2
+
+dos_path=`cygpath -wp $img_dir`
+
+echo
+echo "####################################################################"
+echo 
+echo " READ INSTRUCTIONS BELOW TO EXTRACT FILES FROM $img_file:"
+echo 
+echo " 1) When Explore2fs appears, use 'File->Open Image File' to open:"
+echo "    $dos_path\\$img_file"
+echo
+echo " 2) After it loads, right-click on the hard disk icon in the left"
+echo "    frame, and select Export Directory"
+echo
+echo " 3) Select $dos_path"
+echo
+echo " 4) Wait for extraction to finish and then close Explore2fs"
+echo
+echo "####################################################################"
+echo
+
+tools/explore2fs_windows/explore2fs.exe &
+
+echo 
+echo ">>>> PERFORM THE STEPS ABOVE BEFORE PRESSING ENTER! <<<<"
+echo
+
+scripts/press_enter
+
+
