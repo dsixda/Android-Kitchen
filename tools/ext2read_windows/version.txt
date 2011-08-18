@@ -1,0 +1,3 @@
+Ext2Explore version 2.2.71 (although About screen says 2.1)
+
+http://sourceforge.net/projects/ext2read/
