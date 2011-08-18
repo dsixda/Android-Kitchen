@@ -18,10 +18,6 @@ echo "Nano is a text editor that can be run from the ADB shell on your "
 echo "computer or from a terminal emulator (e.g. ConnectBot) on your"
 echo "Android device.  To run it from a shell, type: nano"
 echo
-echo "The scripts 'sysrw' and 'sysro' will also be included to make it"
-echo "easier to mount the /system folder (as read-write or read-only)"
-echo "for file editing purposes."
-echo
 echo "----------------------------------------------------------------"
 echo
 
@@ -106,19 +102,12 @@ echo
 nano_path=`find . -name nano`
 if [ "$nano_path" == "" ] 
 then
-  echo "Adding /system/bin/nano"
-  cp ../tools/nano_files/nano system/bin/
-  cp ../tools/nano_files/sysrw system/bin/
-  cp ../tools/nano_files/sysro system/bin/
+  echo "Adding /system/xbin/nano"
+  cp ../tools/nano_files/nano system/xbin/
 else 
   echo "Found $nano_path"
 fi
 
 cd ..
 scripts/add_nano_to_update_script
-res=$?
 
-if [ "$res" != "1" ]
-then
-  scripts/add_sysrorw_to_update_script
-fi
