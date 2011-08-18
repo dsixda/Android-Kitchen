@@ -31,8 +31,26 @@ cd WORKING_*
 num_odex_fr=`find system/framework | grep -c "\.odex$"`
 num_odex_app=`find system/app | grep -c "\.odex$"`
 
+
+#
+# Create log file
+#
+
+date_str=`date '+%m%d%y_%H%M%S'`
+log_file=deodex_$date_str.log
+
+
+#
+# Go through each folder specified
+#
+
 for folder in ${dir_list[@]}
 do
+
+  # Log
+  echo "" >> ../$log_file
+  echo "Folder: $folder" >> ../$log_file
+  echo "-------------------" >> ../$log_file
 
   if [ $folder == framework ]
   then
@@ -43,6 +61,9 @@ do
   else
     echo
     echo "Error: Folder $folder not valid!"
+
+    # Log
+    echo "Invalid folder" >> ../$log_file
     continue
   fi
 
@@ -62,17 +83,23 @@ do
   if [ "$grep_cmd" == "" ]
   then
     echo "Nothing found under $path!"
+
+    # Log
+    echo "Nothing here" >> ../../../$log_file
+
   else
 
     #
     # Finally, deodex each file
     #
-    echo "Trying this version of baksmali/smali:"
-    ls ../../../tools/deodex_files/*.jar | sed -e 's/.*\///g'
+    new_version=`more ../../../tools/deodex_files/use_this_version.txt | sed 's/[ ]*$//g'`
+    echo "--> Trying this version of baksmali/smali: $new_version"    
     echo
     version=newer
-    cp -f ../../../tools/deodex_files/baksmali*.jar baksmali.jar
-    cp -f ../../../tools/deodex_files/smali*.jar smali.jar
+    cp -f ../../../tools/deodex_files/baksmali-$new_version.jar baksmali.jar
+    cp -f ../../../tools/deodex_files/smali-$new_version.jar smali.jar
+
+    version_num=$new_version
 
     for odex_file in $grep_cmd
     do
@@ -93,6 +120,9 @@ do
 
         if [ -e $odex_file ]
         then
+          
+          # Log
+          echo "* Warning: $odex_file (using smali/baksmali $version_num)" >> ../../../$log_file
 
           current_dir=`pwd`
           cd ../framework
@@ -108,9 +138,7 @@ do
         
           cd $current_dir
 
-          echo
-          echo 
-          echo "-> Using brute-force method (ignore previous warning if successful):"
+          echo "-> Using brute-force method (ignore above error if successful):"
           echo
 
           ../../../scripts/do_deodex_file $odex_file ../framework $fr_jar_list
@@ -118,15 +146,18 @@ do
           if [ -e $odex_file ] && [ $try == 2 ]
           then
 
+            # Log
+            echo "* Warning: $odex_file (using brute-force with $version_num)" >> ../../../$log_file
+
             if [ $version==older ]
             then
               echo
-              echo "Reverting to newer baksmali/smali:"
-              ls ../../../tools/deodex_files/*.jar | sed -e 's/.*\///g'
+              echo "--> Reverting to newer baksmali/smali ($new_version)"
               echo
               version=newer
-              cp -f ../../../tools/deodex_files/baksmali*.jar baksmali.jar
-              cp -f ../../../tools/deodex_files/smali*.jar smali.jar              
+              version_num=$new_version
+              cp -f ../../../tools/deodex_files/baksmali-$new_version.jar baksmali.jar
+              cp -f ../../../tools/deodex_files/smali-$new_version.jar smali.jar              
             fi  
 
             #echo "Trying $odex_file but ignoring error ..."
@@ -135,34 +166,44 @@ do
             echo "ERROR: Aborting $odex_file"
             found_error=1
             
+            # Log
+            echo "* ERROR: Aborting $odex_file!" >> ../../../$log_file
+
             break
 
           elif [ ! -e $odex_file ]
           then
+            # Log
+            echo "$odex_file successfully deodexed" >> ../../../$log_file
+            
             break
           fi
 
           if [ $version==newer ]
           then
+            old_version=`more ../../../tools/deodex_files/old_version/use_this_version.txt | sed 's/[ ]*$//g'`
             echo
-            echo "Trying older version of baksmali/smali:"
-            ls ../../../tools/deodex_files/old_version/*.jar | sed -e 's/.*\///g'
+            echo "--> Trying older version of baksmali/smali ($old_version)"
             echo
             version=older
-            cp -f ../../../tools/deodex_files/old_version/baksmali*.jar baksmali.jar
-            cp -f ../../../tools/deodex_files/old_version/smali*.jar smali.jar
+            version_num=$old_version
+            cp -f ../../../tools/deodex_files/old_version/baksmali-$old_version.jar baksmali.jar
+            cp -f ../../../tools/deodex_files/old_version/smali-$old_version.jar smali.jar
           else 
             echo
-            echo "Trying newer version of baksmali/smali:"
-            ls ../../../tools/deodex_files/*.jar | sed -e 's/.*\///g'
+            echo "--> Trying newer version of baksmali/smali ($new_version)"
             echo
             version=newer
-            cp -f ../../../tools/deodex_files/baksmali*.jar baksmali.jar
-            cp -f ../../../tools/deodex_files/smali*.jar smali.jar
+            version_num=$new_version
+            cp -f ../../../tools/deodex_files/baksmali-$new_version.jar baksmali.jar
+            cp -f ../../../tools/deodex_files/smali-$new_version.jar smali.jar
           fi
 
           try=2
 
+        else
+          # Log
+          echo "$odex_file successfully deodexed" >> ../../../$log_file
         fi
       done
 
