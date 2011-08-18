@@ -1,0 +1,21 @@
+############################################################################
+#
+# Copyright (c) 2010-2011 dsixda - dislam@rocketmail.com
+#
+# Android Kitchen is 100% free.  This script file is intended for personal
+# and/or educational use only.  It may not be duplicated for monetary
+# benefit or any other purpose without the permission of the developer.
+#
+############################################################################
+
+
+model=`scripts/get_build_prop_val ro.product.model`
+exists=`echo $model | grep -c "GT-I9"`
+
+if [ $exists == 0 ]
+then
+  exit 0
+else
+  exit 1
+fi
+
