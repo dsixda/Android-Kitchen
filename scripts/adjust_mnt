@@ -17,6 +17,12 @@
 if [ "$1" != "" ]
 then
 
+  if [ "$1" != "updater-script" ] && [ "$1" != "update-script" ]
+  then
+    echo "Error: Specified '$1' instead of updater-script or update-script"
+    exit 1
+  fi
+
   device_name=`scripts/get_device_name`
 
   change_mnt=`scripts/get_edify_def_val $device_name change_mnt`
@@ -38,6 +44,7 @@ then
     data_mnt=`scripts/get_edify_def_val $device_name data_mnt`
     sdcard_mnt=`scripts/get_edify_def_val $device_name sdcard_mnt`
     webtop_mnt=`scripts/get_edify_def_val $device_name webtop_mnt`
+    modem_mnt=`scripts/get_edify_def_val $device_name modem_mnt`
   fi
 
   cd WORKING_*
@@ -263,6 +270,88 @@ then
       done
 
 
+      #
+      # Alternative mount/unmount commands
+      #
+
+      use_sbin_mnt=0
+      use_sbin_bb=0
+
+      if [ -e updater-script.orig ]
+      then
+        grep_sbin_mnt=`grep -c "run_program(\"/sbin/mount\"" updater-script.orig`
+        if [ $grep_sbin_mnt -gt 0 ]
+        then
+          use_sbin_mnt=1
+        fi
+
+        grep_sbin_bb=`grep -c "run_program(\"/sbin/busybox\", \"mount\"" updater-script.orig`
+        if [ $grep_sbin_bb -gt 0 ]
+        then
+          use_sbin_bb=1
+        fi
+
+      else
+    
+        #
+        # For Samsung Galaxy S2 and equivalent
+        #
+        cd ../../../../..
+        scripts/check_galaxy_s
+      
+        if [ "$?" == "1" ]
+        then
+          use_sbin_mnt=1
+        fi
+
+        cd WORKING_*
+        cd META-INF/com/google/android
+      fi
+
+
+      if [ $use_sbin_mnt == 1 ]
+      then
+        sed -i \
+          -e 's/^mount("[^"]*", "[^"]*", \("[^"]*"\), \("[^"]*"\))/run_program("\/sbin\/mount", \1, \2)/g' \
+          -e 's/^unmount(\("[^"]*"\))/run_program("\/sbin\/umount", \1)/g' \
+        updater-script
+      fi
+
+      if [ $use_sbin_bb == 1 ]
+      then
+        sed -i \
+          -e 's/^mount("[^"]*", "[^"]*", "[^"]*", \("[^"]*"\))/run_program("\/sbin\/busybox", "mount", \1)/g' \
+          -e 's/^unmount(\("[^"]*"\))/run_program("\/sbin\/busybox", "umount", \1)/g' \
+        updater-script
+      fi
+
+
+
+      #
+      # zImage and modem.bin   
+      #
+
+      if [ `grep -c flash_zimage updater-script` -gt 0 ] && [ `grep -c flash_modem updater-script` -gt 0 ]
+      then
+
+        sed -i \
+          -e '/^flash_zimage[ ]*$/d' \
+          -e 's/^flash_modem[ ]*$/package_extract_file("flash_image", "\/tmp\/flash_image");\nset_perm(0, 0, 0777, "\/tmp\/flash_image");\nassert(package_extract_file("zImage", "\/tmp\/zImage"),\n       run_program("\/tmp\/flash_image", "'"$boot_mnt"'", "\/tmp\/zImage"),\n       delete("\/tmp\/zImage"));\nassert(package_extract_file("modem.bin", "\/tmp\/modem.bin"),\n       run_program("\/tmp\/flash_image", "'"$modem_mnt"'", "\/tmp\/modem.bin"),\n       delete("\/tmp\/modem.bin"));\ndelete("\/tmp\/flash_image");\n/g' \
+          updater-script
+
+      elif [ `grep -c flash_zimage updater-script` -gt 0 ] && [ `grep -c flash_modem updater-script` == 0 ]
+      then
+
+        sed -i -e 's/^flash_zimage[ ]*$/package_extract_file("flash_image", "\/tmp\/flash_image");\nset_perm(0, 0, 0777, "\/tmp\/flash_image");\nassert(package_extract_file("zImage", "\/tmp\/zImage"),\n       run_program("\/tmp\/flash_image", "'"$boot_mnt"'", "\/tmp\/zImage"),\n       delete("\/tmp\/zImage"));\ndelete("\/tmp\/flash_image");\n/g' updater-script
+
+      elif [ `grep -c flash_zimage updater-script` == 0 ] && [ `grep -c flash_modem updater-script` -gt 0 ]
+      then
+
+        sed -i -e 's/^flash_modem[ ]*$/package_extract_file("flash_image", "\/tmp\/flash_image");\nset_perm(0, 0, 0777, "\/tmp\/flash_image");\nassert(package_extract_file("modem.bin", "\/tmp\/modem.bin"),\n       run_program("\/tmp\/flash_image", "'"$modem_mnt"'", "\/tmp\/modem.bin"),\n       delete("\/tmp\/modem.bin"));\ndelete("\/tmp\/flash_image");\n/g' updater-script
+   
+      fi
+
+
     ################################
     # change_mnt==yes; update-script
     ################################
@@ -325,22 +414,49 @@ then
   fi
 
  
+  cd ../../../../..
+
+  ################################
+  # All cases; update-script
+  ################################
+
+  if [ "$1" == "update-script" ]
+  then
+
+    #
+    # Convert 'delete_recursive' of a partition to 'format', for compatibility 
+    # with all of the scripts.  This will be changed back when you build ROM.
+    #
+    scripts/check_galaxy_s
+
+    if [ "$?" == "1" ]
+    then
+      cd WORKING_*
+      cd META-INF/com/google/android
+      sed -i -e 's/delete_recursive \([^:]*:\)[ ]*$/format \1/g' update-script
+      cd ../../../../..
+    fi
+  fi
+
 
   ################################
   # All cases; updater-script
   ################################
 
-  #
-  # Fix cases where a mount hasn't been fixed yet
-  #
-  # e.g.  If updater-script contains: 
-  #         mount("MTD", "userdata", "/data");
-  #       But the other mount entries in file look like:  
-  #         mount("yaffs2", "MTD", ...);
-  #
   if [ "$1" == "updater-script" ]
   then
-    
+
+    cd WORKING_*
+    cd META-INF/com/google/android
+
+    #
+    # Fix cases where a mount hasn't been fixed yet
+    #
+    # e.g.  If updater-script contains: 
+    #         mount("MTD", "userdata", "/data");
+    #       But the other mount entries in file look like:  
+    #         mount("yaffs2", "MTD", ...);
+    #  
     grep_list=( yaffs2 ext3 )
 
     for str in ${grep_list[@]}
@@ -356,8 +472,14 @@ then
       fi
     done
 
+    cd ../../../../..
   fi
 
+
+  # Remove blank lines
+  cd WORKING_*
+  cd META-INF/com/google/android
+  sed -i -e '/^$/d' updater-script
   cd ../../../../..
 
 fi
