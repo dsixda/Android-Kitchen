@@ -133,8 +133,14 @@ cd ../..
 
 
 scripts/add_su_to_update_script
-scripts/do_root_boot_img
 
+scripts/check_galaxy_s
+res=$?
+
+if [ "$res" == "0" ]
+then
+  scripts/do_root_boot_img
+fi
 
 echo 
 echo "Finished rooting"
