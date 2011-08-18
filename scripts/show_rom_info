@@ -50,6 +50,14 @@ echo
 echo -n "Please wait "
 
 
+#
+# Check if Samsung Galaxy S2 or equivalent
+#
+
+echo -n "."
+scripts/check_galaxy_s
+is_galaxy_s=$?
+
 
 #
 # Check Android OS version
@@ -283,21 +291,57 @@ cd ..
 
 
 
-#
-# Check if ROM contains radio.img
-#
 
-echo -n "."
-cd WORKING_*
-
-if [ -e radio.img ]
+if [ "$is_galaxy_s" == "1" ]
 then
-  radio_status=YES
+
+  #
+  # Check if ROM contains modem.bin
+  #
+
+  echo -n "."
+  cd WORKING_*
+
+  if [ -e modem.bin ]
+  then
+    modem_status=YES
+  else
+    modem_status=NO
+  fi
+
+  #
+  # Check for CSC version
+  #
+
+  if [ -e system/CSCVersion.txt ]
+  then
+    csc_version=`more system/CSCVersion.txt | sed 's/[ ]*$//g'`
+  else
+    csc_version=UNKNOWN
+  fi
+
+  cd ..
+
 else
-  radio_status=NO
+
+  #
+  # Check if ROM contains radio.img
+  #
+
+  echo -n "."
+  cd WORKING_*
+
+  if [ -e radio.img ]
+  then
+    radio_status=YES
+  else
+    radio_status=NO
+  fi
+
+  cd ..
+
 fi
 
-cd ..
 
 
 
@@ -362,20 +406,37 @@ cd ../../../../..
 #
 
 echo -n "."
-cd BOOT-EXTRACTED/boot.img-ramdisk
 
-test_start=`grep -c "start sysinit" init.rc`
-test_service=`grep -c "service sysinit" init.rc`
-
-if [[ "$test_start" == "0" || "$test_service" == "0" ]] 
+if [ "$is_galaxy_s" == "1" ]
 then
-  runparts_status=NO
+  
+  cd WORKING_*
+  test_initd=`grep -c "set_perm.*SYSTEM:etc/init.d" META-INF/com/google/android/update-script`
+  cd ..
+
+  if [ $test_initd == 0 ]
+  then
+    runparts_status=NO
+  else
+    runparts_status=YES
+  fi
+
 else
-  runparts_status=YES
+
+  cd BOOT-EXTRACTED/boot.img-ramdisk
+
+  test_start=`grep -c "start sysinit" init.rc`
+  test_service=`grep -c "service sysinit" init.rc`
+
+  if [[ "$test_start" == "0" || "$test_service" == "0" ]] 
+  then
+    runparts_status=NO
+  else
+    runparts_status=YES
+  fi
+
+  cd ../..
 fi
-
-cd ../..
-
 
 
 
@@ -389,8 +450,19 @@ echo " Android OS version             : $android_os"
 echo " Device                         : $device_name"
 echo " Model                          : $model"
 echo " ROM Name                       : $rom_name"
+
+if [ "$is_galaxy_s" == "1" ]
+then
+  echo " CSC version                    : $csc_version"
+fi
+
 echo " Rooted (Superuser.apk + su)    : $su_status"
-echo " Rooted (unsecured boot.img)    : $unsecure_status"                                         
+
+if [ "$is_galaxy_s" == "0" ]
+then
+  echo " Rooted (unsecured boot.img)    : $unsecure_status"                                         
+fi
+
 echo " BusyBox installed              : $bb_status"
 echo " BusyBox run-parts support      : $runparts_status"
 echo " Apps2SD (Apps to EXT) enabled  : $apps2sd_status" 
@@ -405,7 +477,14 @@ echo " Nano text editor installed     : $nano_status"
 echo " Bash shell support             : $bash_status"
 echo " /system/framework is deodexed  : $deodex_fr_status"
 echo " /system/app is deodexed        : $deodex_app_status"
-echo " radio.img found                : $radio_status"
+
+if [ "$is_galaxy_s" == "1" ]
+then
+  echo " modem.bin found                : $modem_status"
+else
+  echo " radio.img found                : $radio_status"
+fi
+
 echo " ROM will wipe all data         : $wipe_status"
 echo
 
