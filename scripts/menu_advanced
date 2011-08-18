@@ -25,7 +25,7 @@ do
   echo " 11 - Deodex files in your ROM"
   echo " 12 - Add task killer tweak for speed (stock ROM only)"
   echo " 13 - Add /data/app functionality"
-  echo " 14 - Add Nano text editor + sysro/sysrw"
+  echo " 14 - Add Nano text editor"
   echo " 15 - Add Bash (command shell)"
   echo " 16 - Add Apps2SD"
   echo " 17 - Add /etc/init.d scripts support (busybox run-parts)"
@@ -35,7 +35,7 @@ do
   echo " 21 - Unpack data.img"
   echo " 22 - Sign APK or ZIP file(s)" 
   echo " 23 - Convert update-script or updater-script"
-  echo " 24 - Run plugin scripts"
+  echo " 24 - Miscellaneous options / Run plugin scripts"
   echo
   echo " 99 - Build ROM from working folder"
   echo "  0 - BACK TO MAIN MENU"
