@@ -9,6 +9,15 @@ echo "comes in a file called 'sec_csc.zip' which contains location and"
 echo "carrier-specific configurations and software."
 echo
 
+echo -n "Proceed (y/n)? (default: y): "
+read do_csc
+echo
+
+if [ "$do_csc" == "n" ]
+then
+  exit 0
+fi
+
 date_str=`date '+%m%d%y_%H%M%S'`
 csc_dir=csc_$date_str
 
