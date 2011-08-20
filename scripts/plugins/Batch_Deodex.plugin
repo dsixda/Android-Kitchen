@@ -10,15 +10,7 @@ echo
 echo "---> Place your ROMs in original_update <--"
 
 scripts/press_enter
-
-cd original_update
-
-grep_zip=`find . | grep -i \\.zip$ | sort -f`
-grep_app=`find . | grep -i \\.app$ | sort -f`
-grep_img=`find . | grep system.img$`
-grep_files="$grep_app $grep_zip $grep_img"
-
-cd ..
+grep_files=`scripts/grep_roms`
 
 if [ "$grep_files" != "" ]
 then
@@ -42,7 +34,7 @@ then
     echo "================================================================================="
     echo 
     scripts/choose_rom name_given $filename
-    scripts/do_deodex_folder "framework app"
+    scripts/do_deodex_folder "framework app" y
  
     echo
     echo "Moving working folder ..."
