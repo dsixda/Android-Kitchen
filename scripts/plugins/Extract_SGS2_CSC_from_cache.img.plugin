@@ -78,16 +78,15 @@ then
 
   rm -f $csc_dir/cache.img
 
-  echo
-  echo "File is now in ext4 format.  Now we need to unpack the sec_csc.zip."
-  scripts/press_enter
-
   #
   # Extract files from ext4_cache.img
   #
 
   if [ `uname | grep CYGWIN` ]
   then
+    echo
+    echo "File is now in ext4 format.  Now we need to unpack the sec_csc.zip."
+    scripts/press_enter
     scripts/show_linux_reader $csc_dir ext4_cache.img
   else
     scripts/extract_ext3_img $csc_dir ext4_cache.img
