@@ -33,9 +33,11 @@ then
   then
     mv $build_dir/cache.img $build_dir/system
   else
+    echo
     echo "Warning: No cache.img found.  You can unpack a cache.img"
     echo "separately by running the plugin script in the kitchen's"
     echo "Advanced menu."
+    echo
   fi
 
   # Sometimes images have zero permissions set when extracted from TAR archive,
@@ -55,9 +57,11 @@ else
     then
       echo "Found original_update/cache.img"
     else
+      echo
       echo "Warning: original_update/cache.img Not found.  You can unpack a"
       echo "cache.img separately by running the plugin script in the kitchen's"
       echo "Advanced menu."
+      echo
     fi
   else
 
@@ -76,11 +80,7 @@ else
   if [ -e original_update/zImage ]
   then
     echo "Found original_update/zImage"
-    echo
-    echo "NOTE: Ensure you use a rooted kernel, such as CF-Root, to allow"
-    echo "future flashing of custom ROMs.  If you flash a non-rooted kernel"
-    echo "then you must use Odin afterwards to flash back the rooted kernel."
-    echo
+    scripts/show_rooted_kernel_msg
   else
     echo "Warning: No original_update/zImage found"
   fi
@@ -141,9 +141,6 @@ fi
 
 
 
-#
-# Convert to ext4
-#
 
 if [ "$1" == "no_create" ]
 then
@@ -152,44 +149,30 @@ else
   src_dir=original_update
 fi
 
-if [ -e $src_dir/cache.img ]
+system_dir=$build_dir/system
+cd $system_dir
+
+# Get full path
+system_dir=`pwd`
+cd ../..
+
+
+#
+# Convert factoryfs.img to ext4
+#
+
+echo
+echo "Unpacking factoryfs.img into ext4 format ..."
+tools/samsung_files/simg2img_files/simg2img $src_dir/factoryfs.img \
+  $system_dir/ext4_factoryfs.img
+
+if [ ! -e $system_dir/ext4_factoryfs.img ]
 then
-  echo
-  echo "Do you wish to extract the Customer Software Customization (CSC)"
-  echo -n "from the cache.img (y/n)? (default: y): "
-
-  read do_extract
-  echo
-
-  if [ "$do_extract" == "n" ]
-  then
-    rm -vf $src_dir/cache.img
-    echo
-  fi
+  echo "Unable to unpack factoryfs.img!"
+  exit 1
 fi
 
-if [ -e $src_dir/cache.img ]
-then
-  img_list=( factoryfs.img cache.img )
-else
-  img_list=( factoryfs.img )
-fi
-
-for img_file in ${img_list[@]}
-do
-  echo "Unpacking $img_file into ext4 format ..."
-  tools/samsung_files/simg2img_files/simg2img $src_dir/$img_file \
-    $build_dir/system/ext4_$img_file
-  
-  if [ ! -e $build_dir/system/ext4_$img_file ]
-  then
-    echo "Unable to unpack $img_file!"
-    exit 1
-  fi
-
-  rm -rf $build_dir/system/$img_file
-
-done
+rm -rf $system_dir/factoryfs.img
 
 
 
@@ -202,13 +185,6 @@ echo
 echo "Adding an update-script ..."
 cp tools/update_files/update-script $build_dir/META-INF/com/google/android/
 
-
-system_dir=$build_dir/system
-cd $system_dir
-
-# Get full path
-system_dir=`pwd`
-cd ../..
 
 
 #
@@ -271,81 +247,107 @@ echo "The file ext4_factoryfs.img has been fully unpacked into:"
 echo "  $system_dir"
 
 
-#
-# Extract files from ext4_cache.img
-#
-
-if [ -e $system_dir/ext4_cache.img ]
+if [ -e $src_dir/cache.img ]
 then
-
   echo
-  echo "Now we will unpack ext4_cache.img ..."
+  echo "Do you wish to extract the Customer Software Customization (CSC)"
+  echo -n "from the cache.img (y/n)? (default: y): "
 
-  scripts/press_enter
+  read do_extract
+  echo
 
-  if [ `uname | grep CYGWIN` ]
+  if [ "$do_extract" == "n" ]
   then
-    scripts/show_linux_reader $system_dir ext4_cache.img
-  else
-    scripts/extract_ext3_img $system_dir ext4_cache.img
-  fi
-
-  cd $system_dir 
-
-  rm -f ext4_cache.img 2>/dev/null
-  if [ "$?" == "1" ]
-  then
+    rm -vf $src_dir/cache.img
     echo
-    echo "WARNING: ext4_cache.img is in use.  Remove file manually after application is closed."
-    echo
-  fi
-
-  if [ ! -e sec_csc.zip ]
-  then
-    echo "WARNING: sec_csc.zip not found!"
   else
-    echo "Extracting the required files from sec_csc.zip ..."
-    unzip -q sec_csc.zip -d temp
 
-    # 
-    # Carrier bloatware
     #
+    # Convert cache.img to ext4
+    #
+    echo "Unpacking cache.img into ext4 format ..."
+    tools/samsung_files/simg2img_files/simg2img $src_dir/cache.img \
+      $system_dir/ext4_cache.img
 
-    echo
-    echo "These are apps found in sec_csc.zip:"
-    ls temp/system/app
-    echo
-    echo -n "Copy the apps to your working folder (y/n)? (default: n): "
-
-    read do_copy
-    echo
-
-    if [ "$do_copy" != "y" ]
+    if [ ! -e $system_dir/ext4_cache.img ]
     then
-      rm -vrf temp/system/app
+      echo "Unable to unpack cache.img!"
+      exit 1
     fi
 
-    rm -rf temp/META-INF
-    mv temp/system/* .
-    rm -rf temp
-  fi
+    rm -rf $system_dir/cache.img
 
-  rm -f sec_csc.zip 2>/dev/null
-  if [ "$?" == "1" ]
-  then
-    echo
-    echo "WARNING: sec_csc.zip is in use.  Remove file manually."
-    echo
-  fi
 
-  cd ../..
+    #
+    # Extract files from ext4_cache.img
+    #
+    if [ `uname | grep CYGWIN` ]
+    then
+      scripts/show_linux_reader $system_dir ext4_cache.img
+    else
+      scripts/extract_ext3_img $system_dir ext4_cache.img
+    fi
+
+    cd $system_dir 
+
+    rm -f ext4_cache.img 2>/dev/null
+    if [ "$?" == "1" ]
+    then
+      echo
+      echo "WARNING: ext4_cache.img is in use.  Remove file manually after application is closed."
+      echo
+    fi
+
+    if [ ! -e sec_csc.zip ]
+    then
+      echo "WARNING: sec_csc.zip not found!"
+    else
+      echo "Extracting the required files from sec_csc.zip ..."
+      unzip -q sec_csc.zip -d temp
+
+      # 
+      # Carrier bloatware
+      #
+
+      echo
+      echo "These are apps found in sec_csc.zip:"
+      ls temp/system/app
+      echo
+      echo -n "Copy the apps to your working folder (y/n)? (default: n): "
+
+      read do_copy
+      echo
+
+      if [ "$do_copy" != "y" ]
+      then
+        rm -vrf temp/system/app
+      fi
+
+      rm -rf temp/META-INF
+      mv temp/system/* .
+      rm -rf temp
+    fi
+
+    rm -f sec_csc.zip 2>/dev/null
+    if [ "$?" == "1" ]
+    then
+      echo
+      echo "WARNING: sec_csc.zip is in use.  Remove file manually."
+      echo
+    fi
+
+    cd ../..
+
+  fi
 fi
+
 
 
 #
 # Insert fake boot.img
 #
 scripts/check_no_bootimg
+
 
 #
 # update-script and other adjustments
