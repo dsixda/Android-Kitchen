@@ -174,19 +174,14 @@ do
 
   sgs2_fix=no
 
+  # Add java.awt.jar to framework folder (fix Email.apk and MobilePrint.apk)
+  # - Thanks to xeudoxus
   if [ `echo $dir_list | grep -c app` -gt 0 ] && \
       [ -e system/framework/com.samsung.device.jar ] && [ ! -e system/framework/java.awt.jar ]
   then
     if [ -e system/app/Email.apk ] || [ -e system/app/MobilePrint.apk ] 
     then
-
       sgs2_fix=yes
-
-      echo
-      echo
-      echo "--> Adding custom java.awt.jar to framework folder (Email.apk/MobilePrint.apk fix)"
-      echo "    ** Thanks to xeudoxus for this fix **"
-      
       cp -f ../tools/samsung_files/java.awt.jar system/framework/
     fi
   fi
