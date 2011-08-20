@@ -36,6 +36,17 @@ num_odex_app=`find system/app | grep -c "\.odex$"`
 # Create log file
 #
 
+echo
+echo -n "Enable logging to file (y/n)? (default: y): "
+read do_log
+
+if [ "$do_log" != "n" ]
+then
+  do_log=y
+else
+  do_log=n
+fi
+
 date_str=`date '+%m%d%y_%H%M%S'`
 log_file=deodex_$date_str.log
 
@@ -47,10 +58,15 @@ log_file=deodex_$date_str.log
 for folder in ${dir_list[@]}
 do
 
-  # Log
-  echo "" >> ../$log_file
-  echo "Folder: $folder" >> ../$log_file
-  echo "-------------------" >> ../$log_file
+  if [ "$do_log" == "y" ]
+  then
+    echo
+    echo "Creating log file $log_file ..."
+
+    echo "" >> ../$log_file
+    echo "Folder: $folder" >> ../$log_file
+    echo "-------------------" >> ../$log_file
+  fi
 
   if [ $folder == framework ]
   then
@@ -62,8 +78,11 @@ do
     echo
     echo "Error: Folder $folder not valid!"
 
-    # Log
-    echo "Invalid folder" >> ../$log_file
+    if [ "$do_log" == "y" ]
+    then
+      echo "Invalid folder" >> ../$log_file
+    fi
+
     continue
   fi
 
@@ -84,8 +103,10 @@ do
   then
     echo "Nothing found under $path!"
 
-    # Log
-    echo "Nothing here" >> ../../../$log_file
+    if [ "$do_log" == "y" ]
+    then
+      echo "Nothing here" >> ../../../$log_file
+    fi
 
   else
 
@@ -120,9 +141,11 @@ do
 
         if [ -e $odex_file ]
         then
-          
-          # Log
-          echo "* Warning: $odex_file (using smali/baksmali $version_num)" >> ../../../$log_file
+         
+          if [ "$do_log" == "y" ]
+          then
+            echo "* Warning: $odex_file (using smali/baksmali $version_num)" >> ../../../$log_file
+          fi
 
           current_dir=`pwd`
           cd ../framework
@@ -146,8 +169,10 @@ do
           if [ -e $odex_file ] && [ $try == 2 ]
           then
 
-            # Log
-            echo "* Warning: $odex_file (using brute-force with $version_num)" >> ../../../$log_file
+            if [ "$do_log" == "y" ]
+            then
+              echo "* Warning: $odex_file (using brute-force with $version_num)" >> ../../../$log_file
+            fi
 
             if [ $version==older ]
             then
@@ -166,16 +191,20 @@ do
             echo "ERROR: Aborting $odex_file"
             found_error=1
             
-            # Log
-            echo "* ERROR: Aborting $odex_file!" >> ../../../$log_file
+            if [ "$do_log" == "y" ]
+            then
+              echo "* ERROR: Aborting $odex_file!" >> ../../../$log_file
+            fi
 
             break
 
           elif [ ! -e $odex_file ]
           then
-            # Log
-            echo "$odex_file successfully deodexed" >> ../../../$log_file
-            
+            if [ "$do_log" == "y" ]
+            then
+              echo "$odex_file successfully deodexed" >> ../../../$log_file
+            fi
+
             break
           fi
 
@@ -202,8 +231,10 @@ do
           try=2
 
         else
-          # Log
-          echo "$odex_file successfully deodexed" >> ../../../$log_file
+          if [ "$do_log" == "y" ]
+          then
+            echo "$odex_file successfully deodexed" >> ../../../$log_file
+          fi
         fi
       done
 
@@ -229,5 +260,11 @@ do
   cd ../..
 
 done
+
+if [ "$do_log" == "y" ]
+then
+  echo
+  echo "Find a summary in the log file $log_file"
+fi
 
 cd $base_dir
