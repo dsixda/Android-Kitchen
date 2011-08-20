@@ -269,7 +269,7 @@ done
 if [ "$do_log" == "y" ]
 then
   echo
-  echo "Find a summary in the log file $log_file"
+  echo "A summary of the deodexing has been logged in $log_file"
 fi
 
 cd $base_dir
