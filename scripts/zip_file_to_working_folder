@@ -130,11 +130,9 @@ else
     if [ -e zImage ]
     then
       echo "Found zImage"
-      echo
-      echo "NOTE: Ensure you use a rooted kernel, such as CF-Root, to allow"
-      echo "future flashing of custom ROMs.  If you flash a non-rooted kernel"
-      echo "then you must use Odin afterwards to flash back the rooted kernel."
-      echo      
+      cd ..
+      scripts/show_rooted_kernel_msg
+      cd $build_dir
     else
       echo "Warning: No zImage found"
     fi
