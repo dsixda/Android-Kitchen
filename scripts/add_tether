@@ -144,6 +144,7 @@ else
   scripts/add_data_app dont_ask
   cd WORKING_*
 
+  echo
   echo "Copying app ..."
   cp -v ../tools/apps/$tether_file data/app/
   cd ..
