@@ -4,9 +4,9 @@ echo "Samsung Galaxy S2 CSC Extractor"
 echo "-------------------------------"
 echo
 echo "This script will extract the CSC (Customer Software Customization)"
-echo "from the cache.img of a stock Samsung Galaxy S2 firmware.  The file"
-echo "is called 'sec_csc.zip' and contains location and carrier-specific"
-echo "configurations and software."
+echo "from the cache.img of a stock Samsung Galaxy S2 firmware.  The CSC"
+echo "comes in a file called 'sec_csc.zip' which contains location and"
+echo "carrier-specific configurations and software."
 echo
 
 date_str=`date '+%m%d%y_%H%M%S'`
