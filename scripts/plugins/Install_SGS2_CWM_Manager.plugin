@@ -8,6 +8,9 @@ echo "Samsung Galaxy S2.  This is required if you need the custom"
 echo "recovery menu and you are not using the CF-Root zImage (which"
 echo "would have installed the app automatically)."
 echo
+echo "NOTE: You'll still need a custom/rooted kernel for this app"
+echo "to run."
+echo
 
 echo -n "Proceed (y/n)? (default: y): "
 read do_cwm
