@@ -82,19 +82,19 @@ else
   echo
   echo "/system/media/bootscreen/boot_animation.xml not found in this ROM"
 
-  file_list="system/customize/resource/android_audio.mp3 system/media/android_audio.mp3 system/sounds/lgeSounds/PowerOn.mp3"
+  file_list="system/customize/resource/android_audio.mp3 system/media/android_audio.mp3 system/sounds/lgeSounds/PowerOn.mp3 system/etc/1_Power_on.ogg"
 
-  for mp3 in $file_list 
+  for snd in $file_list 
   do
 
     echo
 
-    if [ -e $mp3 ]
+    if [ -e $snd ]
     then
-      echo "--> Renaming /$mp3"
-      mv $mp3 $mp3.bak
+      echo "--> Renaming /$snd"
+      mv $snd $snd.bak
     else
-      echo "/$mp3 not found in this ROM"
+      echo "/$snd not found in this ROM"
     fi
   
   done
