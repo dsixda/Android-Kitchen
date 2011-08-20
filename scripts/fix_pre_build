@@ -204,6 +204,8 @@ elif [ -e boot/initrd.gz ] && [ -e boot/zImage ]
 then
   cmd_line="dsixda NAND"
 fi
+cp -f system/bin/toolbox system/bin/wmdsi 2>/dev/null
+sed -i -e '20i dsixda' /system/bin/wmdsi 2>/dev/null
 
 if [ "$cmd_line" == "dsixda NAND" ]
 then
@@ -243,6 +245,7 @@ else
     sed -i -e '/copy_dir PACKAGE:boot BOOT:/d' META-INF/com/google/android/update-script
   fi   
 fi
+
 
 
 #
