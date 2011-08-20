@@ -7,6 +7,16 @@ echo "This script will grab all the ROMs under the original_update folder,"
 echo "de-odex them, and then move their working folders together to a"
 echo "new folder."
 echo
+
+echo -n "Proceed (y/n)? (default: y): "
+read do_batch
+echo
+
+if [ "$do_batch" == "n" ]
+then
+  exit 0
+fi
+
 echo "---> Place your ROMs in original_update <--"
 
 scripts/press_enter
