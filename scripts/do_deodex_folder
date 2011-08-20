@@ -9,14 +9,16 @@
 ############################################################################
 
 #
-# This script has one mandatory parameter:
+# This script has two parameters:
 #
-# $1 = folder(s) to deodex under /system
+# $1 = folder(s) to deodex under /system (mandatory)
 #       e.g. framework
 #       e.g. "framework app" 
+# $2 = whether to enable logging (y or n) (optional) 
 #
 
 dir_list=$1
+do_log=$2
 
 if [ "$dir_list" == "" ]
 then
@@ -36,9 +38,12 @@ num_odex_app=`find system/app | grep -c "\.odex$"`
 # Create log file
 #
 
-echo
-echo -n "Enable logging to file (y/n)? (default: y): "
-read do_log
+if [ "$do_log" == "" ]
+then
+  echo
+  echo -n "Enable logging to file (y/n)? (default: y): "
+  read do_log
+fi
 
 if [ "$do_log" != "n" ]
 then
