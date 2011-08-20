@@ -68,5 +68,4 @@ cd ..
 scripts/add_data_app_to_update_script
 
 echo
-echo Finished
-
+echo "Finished adding /data/app"
