@@ -10,6 +10,7 @@
 
 echo
 echo "NOTE: Ensure you use a rooted kernel (zImage), such as CF-Root, which"
-echo "allows flashing of custom ROMs.  If you flash a stock kernel then you"
-echo "you must use Odin afterwards to flash back a rooted kernel."
+echo "allows flashing of custom ROMs.  If you instead decide to flash a"
+echo "stock kernel then you must use Odin afterwards to flash back a rooted"
+echo "kernel."
 echo
