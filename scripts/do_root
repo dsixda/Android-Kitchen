@@ -21,6 +21,10 @@ then
   exit 0
 fi
 
+scripts/check_galaxy_s
+sgs=$?
+
+
 echo
 echo "ROOTING"
 echo "--------------------------------------------"
@@ -29,7 +33,11 @@ echo "The following will be done for root:"
 echo
 echo "- Add Superuser.apk and su"
 echo "- Add necessary lines to the update-script"
-echo "- Update default.prop in the ramdisk"
+
+if [ "$sgs" == "0" ]
+then
+  echo "- Update default.prop in the ramdisk"
+fi
 echo 
 echo "--------------------------------------------"
 echo
@@ -134,10 +142,7 @@ cd ../..
 
 scripts/add_su_to_update_script
 
-scripts/check_galaxy_s
-res=$?
-
-if [ "$res" == "0" ]
+if [ "$sgs" == "0" ]
 then
   scripts/do_root_boot_img
 fi
