@@ -11,6 +11,15 @@
 
 clear
 
+scripts/check_galaxy_s
+
+if [ "$?" == "1" ]
+then
+  echo
+  echo "Not supported on this ROM"
+  exit 0
+fi
+
 echo
 echo "----------------------------------------------------------------"
 echo  
