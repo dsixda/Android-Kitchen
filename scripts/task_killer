@@ -8,6 +8,16 @@
 #
 ############################################################################
 
+clear
+scripts/check_galaxy_s
+
+if [ "$?" == "1" ]
+then
+  echo
+  echo "Not supported on this ROM"
+  exit 0
+fi
+
 scripts/ensure_boot_extracted
 
 if [ -d BOOT-EXTRACTED ]
