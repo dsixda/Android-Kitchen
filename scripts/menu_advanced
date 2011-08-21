@@ -25,7 +25,7 @@ do
   echo " 11 - Deodex files in your ROM"
   echo " 12 - Add task killer tweak for speed (stock ROM only)"
   echo " 13 - Add /data/app functionality"
-  echo " 14 - Add Nano text editor"
+  echo " 14 - Add Nano text editor + sysro/sysrw"
   echo " 15 - Add Bash (command shell)"
   echo " 16 - Add Apps2SD"
   echo " 17 - Add /etc/init.d scripts support (busybox run-parts)"

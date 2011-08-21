@@ -168,6 +168,23 @@ fi
 
 
 #
+# Check for sysrw/sysro
+#
+
+cd WORKING_*
+sysrw_path=`find . -name sysrw`
+cd ..
+
+if [ "$sysrw_path" != "" ]
+then
+  echo
+  echo "Found $sysrw_path"
+  scripts/add_sysrorw_to_update_script
+fi
+
+
+
+#
 # Check for apps2sd
 #
 
