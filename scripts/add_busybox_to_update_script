@@ -67,4 +67,6 @@ else
 fi
 
 cd ../../../../..
-echo
+
+scripts/fix_update_script_blanks
+

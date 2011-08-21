@@ -54,4 +54,5 @@ then
 
 fi
 
+scripts/fix_update_script_blanks
 
