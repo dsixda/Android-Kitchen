@@ -1,0 +1,76 @@
+
+echo
+echo "Extract SGS2 Initramfs - by mistadman"
+echo "-------------------------------------"
+echo
+echo "This script will extract the initramfs (i.e. the ramdisk) from"
+echo "the zImage of a Samsung Galaxy S/S2 or equivalent."
+echo
+echo "Unfortunately there is no zImage re-packing tool because it is"
+echo "dependent on your OS.  The best way to re-pack would be to"
+echo "download the kernel source code and toolchain for your device"
+echo "and build a zImage using those resources."
+echo
+
+echo -n "Proceed (y/n)? (default: y): "
+read do_extract
+echo
+
+if [ "$do_extract" == "n" ]
+then
+  exit 0
+fi
+
+
+clear
+
+date_str=`date '+%m%d%y_%H%M%S'`
+initramfs_dir=initramfs_$date_str
+
+echo
+echo "Creating folder `pwd`/$initramfs_dir ..."
+mkdir $initramfs_dir
+
+echo
+echo "---> Place zImage into the folder mentioned above <--"
+
+scripts/press_enter
+
+cd $initramfs_dir
+
+if [ -e zImage ]
+then
+
+  cp ../tools/samsung_files/unpack-initramfs .
+
+  ./unpack-initramfs zImage
+      
+  if [ ! -e kernel ]
+  then
+    echo "Error: No kernel found!"
+  fi
+
+  if [ ! -d initramfs_root ]
+  then
+    echo "Error: No initramfs_root folder found!"
+  fi
+
+  rm zImage
+  rm unpack-initramfs
+  cd ..
+  echo
+  echo "Contents of $initramfs_dir:"
+  echo
+  echo "`ls -l $initramfs_dir`"
+
+
+else
+  echo "Error: zImage not found!"
+  echo
+  cd ..
+  echo "Removing initramfs_dir folder"
+  rm -rf $initramfs_dir
+  exit 0
+fi      
+  
+
