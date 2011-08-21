@@ -12,8 +12,15 @@
 #
 # Remove blank lines
 #
-cd WORKING_*
-cd META-INF/com/google/android
-`sed -i -e '/^$/d' update-script`
-cd ../../../../..
 
+num_working=`ls | grep -c "^WORKING_"`
+if [ $num_working == 1 ]
+then
+  if [ -e WORKING_*/META-INF/com/google/android/update-script ]
+  then
+    cd WORKING_*
+    cd META-INF/com/google/android
+    `sed -i -e '/^$/d' update-script`
+    cd ../../../../..
+  fi
+fi
