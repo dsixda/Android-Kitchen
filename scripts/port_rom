@@ -54,8 +54,31 @@ then
 
   if [ -d system ]
   then
-    cd ..
-    scripts/ensure_boot_extracted
+
+    #
+    # Samsung Galaxy S2 or equivalent
+    #
+    if [ -e zImage ]
+    then
+      rm -f boot.img
+
+      cp ../tools/samsung_files/unpack-initramfs .
+      ./unpack-initramfs zImage
+    
+      mkdir ../BOOT-EXTRACTED
+      echo
+      mv -vf initramfs_root ../BOOT-EXTRACTED/boot.img-ramdisk
+      rm -f kernel
+      rm -f zImage
+      rm -f unpack-initramfs
+
+      cd ..
+
+    elif [ -e boot.img ]
+    then
+      cd ..
+      scripts/ensure_boot_extracted
+    fi
 
   else
     cd ..
@@ -80,6 +103,7 @@ then
   echo "Error: BOOT-EXTRACTED folder not found"
   exit 0
 fi
+
 
 
 clear
@@ -118,6 +142,12 @@ board=`scripts/get_product_board`
 
 cd BOOT-EXTRACTED/boot.img-ramdisk
 file_list=`ls *.$board.rc 2>/dev/null`
+
+if [ "$file_list" == "" ]
+then
+ board=`ls init.*.rc | sed -e 's/init.goldfish.rc//g' -e 's/init.\([^.]*\).rc/\1/g' -e '/^$/d'`
+ file_list=`ls *.$board.rc 2>/dev/null`
+fi
 
 if [ "$file_list" != "" ]
 then
@@ -233,12 +263,16 @@ fi
 # Copy the zImage by itself if it's a Galaxy S2 or equivalent
 #
 
-scripts/check_galaxy_s
-if [ "$?" == "1" ]
+sgs_exists=`echo $my_device | grep -c "GT-I9"`
+if [ $sgs_exists -gt 0 ]
 then
   echo 
-  echo "Copying kernel ..."
+  echo "Copying zImage ..."
   cp -vf MY_KERNEL/zImage WORKING_*/
+else
+  cd WORKING_*
+  rm -f modem.bin flash_image
+  cd ..
 fi
 
 
