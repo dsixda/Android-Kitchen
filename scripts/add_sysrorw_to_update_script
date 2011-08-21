@@ -24,29 +24,29 @@ then
     #
     # Do this to prevent conflicts with the update-script in ROMs that already have the binary
     #
-    if [ -e ../../../../system/xbin/sysro ]
+    if [ -e ../../../../system/bin/sysro ]
     then
 
-      if [ "`find ../../../../system/bin -name sysro`" == "" ]
+      if [ "`find ../../../../system/xbin -name sysro`" == "" ]
       then
-        echo "Copying system/xbin/sysro to system/bin/sysro"
-        cp -f ../../../../system/xbin/sysro ../../../../system/bin/sysro
+        echo "Copying system/bin/sysro to system/xbin/sysro"
+        cp -f ../../../../system/bin/sysro ../../../../system/xbin/sysro
       fi
     fi
 
-    if [ -e ../../../../system/xbin/sysrw ]
+    if [ -e ../../../../system/bin/sysrw ]
     then
 
-      if [ "`find ../../../../system/bin -name sysrw`" == "" ]
+      if [ "`find ../../../../system/xbin -name sysrw`" == "" ]
       then
-        echo "Copying system/xbin/sysrw to system/bin/sysrw"
-        cp -f ../../../../system/xbin/sysrw ../../../../system/bin/sysrw
+        echo "Copying system/bin/sysrw to system/xbin/sysrw"
+        cp -f ../../../../system/bin/sysrw ../../../../system/xbin/sysrw
       fi
     fi
 
     echo
     echo "Updating update-script with sysro and sysrw entries"
-    perl -pi -e 's/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh\nset_perm 0 0 04755 SYSTEM:bin\/sysrw\nset_perm 0 0 04755 SYSTEM:bin\/sysro\n/g' update-script
+    perl -pi -e 's/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh\nset_perm 0 0 04755 SYSTEM:xbin\/sysrw\nset_perm 0 0 04755 SYSTEM:xbin\/sysro\n/g' update-script
  
     if [ "`grep -om 1 sysro update-script`" != "sysro" ] || [ "`grep -om 1 sysrw update-script`" != "sysrw" ]
     then
