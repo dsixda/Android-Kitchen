@@ -48,15 +48,23 @@ then
   echo
   echo Extracting kernel ...
   ./extract-kernel.pl boot.img 2>/dev/null
+      
+  if [ ! -e zImage ]
+  then
+    echo "Error: No zImage found!"
+  fi
 
   echo Extracting ramdisk ... 
   ./extract-ramdisk.pl boot.img 2>/dev/null
+      
+  if [ ! -d boot.img-ramdisk ]
+  then
+    echo "Error: No ramdisk folder found!"
+  fi
 
   rm boot.img
   rm extract-*.pl
   cd ..
-  echo
-  echo Done!
   echo
   echo "Contents of $boot_dir:"
   echo
