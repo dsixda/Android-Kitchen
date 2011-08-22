@@ -3,8 +3,11 @@ echo
 echo "Extract SGS2 Initramfs - by mistadman"
 echo "-------------------------------------"
 echo
-echo "This script will extract the initramfs (i.e. the ramdisk) from"
-echo "the zImage of a Samsung Galaxy S/S2 or equivalent."
+echo "This script will attempt to extract the initramfs (i.e. the"
+echo "ramdisk) from the zImage of a Samsung Galaxy S/S2 or equivalent."
+echo
+echo "This may not work with all zImages, however. You may find best"
+echo "results with a stock zImage."
 echo
 echo "Unfortunately there is no zImage re-packing tool because it is"
 echo "dependent on your OS.  The best way to re-pack would be to"
@@ -68,7 +71,7 @@ else
   echo "Error: zImage not found!"
   echo
   cd ..
-  echo "Removing initramfs_dir folder"
+  echo "Removing $initramfs_dir folder"
   rm -rf $initramfs_dir
   exit 0
 fi      
