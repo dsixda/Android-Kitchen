@@ -36,7 +36,20 @@ else
 fi
 
 
-scripts/ensure_boot_extracted
+#
+# Check if Samsung Galaxy S2 or equivalent
+#
+
+scripts/check_galaxy_s
+is_galaxy_s=$?
+
+if [ "$is_galaxy_s" == "1" ]
+then
+  scripts/extract_initramfs
+else
+  scripts/ensure_boot_extracted
+fi
+
 
 if [ ! -d BOOT-EXTRACTED ] 
 then
@@ -48,15 +61,6 @@ fi
 clear
 echo
 echo -n "Please wait "
-
-
-#
-# Check if Samsung Galaxy S2 or equivalent
-#
-
-echo -n "."
-scripts/check_galaxy_s
-is_galaxy_s=$?
 
 
 #
@@ -125,28 +129,22 @@ fi
 
 cd ..
 
-if [ -e BOOT-EXTRACTED/boot.img-ramdisk/default.prop ]
+if [ ! -e BOOT-EXTRACTED/boot.img-ramdisk/default.prop ]
 then
-  cd BOOT-EXTRACTED/boot.img-ramdisk
-else
-  echo "Error: BOOT-EXTRACTED/boot.img-ramdisk/default.prop not found!"
-  rm -rf BOOT-EXTRACTED
-  exit 0
-fi
-
-grep_root=`grep -m 1 ro.secure default.prop`
-
-if [ "$grep_root" == "ro.secure=1" ] 
-then
-  unsecure_status=NO
-elif [ "$grep_root" == "ro.secure=0" ]
-then
-  unsecure_status=YES
-else
   unsecure_status=UNKNOWN
-fi
+else
+  grep_root=`grep -m 1 ro.secure BOOT-EXTRACTED/boot.img-ramdisk/default.prop`
 
-cd ../..
+  if [ "$grep_root" == "ro.secure=1" ] 
+  then
+    unsecure_status=NO
+  elif [ "$grep_root" == "ro.secure=0" ]
+  then
+    unsecure_status=YES
+  else
+    unsecure_status=UNKNOWN
+  fi
+fi
 
 
 
@@ -407,22 +405,8 @@ cd ../../../../..
 
 echo -n "."
 
-if [ "$is_galaxy_s" == "1" ]
+if [ -e BOOT-EXTRACTED/boot.img-ramdisk ]
 then
-  
-  cd WORKING_*
-  test_initd=`grep -c "set_perm.*SYSTEM:etc/init.d" META-INF/com/google/android/update-script`
-  cd ..
-
-  if [ $test_initd == 0 ]
-  then
-    runparts_status=NO
-  else
-    runparts_status=YES
-  fi
-
-else
-
   cd BOOT-EXTRACTED/boot.img-ramdisk
 
   test_start=`grep -c "start sysinit" init.rc`
@@ -436,9 +420,9 @@ else
   fi
 
   cd ../..
+else
+  runparts_status=UNKNOWN
 fi
-
-
 
 
 clear
@@ -457,12 +441,7 @@ then
 fi
 
 echo " Rooted (Superuser.apk + su)    : $su_status"
-
-if [ "$is_galaxy_s" == "0" ]
-then
-  echo " Rooted (unsecured boot.img)    : $unsecure_status"                                         
-fi
-
+echo " Rooted (unsecured boot.img)    : $unsecure_status"                                         
 echo " BusyBox installed              : $bb_status"
 echo " BusyBox run-parts support      : $runparts_status"
 echo " Apps2SD (Apps to EXT) enabled  : $apps2sd_status" 
