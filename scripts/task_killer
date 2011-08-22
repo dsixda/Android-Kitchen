@@ -14,7 +14,7 @@ scripts/check_galaxy_s
 if [ "$?" == "1" ]
 then
   echo
-  echo "Not supported by kitchen for this ROM"
+  echo "Feature not supported by kitchen for this ROM"
   exit 0
 fi
 
