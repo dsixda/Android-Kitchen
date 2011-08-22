@@ -9,8 +9,8 @@
 ############################################################################
 
 
-model=`scripts/get_build_prop_val ro.product.device`
-exists=`echo $model | grep -c "GT-I9"`
+device=`scripts/get_build_prop_val ro.product.device`
+exists=`echo $device | grep -c "GT-I9"`
 
 if [ $exists == 0 ]
 then
