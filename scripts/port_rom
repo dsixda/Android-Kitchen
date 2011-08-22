@@ -64,10 +64,16 @@ then
 
       cp ../tools/samsung_files/unpack-initramfs .
       ./unpack-initramfs zImage
-    
-      mkdir ../BOOT-EXTRACTED
-      echo
-      mv -vf initramfs_root ../BOOT-EXTRACTED/boot.img-ramdisk
+   
+      if [ ! -d initramfs_root ]
+      then
+        echo "Error: Unable to unpack initramfs_root folder!"
+      else
+        mkdir ../BOOT-EXTRACTED
+        echo
+        mv -vf initramfs_root ../BOOT-EXTRACTED/boot.img-ramdisk
+      fi
+
       rm -f kernel
       rm -f zImage
       rm -f unpack-initramfs
