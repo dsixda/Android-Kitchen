@@ -9,6 +9,16 @@
 ############################################################################
 
 
+scripts/check_galaxy_s
+
+if [ "$?" == "1" ]
+then
+  clear
+  echo
+  echo "Feature not supported by kitchen for this ROM"
+  exit 0
+fi
+
 if [ "$1" == "" ]
 then
   clear
