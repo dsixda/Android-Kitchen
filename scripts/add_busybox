@@ -63,16 +63,19 @@ then
   echo
   echo "Working folder already has /system/bin/busybox"
 
-  echo -n "Replace with BusyBox $version (y/n)? (default: y): "
-  read replace_bin_bb
-  echo
-
-  if [ "$replace_bin_bb" == "n" ]
+  if [ "$1" == "show_help" ]
   then
-    echo "Cancelled"
-  else
-    echo "Replacing /system/bin/busybox"
-    cp -f ../tools/busybox_files/busybox system/bin/
+    echo -n "Replace with BusyBox $version (y/n)? (default: y): "
+    read replace_bin_bb
+    echo
+
+    if [ "$replace_bin_bb" == "n" ]
+    then
+      echo "Cancelled"
+    else
+      echo "Replacing /system/bin/busybox"
+      cp -f ../tools/busybox_files/busybox system/bin/
+    fi
   fi
 
   cd ..
@@ -95,13 +98,18 @@ if [ -e system/xbin/busybox ]
 then
 
   echo "Working folder already has /system/xbin/busybox"
-  echo -n "Replace with BusyBox $version (y/n)? (default: y): "
-  read replace_bb
-  echo
+
+  if [ "$1" == "show_help" ]
+  then
+    echo -n "Replace with BusyBox $version (y/n)? (default: y): "
+    read replace_bb
+    echo
+  else
+    replace_bb=n
+  fi
 
   if [ "$replace_bb" == "n" ]
   then
-    echo "Cancelled"
     cd ..
     exit 1
   fi
