@@ -11,15 +11,6 @@
 
 clear
 
-scripts/check_galaxy_s
-
-if [ "$?" == "1" ]
-then
-  echo
-  echo "Feature not supported by kitchen for this ROM"
-  exit 0
-fi
-
 echo
 echo "----------------------------------------------------------------"
 echo  
@@ -44,91 +35,132 @@ fi
 
 echo 
 
-scripts/ensure_boot_extracted
+scripts/check_galaxy_s
 
-if [ -d BOOT-EXTRACTED ]
+if [ "$?" == "1" ]
 then
-  if [ -d WORKING_* ]
-  then
+  echo
+  echo "Nano feature not supported by kitchen for this ROM;"
+  echo "we'll just add sysro/sysrw ..."
 
-    if [ -d BOOT-EXTRACTED/boot.img-ramdisk ]
+else
+  scripts/ensure_boot_extracted
+
+  if [ -d BOOT-EXTRACTED ]
+  then
+    if [ -d WORKING_* ]
     then
-      cd BOOT-EXTRACTED/boot.img-ramdisk
+
+      if [ -d BOOT-EXTRACTED/boot.img-ramdisk ]
+      then
+        cd BOOT-EXTRACTED/boot.img-ramdisk
+      else
+        echo "Error: BOOT-EXTRACTED/boot.img-ramdisk folder not found!"
+        exit 0
+      fi
+
     else
-      echo "Error: BOOT-EXTRACTED/boot.img-ramdisk folder not found!"
       exit 0
     fi
-
   else
     exit 0
   fi
-else
-  exit 0
-fi
 
-echo
+  echo
 
-if [ `grep -c TERMINFO init.rc` == 1 ]
-then
-  echo "TERMINFO already defined in init.rc"
-  cd ../..
-  rm -rf BOOT-EXTRACTED
-
-else
-  echo "Setting TERMINFO in init.rc ..."
-  perl -pi -e 's/    export PATH /    export TERMINFO \/system\/etc\/terminfo\n    export PATH /g' init.rc
-
-  if [ -e init.rc.bak ]
+  if [ `grep -c TERMINFO init.rc` == 1 ]
   then
-    rm -f init.rc.bak
-  fi
-
-  if [ "`grep TERMINFO init.rc`" == "" ]
-  then
-    echo "Error: Could not update init.rc!"
+    echo "TERMINFO already defined in init.rc"
     cd ../..
     rm -rf BOOT-EXTRACTED
+
+  else
+    echo "Setting TERMINFO in init.rc ..."
+    perl -pi -e 's/    export PATH /    export TERMINFO \/system\/etc\/terminfo\n    export PATH /g' init.rc
+
+    if [ -e init.rc.bak ]
+    then
+      rm -f init.rc.bak
+    fi
+
+    if [ "`grep TERMINFO init.rc`" == "" ]
+    then
+      echo "Error: Could not update init.rc!"
+      cd ../..
+      rm -rf BOOT-EXTRACTED
+      exit 0
+    fi
+
+    cd ../..
+    scripts/build_boot_img
+
+    echo
+    echo "Adding /system/etc/terminfo ..."
+    echo
+
+    cd WORKING_*
+    mkdir -p system/etc/terminfo
+    cp ../tools/nano_files/terminfo.zip system/etc/terminfo/
+    cd system/etc/terminfo
+    unzip terminfo.zip
+    rm terminfo.zip
+    cd ../../../..
+  fi
+
+
+  cd WORKING_*
+  echo
+
+  nano_path=`find . -name nano`
+  if [ "$nano_path" == "" ] 
+  then
+    echo
+    cp -fv ../tools/nano_files/nano system/xbin/
+    
+  else 
+    echo "Found $nano_path"
+  fi
+
+  cd ..
+  scripts/add_nano_to_update_script
+  res=$?
+
+  if [ "$res" == "1" ]
+  then
     exit 0
   fi
 
-  cd ../..
-  scripts/build_boot_img
-
-  echo
-  echo "Adding /system/etc/terminfo ..."
-  echo
-
-  cd WORKING_*
-  mkdir -p system/etc/terminfo
-  cp ../tools/nano_files/terminfo.zip system/etc/terminfo/
-  cd system/etc/terminfo
-  unzip terminfo.zip
-  rm terminfo.zip
-  cd ../../../..
 fi
 
 
+#
+# sysro/sysrw require busybox to mount for all devices
+# The regular 'mount' doesn't work for all devices
+#
 
 cd WORKING_*
 echo
 
-nano_path=`find . -name nano`
-if [ "$nano_path" == "" ] 
+sys_path=`find . -name sysrw`
+if [ "$sys_path" == "" ] 
 then
-  echo "Adding /system/xbin/nano"
-  cp ../tools/nano_files/nano system/xbin/
-  cp ../tools/nano_files/sysrw system/xbin/
-  cp ../tools/nano_files/sysro system/xbin/
-  
+  echo
+  cp -fv ../tools/nano_files/sysrw system/xbin/
 else 
-  echo "Found $nano_path"
+  echo "Found $sys_path"
+fi
+
+sys_path=`find . -name sysro`
+if [ "$sys_path" == "" ] 
+then
+  echo
+  cp -fv ../tools/nano_files/sysro system/xbin/ 
+else 
+  echo "Found $sys_path"
 fi
 
 cd ..
-scripts/add_nano_to_update_script
-res=$?
+scripts/add_busybox no_clear
+scripts/add_sysrorw_to_update_script
+scripts/fix_update_script_blanks
 
-if [ "$res" != "1" ]
-then
-  scripts/add_sysrorw_to_update_script
-fi
