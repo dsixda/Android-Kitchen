@@ -65,4 +65,5 @@ else
 fi
 
 cd ..
+scripts/fix_update_script_blanks
 
