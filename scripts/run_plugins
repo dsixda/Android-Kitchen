@@ -43,12 +43,8 @@ else
   for plugin_file in $grep_cmd
   do
     echo -n "."
-
     # Converting end-of-line character in files created in DOS 
-    cat scripts/plugins/$plugin_file | tr -d '\r' > scripts/plugins/temp.plugin
-    rm -f scripts/plugins/$plugin_file
-    mv scripts/plugins/temp.plugin scripts/plugins/$plugin_file
-    chmod +x scripts/plugins/$plugin_file
+    scripts/convert_to_unix scripts/plugins/$plugin_file
   done
 
   echo
