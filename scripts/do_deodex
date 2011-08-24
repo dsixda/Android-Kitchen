@@ -187,6 +187,8 @@ do
   fi
 
   cd ..
+  scripts/convert_to_unix tools/deodex_files/use_this_version.txt
+  scripts/convert_to_unix tools/deodex_files/old_version/use_this_version.txt
   scripts/do_deodex_folder "$dir_list"
 
   cd WORKING_*
