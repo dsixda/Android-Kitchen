@@ -35,11 +35,22 @@ fi
 
 echo 
 
+scripts/add_busybox no_clear
+res=$?
+
+if [ "$res" == "1" ]
+then
+  exit 0
+fi
+
 
 #
 # sysro/sysrw require busybox to mount
 # The regular 'mount' doesn't work for all devices
 #
+
+scripts/convert_to_unix tools/nano_files/sysrw
+scripts/convert_to_unix tools/nano_files/sysro
 
 cd WORKING_*
 echo
@@ -47,7 +58,6 @@ echo
 sys_path=`find . -name sysrw`
 if [ "$sys_path" == "" ] 
 then
-  echo
   cp -fv ../tools/nano_files/sysrw system/xbin/
 else 
   echo "Found $sys_path"
@@ -56,14 +66,13 @@ fi
 sys_path=`find . -name sysro`
 if [ "$sys_path" == "" ] 
 then
-  echo
   cp -fv ../tools/nano_files/sysro system/xbin/ 
 else 
   echo "Found $sys_path"
 fi
 
 cd ..
-scripts/add_busybox no_clear
+echo
 scripts/add_sysrorw_to_update_script
 
 
