@@ -20,7 +20,7 @@ echo "Android device.  To run it from a shell, type: nano"
 echo
 echo "The scripts 'sysrw' and 'sysro' will also be included to make it"
 echo "easier to mount the /system folder (as read-write or read-only)"
-echo "for file editing purposes."
+echo "for file editing purposes as root."
 echo
 echo "----------------------------------------------------------------"
 echo
@@ -35,13 +35,44 @@ fi
 
 echo 
 
+
+#
+# sysro/sysrw require busybox to mount
+# The regular 'mount' doesn't work for all devices
+#
+
+cd WORKING_*
+echo
+
+sys_path=`find . -name sysrw`
+if [ "$sys_path" == "" ] 
+then
+  echo
+  cp -fv ../tools/nano_files/sysrw system/xbin/
+else 
+  echo "Found $sys_path"
+fi
+
+sys_path=`find . -name sysro`
+if [ "$sys_path" == "" ] 
+then
+  echo
+  cp -fv ../tools/nano_files/sysro system/xbin/ 
+else 
+  echo "Found $sys_path"
+fi
+
+cd ..
+scripts/add_busybox no_clear
+scripts/add_sysrorw_to_update_script
+
+
 scripts/check_galaxy_s
 
 if [ "$?" == "1" ]
 then
   echo
-  echo "Nano feature not supported by kitchen for this ROM;"
-  echo "we'll just add sysro/sysrw ..."
+  echo "Nano feature not supported by kitchen for this ROM"
 
 else
   scripts/ensure_boot_extracted
@@ -123,44 +154,8 @@ else
 
   cd ..
   scripts/add_nano_to_update_script
-  res=$?
-
-  if [ "$res" == "1" ]
-  then
-    exit 0
-  fi
 
 fi
 
-
-#
-# sysro/sysrw require busybox to mount for all devices
-# The regular 'mount' doesn't work for all devices
-#
-
-cd WORKING_*
-echo
-
-sys_path=`find . -name sysrw`
-if [ "$sys_path" == "" ] 
-then
-  echo
-  cp -fv ../tools/nano_files/sysrw system/xbin/
-else 
-  echo "Found $sys_path"
-fi
-
-sys_path=`find . -name sysro`
-if [ "$sys_path" == "" ] 
-then
-  echo
-  cp -fv ../tools/nano_files/sysro system/xbin/ 
-else 
-  echo "Found $sys_path"
-fi
-
-cd ..
-scripts/add_busybox no_clear
-scripts/add_sysrorw_to_update_script
 scripts/fix_update_script_blanks
 
