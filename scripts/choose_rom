@@ -67,7 +67,7 @@ else
     #
     # Check for factoryfs.img (cache.img and zImage are optional)
     #  
-    if [ ! -e original_update/factoryfs.img]
+    if [ ! -e original_update/factoryfs.img ]
     then
 
       #
