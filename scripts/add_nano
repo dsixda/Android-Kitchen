@@ -147,21 +147,20 @@ else
     cd ../../../..
   fi
 
-
-  cd WORKING_*
   echo
 
-  nano_path=`find . -name nano`
-  if [ "$nano_path" == "" ] 
+  scripts/nano_exists
+  res=$?
+  
+  if [ "$res" == "0" ] 
   then
-    echo
+    cd WORKING_*
     cp -fv ../tools/nano_files/nano system/xbin/
-    
+    cd ..
   else 
-    echo "Found $nano_path"
+    echo "Found nano binary"
   fi
 
-  cd ..
   scripts/add_nano_to_update_script
 
 fi
