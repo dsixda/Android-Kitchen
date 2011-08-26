@@ -192,10 +192,10 @@ then
 
       if [ -e updater-script.orig ]
       then
-        param1_old=`grep -m 1 "format(.*$sys_mnt" updater-script.orig | \
-                    sed -e 's/format("\([^"]*\).*/\1/g'`
-        param2_old=`grep -m 1 "format(.*$sys_mnt" updater-script.orig | \
-                    sed -e 's/format("[^"]*"[ ]*,[ ]*"\([^"]*\).*/\1/g'`
+        param1_old=`grep -m 1 "mount(.*$sys_mnt" updater-script.orig | \
+                    sed -e 's/mount("\([^"]*\).*/\1/g'`
+        param2_old=`grep -m 1 "mount(.*$sys_mnt" updater-script.orig | \
+                    sed -e 's/mount("[^"]*"[ ]*,[ ]*"\([^"]*\).*/\1/g'`
         
         if [ "$param1_old" != "" ] && [ "$param2_old" != "" ]
         then
