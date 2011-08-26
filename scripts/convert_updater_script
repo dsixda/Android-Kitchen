@@ -105,6 +105,8 @@ echo "- Initial formatting ..."
 # The 'strings' command is used in case the ui_print statement has special symbols in it
 more updater-script \
   | sed -e ':a;N;$!ba;s/([ ]*\n/(/g' \
+  | sed -e ':a;N;$!ba;s/\n[ ]*\&\&/ \&\&/g' \
+  | sed -e ':a;N;$!ba;s/\n[ ]*||/ ||/g' \
   | sed -e ':a;N;$!ba;s/\n);/);/g' \
   | strings \
   | sed -e ':a;N;$!ba;s/ui_print("[^"]*");//g' \
@@ -197,6 +199,19 @@ do
 
   line_num=`sed -n -e '/assert(/{=;q}' temp.log`
 done
+
+
+#
+# Fix the mess left over sometimes by the assert statement
+#
+sed -i \
+  -e 's/^==[ ]*\(.*$\)/\1/g' \
+  -e 's/^||[ ]*\(.*$\)/\1/g' \
+  -e 's/^&&[ ]*\(.*$\)/\1/g' \
+  -e 's/^[^a-z]*\([a-z]*\)/\1/g' \
+  -e '/^ui_print/d' \
+  temp.log
+
 
 
 #
