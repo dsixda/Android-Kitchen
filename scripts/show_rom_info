@@ -258,16 +258,15 @@ cd ../../../../..
 #
 
 echo -n "."
-cd WORKING_*
-
-if [ "`find . -name nano`" == "" ] 
+scripts/nano_exists
+res=$?
+if [ "$res" = "0" ] 
 then
   nano_status=NO
 else
   nano_status=YES
 fi
 
-cd ..
 
 
 
