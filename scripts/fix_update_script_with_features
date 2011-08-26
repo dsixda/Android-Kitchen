@@ -155,7 +155,7 @@ fi
 #
 
 cd WORKING_*
-nano_path=`find . -name nano`
+nano_path=`find . -type f -name nano`
 cd ..
 
 if [ "$nano_path" != "" ]
