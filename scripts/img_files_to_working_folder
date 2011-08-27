@@ -201,9 +201,24 @@ scripts/check_bootimg_header
 # Not a valid boot.img
 if [ "$?" == "1" ]
 then
+
   scripts/check_galaxy_s
-  
-  if [ "$?" == "1" ]
+  is_gs=$?
+
+  if [ "$is_gs" == "1" ]
+  then
+    cp_file=redbend_ua
+  else
+    scripts/check_galaxy_s2
+    is_gs2=$?
+
+    if [ "$is_gs2" == "1" ]
+    then
+      cp_file=flash_image
+    fi
+  fi
+
+  if [ "$is_gs" == "1" ] || [ "$is_gs2" == "1" ]
   then
     echo
     echo "NOTE: The boot.img may actually be a kernel (zImage) instead.  We will"
@@ -212,8 +227,9 @@ then
 
     cd WORKING_*
     mv -v boot.img zImage
-    cp -v ../tools/samsung_files/flash_image .
-    echo "flash_zimage" >> META-INF/com/google/android/update-script
+    echo
+    cp -v ../tools/samsung_files/$cp_file .
+    echo $cp_file >> META-INF/com/google/android/update-script
     cd ..
     scripts/check_no_bootimg 
   fi
