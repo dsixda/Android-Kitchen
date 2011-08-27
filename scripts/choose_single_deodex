@@ -16,6 +16,15 @@ echo
 cd WORKING_*
 
 grep_cmd=`find . | grep \\.odex$ | sort -f`
+
+if [ "$grep_cmd" == "" ]
+then
+  echo "Error: No files found!"
+  cd ..
+  scripts/press_enter
+  exit 0
+fi
+
 count=0
 
 rm -f ../temp.list
@@ -58,8 +67,9 @@ then
     exit 0
   fi
 
-  cp ../tools/deodex_files/baksmali*.jar baksmali.jar
-  cp ../tools/deodex_files/smali*.jar smali.jar
+  version=`more ../tools/deodex_files/use_this_version.txt | sed 's/[ ]*$//g'`
+  cp -f ../tools/deodex_files/baksmali-$version.jar baksmali.jar
+  cp -f ../tools/deodex_files/smali-$version.jar smali.jar
 
   try_again=y
 
