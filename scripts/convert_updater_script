@@ -14,7 +14,6 @@ then
   clear
 fi
 
-
 echo
 
 base_dir=`pwd`
@@ -141,13 +140,14 @@ sed -i -e '/^run_program("\/sbin\/busybox", "umount"/d' temp.log
 
 
 #
-# For Samsung Galaxy S2 and equivalent
+# For Samsung Galaxy S/S2 and equivalent
 #
 if [ -e ../../../../zImage ] && [ `grep -c boot.img temp.log` == 0 ]
 then
   sed -i \
     -e '/zImage"/d' \
     -e '/flash_image"/d' \
+    -e '/redbend_ua"/d' \
     temp.log
 
   echo "flash_zimage" >> temp.log
@@ -157,7 +157,8 @@ if [ -e ../../../../modem.bin ]
 then
   sed -i \
     -e '/modem.bin"/d' \
-    -e '/flash_bin"/d' \
+    -e '/flash_image"/d' \
+    -e '/redbend_ua"/d' \
     temp.log
 
   echo "flash_modem" >> temp.log
