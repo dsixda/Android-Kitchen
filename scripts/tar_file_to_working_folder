@@ -47,17 +47,17 @@ mkdir $build_dir
 echo
 echo "Extracting ROM ..."
 
-tar xvf original_update/$update_file -C $build_dir -x factoryfs.img cache.img modem.bin zImage
+tar xvf original_update/$update_file -C $build_dir -x factoryfs.img cache.img modem.bin zImage factoryfs.rfs cache.rfs 2>/dev/null
 
-if [ "$?" != "0" ]
+cd $build_dir
+
+if [ ! -e factoryfs.img ] && [ ! -e factoryfs.rfs ]
 then
   echo
   echo "Error: Cannot extract ROM!"
   cd ..
   exit 1
 fi
-
-cd $build_dir
 
 
 echo
@@ -74,6 +74,20 @@ then
 
   cd ..
   scripts/simg_files_to_working_folder no_create $2
+  exit $?
+
+elif [ -e factoryfs.rfs ]
+then
+
+  if [ -e zImage ]
+  then
+    cd ..
+    scripts/show_rooted_kernel_msg
+    cd $build_dir
+  fi
+
+  cd ..
+  scripts/rfs_files_to_working_folder no_create $2
   exit $?
 
 else
