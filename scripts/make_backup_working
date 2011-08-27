@@ -8,12 +8,6 @@
 #
 ############################################################################
 
-
-if [ "$1" == "" ]
-then
-  scripts/press_enter
-fi
-
 found_working=`ls | grep "^WORKING_"` 
 
 if [ "$found_working" != "" ]
