@@ -76,7 +76,7 @@ echo
 scripts/add_sysrorw_to_update_script
 
 
-scripts/check_galaxy_s
+scripts/check_galaxy_sx
 
 if [ "$?" == "1" ]
 then
