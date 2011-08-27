@@ -265,12 +265,6 @@ then
     echo
   fi
 
-  if [ ! -e flash_image ]
-  then
-    echo "Adding flash_image to ROM ..."
-    cp ../tools/samsung_files/flash_image .
-  fi
-
 elif [ $grep_zimage != 0 ]
 then
   echo
@@ -295,12 +289,6 @@ then
     echo
   fi
 
-  if [ ! -e flash_image ]
-  then
-    echo "Adding flash_image to ROM ..."
-    cp ../tools/samsung_files/flash_image .
-  fi
-
 elif [ $grep_modem != 0 ]
 then
   echo
@@ -308,6 +296,36 @@ then
   sed -i -e '/flash_modem/d' META-INF/com/google/android/update-script
 fi
 
+
+#
+# Galaxy S/S2 modem and kernel flashing utility
+#
+if [ -e zImage ] || [ -e modem.bin ]
+then
+  cd ..
+  scripts/check_galaxy_s2
+  res=$?
+  cd WORKING_*
+
+  if [ "$res" == "1" ] && [ ! -e flash_image ]
+  then
+    echo "Adding flash_image to ROM ..."
+    cp ../tools/samsung_files/flash_image .
+
+  else
+    
+    cd ..
+    scripts/check_galaxy_s
+    res=$?
+    cd WORKING_*
+
+    if [ "$res" == "1" ] && [ ! -e redbend_ua ]
+    then
+      echo "Adding redbend_ua to ROM ..."
+      cp ../tools/samsung_files/redbend_ua .
+    fi
+  fi
+fi
 
 
 #
