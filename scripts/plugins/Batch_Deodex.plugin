@@ -25,7 +25,7 @@ grep_files=`scripts/grep_roms`
 if [ "$grep_files" != "" ]
 then
 
-  scripts/make_backup_working no_prompt
+  scripts/make_backup_working 
 
   date_str=`date '+%m%d%y_%H%M%S'`
   done_dir="batch_$date_str"
