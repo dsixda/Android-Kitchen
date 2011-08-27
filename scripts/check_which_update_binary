@@ -28,23 +28,21 @@ then
 else
 
   cd ../../../../..
-  scripts/check_galaxy_s
-  sgs=$?
+  scripts/check_galaxy_s2
+  sgs2=$?
   cd $update_dir
 
   echo
   echo "Copying update-binary ..."
 
-  if [ "$sgs" == "1" ] 
+  if [ "$sgs2" == "1" ] 
   then
     
-    cp -vf ../../../../../tools/update_files/sgs-update-binary update-binary
+    cp -vf ../../../../../tools/update_files/sgs2-update-binary update-binary
 
   else
 
     grep_emmc=`grep -c "mount(.*,.*,.*,.*)" updater-script`
-    grep_ext3=`grep -c "mount(\"ext3\"" updater-script`
-    grep_mtd=`grep -c "mount(\"MTD\"" updater-script`
 
     if [ $grep_emmc -gt 0 ]
     then
@@ -55,26 +53,25 @@ else
       # e.g. mount("ext3", "EMMC", "/dev/block/mmcblk0p26", "/data");
       # e.g. mount("yaffs2", "MTD", "userdata", "/data");
       #
+
       cp -vf ../../../../../tools/update_files/emmc-update-binary update-binary
 
-    elif [ $grep_ext3 -gt 0 ]
-    then
+   else
 
       #
       # Three args for mount, but no MTD or assert
       #
       # mount("ext3", "/dev/block/mmcblk0p25", "/system");
       #
-      cp -vf ../../../../../tools/update_files/ext3-update-binary update-binary
-
-    else
-
+      # OR
       #
       # Three arguments, can use MTD and assert 
       #
       # e.g. mount("MTD", "userdata", "/data");
       #
+
       cp -vf ../../../../../tools/update_files/mtd-update-binary update-binary
+
     fi
   fi
 
