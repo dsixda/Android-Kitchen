@@ -148,7 +148,7 @@ then
     echo "$file_chosen has been decompiled, please check the $folder/out folder." 
     echo
     echo "Make changes to the appropriate smali files and press Enter when done."
-    echo
+    echo -n "(Enter) "
     read go_compile
 
     if [ ! -e classes.dex ]
@@ -156,6 +156,12 @@ then
       echo "Error: classes.dex not found!"
       error=1
     else
+
+      echo
+      echo "Making backup file $file_chosen.bak ..."
+      echo
+
+      cp -f $file_chosen $file_chosen.bak
 
       echo
       echo "Compiling $file_chosen ..."
@@ -204,6 +210,10 @@ then
 
   rm -f *smali.jar
 
+else
+  echo 
+  echo "Aborting"
+  exit 0
 fi
 
 if [ "$error" != "1" ]
