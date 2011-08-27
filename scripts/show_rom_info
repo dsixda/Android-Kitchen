@@ -40,7 +40,7 @@ fi
 # Check if Samsung Galaxy S2 or equivalent
 #
 
-scripts/check_galaxy_s
+scripts/check_galaxy_sx
 is_galaxy_s=$?
 
 if [ "$is_galaxy_s" == "1" ]
