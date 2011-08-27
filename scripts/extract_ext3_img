@@ -113,7 +113,7 @@ then
   if [ "$res" == "0" ]
   then
     
-    if [ "$img_file" == "ext4_cache.img" ]
+    if [ "$img_file" == "ext4_cache.img" ] || [ "$img_file" == "cache.rfs" ]
     then
       sudo cp ../tmp/recovery/sec_csc.zip .
     else
