@@ -55,41 +55,45 @@ else
   app_cmd=`find . ! -name . -prune -type f | grep -i -m 1 \\.app$`
 
   #
+  # Check for SGS factoryfs.rfs
+  #
+  facrfs_cmd=`find . ! -name . -prune -type f | grep -i factoryfs.rfs$`
+
+  #
+  # Check for SGS2 factoryfs.img
+  #
+  facimg_cmd=`find . ! -name . -prune -type f | grep -i factoryfs.img$`
+
+  #
   # Check for WORKING_* folder in original_update
   #
   wkg_cmd=`find . ! -name . -prune -type d | grep "WORKING_"`
 
   cd ..
 
-  if [ "$zip_cmd" == "" ] && [ "$tar_cmd" == "" ] && [ "$app_cmd" == "" ] && [ "$wkg_cmd" == "" ]
+  if [ "$zip_cmd" == "" ] && [ "$tar_cmd" == "" ] && [ "$app_cmd" == "" ] && [ "$wkg_cmd" == "" ] \
+    && [ "$facrfs_cmd" == "" ] && [ "$facimg_cmd" == "" ]
   then
 
     #
-    # Check for factoryfs.img (cache.img and zImage are optional)
-    #  
-    if [ ! -e original_update/factoryfs.img ]
+    # Check for system.img and boot.img in original_update  
+    #
+
+    # We'll prompt for a Null boot.img if no boot.img found
+    if [ ! -e original_update/system.img ]
     then
 
-      #
-      # Check for system.img and boot.img in original_update  
-      #
+      # No system.img found, check for boot.img
 
-      # We'll prompt for a Null boot.img if no boot.img found
-      if [ ! -e original_update/system.img ]
+      if [ -e original_update/boot.img ]
       then
-
-        # No system.img found, check for boot.img
-
-        if [ -e original_update/boot.img ]
-        then
-          echo "Error: No original_update/system.img found"
-        else
-          echo
-          echo "Error: No ROMs found under original_update folder!"
-        fi
-
-        exit 0
+        echo "Error: No original_update/system.img found"
+      else
+        echo
+        echo "Error: No ROMs found under original_update folder!"
       fi
+
+      exit 0
     fi
 
   fi
@@ -116,6 +120,11 @@ else
     if [ "$filename" == "system.img" ]
     then
       filename="system.img and boot.img"
+
+    elif [ "$filename" == "factoryfs.rfs" ]
+    then
+      filename="factoryfs.rfs, cache.rfs and zImage"
+
     elif [ "$filename" == "factoryfs.img" ]
     then
       filename="factoryfs.img, cache.img and zImage"
@@ -158,34 +167,45 @@ else
 fi
 
 
-if [ "$file_chosen" == "system.img" ]
+if [ ! -d "original_update/$file_chosen" ]
 then
-  scripts/img_files_to_working_folder create_working $1
-  exit $?
 
-elif [ "$file_chosen" == "factoryfs.img" ]
-then
-  scripts/simg_files_to_working_folder create_working $1
-  exit $?
+  if [ "$file_chosen" == "system.img" ]
+  then
+    scripts/img_files_to_working_folder create_working $1
+    exit $?
 
-elif [ "`echo $file_chosen | grep -i \\.zip$`" != "" ] && [ ! -d "original_update/$file_chosen" ]
-then
-  scripts/zip_file_to_working_folder "$file_chosen" $1
-  exit $?
+  elif [ "$file_chosen" == "factoryfs.rfs" ]
+  then
+    scripts/rfs_files_to_working_folder create_working $1
+    exit $?
 
-elif [ "`echo $file_chosen | grep -i \\.tar$`" != "" ] && [ ! -d "original_update/$file_chosen" ]
-then
-  scripts/tar_file_to_working_folder "$file_chosen" $1
-  exit $?
+  elif [ "$file_chosen" == "factoryfs.img" ]
+  then
+    scripts/simg_files_to_working_folder create_working $1
+    exit $?
 
-elif [ "`echo $file_chosen | grep -i \\.app$`" != "" ] && [ ! -d "original_update/$file_chosen" ]
-then
-  scripts/app_file_to_working_folder "$file_chosen" $1
-  exit $?
+  elif [ "`echo $file_chosen | grep -i \\.zip$`" != "" ]
+  then
+    scripts/zip_file_to_working_folder "$file_chosen" $1
+    exit $?
 
-elif [ "`echo $file_chosen | grep -m 1 \"^WORKING_\"`" != "" ]
-then
-  scripts/wkg_to_working_folder "$file_chosen" $1
-  exit $?
-fi 
+  elif [ "`echo $file_chosen | grep -i \\.tar$`" != "" ]
+  then
+    scripts/tar_file_to_working_folder "$file_chosen" $1
+    exit $?
+
+  elif [ "`echo $file_chosen | grep -i \\.app$`" != "" ]
+  then
+    scripts/app_file_to_working_folder "$file_chosen" $1
+    exit $?
+  fi
+
+else
+  if [ "`echo $file_chosen | grep -m 1 \"^WORKING_\"`" != "" ]
+  then
+    scripts/wkg_to_working_folder "$file_chosen" $1
+    exit $?
+  fi 
+fi
 
