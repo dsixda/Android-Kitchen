@@ -277,7 +277,7 @@ then
   cp -vf MY_KERNEL/zImage WORKING_*/
 else
   cd WORKING_*
-  rm -f modem.bin flash_image
+  rm -f modem.bin flash_image redbend_ua
   cd ..
 fi
 
