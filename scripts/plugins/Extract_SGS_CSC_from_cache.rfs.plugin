@@ -1,0 +1,72 @@
+
+echo
+echo "Samsung Galaxy S CSC Extractor"
+echo "-------------------------------"
+echo
+echo "This script will extract the CSC (Customer Software Customization)"
+echo "from the cache.rfs of a stock Samsung Galaxy S firmware.  The CSC"
+echo "comes in a file called 'sec_csc.zip' which contains location and"
+echo "carrier-specific configurations and software."
+echo
+
+echo -n "Proceed (y/n)? (default: y): "
+read do_csc
+echo
+
+if [ "$do_csc" == "n" ]
+then
+  exit 0
+fi
+
+date_str=`date '+%m%d%y_%H%M%S'`
+csc_dir=csc_$date_str
+
+echo
+echo "Creating folder `pwd`/$csc_dir ..."
+mkdir $csc_dir
+
+echo
+echo "---> Place stock cache.rfs into the folder mentioned above <--"
+
+scripts/press_enter
+
+if [ -e $csc_dir/cache.rfs ]
+then
+
+  if [ `uname | grep CYGWIN` ]
+  then
+    scripts/show_magiciso $csc_dir cache.rfs
+  else
+    scripts/extract_ext3_img $csc_dir cache.rfs
+  fi
+
+  rm -f $csc_dir/cache.rfs 2>/dev/null
+  if [ "$?" == "1" ]
+  then
+    echo
+    echo "WARNING: cache.rfs is in use.  Remove file manually after application is closed."
+    echo
+  fi
+
+  if [ ! -e $csc_dir/sec_csc.zip ]
+  then
+    echo "WARNING: sec_csc.zip not found!"
+    exit 1
+  else
+    echo
+    echo "Finished!  Your file is at $csc_dir/sec_csc.zip."
+    echo
+    echo "You can unzip this file and copy the contents of the 'system'"
+    echo "folder to your ROM's system folder."
+    echo
+    exit 0
+  fi
+
+else
+  echo "Error: cache.rfs not found!"
+  echo
+  cd ..
+  echo "Removing $csc_dir folder"
+  rm -rf csc_dir
+  exit 1
+fi
