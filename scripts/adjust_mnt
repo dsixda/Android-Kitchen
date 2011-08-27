@@ -14,6 +14,16 @@
 #
 
 
+# First check for Samsung Galaxy S/S2
+scripts/check_galaxy_s
+is_gs=$?
+if [ "$is_gs" == "0" ]
+then
+  scripts/check_galaxy_s2
+  is_gs2=$? 
+fi    
+
+
 if [ "$1" != "" ]
 then
 
@@ -296,16 +306,10 @@ then
         #
         # For Samsung Galaxy S2 and equivalent
         #
-        cd ../../../../..
-        scripts/check_galaxy_s
-      
-        if [ "$?" == "1" ]
+        if [ "$is_gs" == "1" ] || [ "$is_gs2" == "1" ]
         then
           use_sbin_mnt=1
         fi
-
-        cd WORKING_*
-        cd META-INF/com/google/android
       fi
 
 
@@ -327,28 +331,63 @@ then
 
 
 
-      #
-      # zImage and modem.bin   
-      #
+      ###############################
+      # Samsung zImage and modem.bin   
+      ###############################
 
-      if [ `grep -c flash_zimage updater-script` -gt 0 ] && [ `grep -c flash_modem updater-script` -gt 0 ]
+      if [ "$is_gs2" == "1" ] 
       then
 
-        sed -i \
-          -e '/^flash_zimage[ ]*$/d' \
-          -e 's/^flash_modem[ ]*$/package_extract_file("flash_image", "\/tmp\/flash_image");\nset_perm(0, 0, 0777, "\/tmp\/flash_image");\nassert(package_extract_file("zImage", "\/tmp\/zImage"),\n       run_program("\/tmp\/flash_image", "'"$boot_mnt"'", "\/tmp\/zImage"),\n       delete("\/tmp\/zImage"));\nassert(package_extract_file("modem.bin", "\/tmp\/modem.bin"),\n       run_program("\/tmp\/flash_image", "'"$modem_mnt"'", "\/tmp\/modem.bin"),\n       delete("\/tmp\/modem.bin"));\ndelete("\/tmp\/flash_image");\n/g' \
-          updater-script
+        ####################
+        # Samsung Galaxy S2
+        ####################
 
-      elif [ `grep -c flash_zimage updater-script` -gt 0 ] && [ `grep -c flash_modem updater-script` == 0 ]
+        if [ `grep -c flash_zimage updater-script` -gt 0 ] && [ `grep -c flash_modem updater-script` -gt 0 ]
+        then
+
+          sed -i \
+            -e '/^flash_zimage[ ]*$/d' \
+            -e 's/^flash_modem[ ]*$/package_extract_file("flash_image", "\/tmp\/flash_image");\nset_perm(0, 0, 0777, "\/tmp\/flash_image");\nassert(package_extract_file("zImage", "\/tmp\/zImage"),\n       run_program("\/tmp\/flash_image", "'"$boot_mnt"'", "\/tmp\/zImage"),\n       delete("\/tmp\/zImage"));\nassert(package_extract_file("modem.bin", "\/tmp\/modem.bin"),\n       run_program("\/tmp\/flash_image", "'"$modem_mnt"'", "\/tmp\/modem.bin"),\n       delete("\/tmp\/modem.bin"));\ndelete("\/tmp\/flash_image");\n/g' \
+            updater-script
+
+        elif [ `grep -c flash_zimage updater-script` -gt 0 ] && [ `grep -c flash_modem updater-script` == 0 ]
+        then
+
+          sed -i -e 's/^flash_zimage[ ]*$/package_extract_file("flash_image", "\/tmp\/flash_image");\nset_perm(0, 0, 0777, "\/tmp\/flash_image");\nassert(package_extract_file("zImage", "\/tmp\/zImage"),\n       run_program("\/tmp\/flash_image", "'"$boot_mnt"'", "\/tmp\/zImage"),\n       delete("\/tmp\/zImage"));\ndelete("\/tmp\/flash_image");\n/g' updater-script
+
+        elif [ `grep -c flash_zimage updater-script` == 0 ] && [ `grep -c flash_modem updater-script` -gt 0 ]
+        then
+
+          sed -i -e 's/^flash_modem[ ]*$/package_extract_file("flash_image", "\/tmp\/flash_image");\nset_perm(0, 0, 0777, "\/tmp\/flash_image");\nassert(package_extract_file("modem.bin", "\/tmp\/modem.bin"),\n       run_program("\/tmp\/flash_image", "'"$modem_mnt"'", "\/tmp\/modem.bin"),\n       delete("\/tmp\/modem.bin"));\ndelete("\/tmp\/flash_image");\n/g' updater-script
+     
+        fi
+
+      elif [ "$is_gs" == "1" ]
       then
 
-        sed -i -e 's/^flash_zimage[ ]*$/package_extract_file("flash_image", "\/tmp\/flash_image");\nset_perm(0, 0, 0777, "\/tmp\/flash_image");\nassert(package_extract_file("zImage", "\/tmp\/zImage"),\n       run_program("\/tmp\/flash_image", "'"$boot_mnt"'", "\/tmp\/zImage"),\n       delete("\/tmp\/zImage"));\ndelete("\/tmp\/flash_image");\n/g' updater-script
+        ###################
+        # Samsung Galaxy S
+        ###################
 
-      elif [ `grep -c flash_zimage updater-script` == 0 ] && [ `grep -c flash_modem updater-script` -gt 0 ]
-      then
+        if [ `grep -c flash_zimage updater-script` -gt 0 ] && [ `grep -c flash_modem updater-script` -gt 0 ]
+        then
 
-        sed -i -e 's/^flash_modem[ ]*$/package_extract_file("flash_image", "\/tmp\/flash_image");\nset_perm(0, 0, 0777, "\/tmp\/flash_image");\nassert(package_extract_file("modem.bin", "\/tmp\/modem.bin"),\n       run_program("\/tmp\/flash_image", "'"$modem_mnt"'", "\/tmp\/modem.bin"),\n       delete("\/tmp\/modem.bin"));\ndelete("\/tmp\/flash_image");\n/g' updater-script
-   
+          sed -i \
+            -e '/^flash_zimage[ ]*$/d' \
+            -e 's/^flash_modem[ ]*$/package_extract_file("redbend_ua", "\/tmp\/redbend_ua");\nset_perm(0, 0, 0777, "\/tmp\/redbend_ua");\nassert(package_extract_file("zImage", "\/tmp\/zImage"),\n       run_program("\/tmp\/redbend_ua", "restore", "\/tmp\/zImage", "'"$boot_mnt"'"),\n       delete("\/tmp\/zImage"));\nassert(package_extract_file("modem.bin", "\/tmp\/modem.bin"),\n       run_program("\/tmp\/redbend_ua", "restore", "\/tmp\/modem.bin", "'"$modem_mnt"'"),\n       delete("\/tmp\/modem.bin"));\ndelete("\/tmp\/redbend_ua");\n/g' \
+            updater-script
+
+        elif [ `grep -c flash_zimage updater-script` -gt 0 ] && [ `grep -c flash_modem updater-script` == 0 ]
+        then
+
+          sed -i -e 's/^flash_zimage[ ]*$/package_extract_file("redbend_ua", "\/tmp\/redbend_ua");\nset_perm(0, 0, 0777, "\/tmp\/redbend_ua");\nassert(package_extract_file("zImage", "\/tmp\/zImage"),\n       run_program("\/tmp\/redbend_ua", "restore", "\/tmp\/zImage", "'"$boot_mnt"'"),\n       delete("\/tmp\/zImage"));\ndelete("\/tmp\/redbend_ua");\n/g' updater-script
+
+        elif [ `grep -c flash_zimage updater-script` == 0 ] && [ `grep -c flash_modem updater-script` -gt 0 ]
+        then
+
+          sed -i -e 's/^flash_modem[ ]*$/package_extract_file("redbend_ua", "\/tmp\/redbend_ua");\nset_perm(0, 0, 0777, "\/tmp\/redbend_ua");\nassert(package_extract_file("modem.bin", "\/tmp\/modem.bin"),\n       run_program("\/tmp\/redbend_ua", "restore", "\/tmp\/modem.bin", "'"$modem_mnt"'"),\n       delete("\/tmp\/modem.bin"));\ndelete("\/tmp\/redbend_ua");\n/g' updater-script
+     
+        fi
       fi
 
 
@@ -427,7 +466,7 @@ then
     # Convert 'delete_recursive' of a partition to 'format', for compatibility 
     # with all of the scripts.  This will be changed back when you build ROM.
     #
-    scripts/check_galaxy_s
+    scripts/check_galaxy_sx
 
     if [ "$?" == "1" ]
     then
