@@ -14,7 +14,7 @@ current_ver=$1
 
 echo 
 echo "============================================================"
-echo " HTC Android Kitchen $current_ver - by dsixda (xda-developers.com)"
+echo " Android Kitchen $current_ver - by dsixda (xda-developers.com)"
 echo "============================================================"
 echo
 echo "About the Kitchen"
