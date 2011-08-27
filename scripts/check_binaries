@@ -24,7 +24,7 @@ do
     echo
     echo
     echo
-    echo "Welcome to the HTC Android Kitchen"
+    echo "Welcome to dsixda's Android Kitchen"
     echo
     echo -n "Please wait "
     for (( count = 0 ; $count <= $i ; count++ ))
@@ -52,8 +52,8 @@ do
     echo
     echo "Error:  The application '$bin' is not installed.  The kitchen"
     echo "        will not function properly without it.  Refer to the"
-    echo "        FAQ for the HTC Android Kitchen at xda-developers.com"
-    echo "        for assistance on installing the binary for '$bin'."
+    echo "        FAQ for the Android Kitchen at xda-developers.com for"
+    echo "        assistance on installing the binary for '$bin'."
     echo 
 
     found_error=1
@@ -68,7 +68,7 @@ do
       echo
       echo
       echo "Error:  You do not have the correct version of 'sed' installed."
-      echo "        Refer to the FAQ for the HTC Android Kitchen at"
+      echo "        Refer to the FAQ for the Android Kitchen at"
       echo "        xda-developers.com to ensure you have installed the GNU"
       echo "        version of sed."
       echo
