@@ -30,7 +30,7 @@ else
 fi
 
 
-boot_img_size=`ls -lh boot.img | sed -e 's/.* [ ]*\([0-9]*\.[0-9]*M\) .*/\1/g'`
+boot_img_size=`ls -lh boot.img | sed -e 's/.* [ ]*\([0-9]*\.[0-9]*[MK]\) .*/\1/g'`
 
 cd $base_dir
 
