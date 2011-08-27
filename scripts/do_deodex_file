@@ -455,10 +455,12 @@ then
          [ "$odex_file" == "Browser.odex" ] || \
          [ "$odex_file" == "DualClock.odex" ] || \
          [ "$odex_file" == "FmRadio.odex" ] || \
+         [ "$odex_file" == "FMRadio.odex" ] || \
          [ "$odex_file" == "JobManager.odex" ] || \
          [ "$odex_file" == "Settings.odex" ] || \
          [ "$odex_file" == "TwCalendarAppWidget.odex" ] || \
-         [ "$odex_file" == "VoiceRecorder.odex" ] 
+         [ "$odex_file" == "VoiceRecorder.odex" ] || \
+         [ "$odex_file" == "syncmlds.odex" ]
     then
       classfile=twframework.jar
   
@@ -475,14 +477,16 @@ then
     then
       classfile=libvtmanagerjar.jar
 
-    elif [ "$odex_file" == "FactoryTest.odex" ]
+    elif [ "$odex_file" == "FactoryTest.odex" ] || [ "$odex_file" == "Camera.odex" ] || \
+         [ "$odex_file" == "SelfTestMode.odex" ]
     then
       classfile=seccamera.jar
 
-    elif [ "$odex_file" == "Camera.odex" ] 
-    then
-      classfile=seccamera.jar:secmediarecorder.jar
-   
+      if [ "$odex_file" == "Camera.odex" ] && [ -e ../framework/secmediarecorder.jar ]
+      then
+        classfile=$classfile:secmediarecorder.jar
+      fi
+    
     elif [ "$odex_file" == "MiniDiary.odex" ] || \
          [ "$odex_file" == "Mms.odex" ] 
     then
