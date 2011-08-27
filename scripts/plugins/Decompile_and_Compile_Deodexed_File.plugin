@@ -1,0 +1,216 @@
+
+echo
+echo "Decompile and Compile a Deodexed File"
+echo "--------------------------------------"
+echo
+echo "This script will decompile a de-odexed APK/JAR to its smali"
+echo "components.  You will need a working folder consisting of"
+echo "the system/app and system/framework subfolders."
+echo
+
+echo -n "Proceed (y/n)? (default: y): "
+read proceed
+echo
+
+if [ "$proceed" == "n" ]
+then
+  exit 0
+fi
+
+
+if [ ! -d WORKING_* ]
+then
+  echo
+  echo Working folder not found!
+  exit 0
+fi
+
+orig_folder=`pwd`
+
+echo
+cd WORKING_*
+
+if [ ! -d system/app ]
+then
+  echo "system/app is missing!"
+  cd ..
+  exit 0
+fi
+
+if [ ! -d system/framework ]
+then
+  echo "system/framework is missing!"
+  cd ..
+  exit 0
+fi
+
+
+grep1=`find system/framework | grep \\.jar$ | sort -f`
+grep2=`find system/framework | grep \\.apk$ | sort -f`
+grep3=`find system/app | grep \\.jar$ | sort -f`
+grep4=`find system/app | grep \\.apk$ | sort -f`
+
+grep_cmd=`echo $grep1 $grep2 $grep3 $grep4`
+
+if [ "$grep_cmd" == "" ]
+then
+  echo "Error: No files found!"
+  cd ..
+  exit 0
+fi
+
+count=0
+
+rm -f ../temp.list
+
+echo >> ../temp.list
+echo "All files:" >> ../temp.list
+echo >> ../temp.list
+
+for filename in $grep_cmd 
+do
+
+  # Skip those that are not de-odexed
+  # no_ext=`echo $filename | sed 's/\(.*\/.*\/[a-zA-Z]*\).*/\1/g'`
+  # odex_file="$no_ext.odex"
+  # if [ -e $odex_file ]
+  # then
+  #   continue
+  # fi
+
+  count=$(($count+1))
+
+  # Store file names in an array
+  file_array[$count]=$filename
+  echo "  ($count) $filename" >> ../temp.list
+done
+
+more ../temp.list
+rm -f ../temp.list
+
+echo
+echo -n "Enter file number (0 = cancel): "
+
+read enterNumber
+
+if [ "$enterNumber" == "0" ]
+then
+  cd $orig_folder
+  exit 0
+
+# Verify input is a number
+elif [ "`echo $enterNumber | sed 's/[0-9]*//'`" == "" ]
+then
+
+  file_chosen=${file_array[$enterNumber]}
+
+  if [ "$file_chosen" == "" ]
+  then
+    cd $orig_folder
+    exit 0
+  fi
+  
+  echo
+  echo "Decompiling $file_chosen ..."
+
+  folder=`echo $file_chosen | sed -e 's/\(.*\/.*\)\/.*/\1/g'`
+  file_chosen=`echo $file_chosen | sed -e 's/.*\/.*\/\(.*\)/\1/g'`
+
+  cd $folder
+  rm -rf out
+  rm -f classes.dex
+
+  version=`more ../../../tools/deodex_files/use_this_version.txt | sed 's/[ ]*$//g'`
+  cp -f ../../../tools/deodex_files/baksmali-$version.jar baksmali.jar
+  cp -f ../../../tools/deodex_files/smali-$version.jar smali.jar
+
+  echo
+  echo "-> unzip $file_chosen classes.dex"
+  echo
+  unzip $file_chosen classes.dex
+
+  if [ ! -e classes.dex ]
+  then
+    echo "Error: File is not deodexed!"
+    rm -f *smali.jar
+    cd $orig_folder
+    exit 0
+  fi
+
+  echo
+  echo "-> java -Xmx512m -jar baksmali.jar classes.dex"
+  echo
+  java -Xmx512m -jar baksmali.jar classes.dex
+
+  if [ -d out ]
+  then
+    echo
+    echo "$file_chosen has been decompiled, please check the $folder/out folder." 
+    echo
+    echo "Make changes to the appropriate smali files and press Enter when done."
+    echo
+    read go_compile
+
+    if [ ! -e classes.dex ]
+    then
+      echo "Error: classes.dex not found!"
+      error=1
+    else
+
+      echo
+      echo "Compiling $file_chosen ..."
+      echo
+      echo "-> java -Xmx512m -jar smali.jar out -o classes.dex"
+      echo
+      java -Xmx512m -jar smali.jar out -o classes.dex      
+      
+      if [ "$?" != "0" ]
+      then
+        echo "Error during compile, aborting"
+        error=1
+      else
+
+        echo "-> zip -r -q $file_chosen classes.dex"
+        echo
+        zip -r -q $file_chosen classes.dex
+  
+        if [ "$?" != "0" ]
+        then
+          echo "Error when zipping back classes.dex"
+          error=1
+        fi
+
+        rm -rf out
+        rm -f classes.dex
+
+        if [ -e classes.dex ]
+        then
+          echo "Error: Compile failed, classes.dex still exists!"
+          error=1
+        fi
+
+        if [ -d out ]
+        then
+          echo "Error: Compile failed, folder $folder/out still exists!"
+          error=1
+        fi
+      fi
+    fi
+
+  else
+    echo "Error: Folder $folder/out not found!"
+    error=1
+  fi
+
+  rm -f *smali.jar
+
+fi
+
+if [ "$error" != "1" ]
+then
+  echo
+  echo "Finished"
+fi
+
+cd $orig_folder
+
