@@ -15,16 +15,12 @@ grep_cmd2=`find . -maxdepth 1 -type f | grep -i \\.tar$ | sed 's/ /temp_space/g'
 grep_cmd3=`find system.img 2>/dev/null`
 grep_cmd4=`find . -maxdepth 1 -type f | grep -i \\.app$ | sed 's/ /temp_space/g' 2>/dev/null`
 
-if [ -e factoryfs.img ]
-then
-  grep_cmd5=`find factoryfs.img 2>/dev/null`
-else
-  grep_cmd5=
-fi
+grep_cmd5=`find factoryfs.img 2>/dev/null`
+grep_cmd6=`find factoryfs.rfs 2>/dev/null`
 
-grep_cmd6=`find . -maxdepth 1 -type d | grep "\./WORKING_" | sed 's/ /temp_space/g' 2>/dev/null`
+grep_cmd7=`find . -maxdepth 1 -type d | grep "\./WORKING_" | sed 's/ /temp_space/g' 2>/dev/null`
 
-grep_cmd=`echo $grep_cmd1 $grep_cmd2 $grep_cmd3 $grep_cmd4 $grep_cmd5 $grep_cmd6 | sed -e 's/\.\///g' | sort -f`
+grep_cmd=`echo $grep_cmd1 $grep_cmd2 $grep_cmd3 $grep_cmd4 $grep_cmd5 $grep_cmd6 $grep_cmd7 | sed -e 's/\.\///g' | sort -f`
 
 cd ..
 echo $grep_cmd
