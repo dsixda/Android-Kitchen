@@ -10,7 +10,7 @@
 
 
 device=`scripts/get_build_prop_val ro.product.device`
-exists=`echo $device | grep -c "GT-I9"`
+exists=`echo $device | grep -c "GT-I90"`
 
 if [ $exists == 0 ]
 then
