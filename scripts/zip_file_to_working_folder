@@ -113,36 +113,64 @@ then
   fi
 
 
-# Check for Samsung stock ROM
-else
+#
+# Check for Samsung Galaxy S2 stock ROM
+#
+elif [ -e factoryfs.img ]
+then
+  echo Found factoryfs.img
 
-  if [ -e factoryfs.img ]
+  if [ -e cache.img ]
   then
-    echo Found factoryfs.img
-
-    if [ -e cache.img ]
-    then
-      echo Found cache.img
-    else
-      echo "Warning: No cache.img found"
-    fi
-
-    if [ -e zImage ]
-    then
-      echo "Found zImage"
-      cd ..
-      scripts/show_rooted_kernel_msg
-      cd $build_dir
-    else
-      echo "Warning: No zImage found"
-    fi
-
-    cd ..
-    scripts/simg_files_to_working_folder no_create $2
-    exit $?
+    echo Found cache.img
+  else
+    echo "Warning: No cache.img found"
   fi
 
+  if [ -e zImage ]
+  then
+    echo "Found zImage"
+    cd ..
+    scripts/show_rooted_kernel_msg
+    cd $build_dir
+  else
+    echo "Warning: No zImage found"
+  fi
+
+  cd ..
+  scripts/simg_files_to_working_folder no_create $2
+  exit $?
+
+
+#
+# Check for Samsung Galaxy S stock ROM
+#
+elif [ -e factoryfs.rfs ]
+then
+  echo Found factoryfs.rfs
+
+  if [ -e cache.rfs ]
+  then
+    echo Found cache.rfs
+  else
+    echo "Warning: No cache.rfs found"
+  fi
+
+  if [ -e zImage ]
+  then
+    echo "Found zImage"
+    cd ..
+    scripts/show_rooted_kernel_msg
+    cd $build_dir
+  else
+    echo "Warning: No zImage found"
+  fi
+
+  cd ..
+  scripts/rfs_files_to_working_folder no_create $2
+  exit $?
 fi
+
 
 
 
