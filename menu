@@ -10,7 +10,7 @@
 #
 ############################################################################
 
-version=0.177
+version=0.178
 
 
 if [ ! -e menu ]
@@ -67,7 +67,7 @@ do
 
   echo 
   echo "============================================================"
-  echo " HTC Android Kitchen $version - by dsixda (xda-developers.com)"
+  echo " Android Kitchen $version - by dsixda (xda-developers.com)"
   echo "============================================================"
   echo
   echo "  1 - Set up working folder from ROM"
