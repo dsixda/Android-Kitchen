@@ -1,0 +1,106 @@
+############################################################################
+#
+# Copyright (c) 2010-2011 dsixda - dislam@rocketmail.com
+#
+# Android Kitchen is 100% free.  This script file is intended for personal
+# and/or educational use only.  It may not be duplicated for monetary
+# benefit or any other purpose without the permission of the developer.
+#
+############################################################################
+
+#
+# This script has two optional arguments:
+#
+# $1 = "no_create" or "create" or "create_working 
+#         - must specify no_create if working folder already exists
+# $2 = "kernel_only" or "name_given" - if this is specified then $1 is mandatory
+#
+
+
+if [ "$1" == "no_create" ] 
+then
+  build_dir=`ls | grep -m 1 ^WORKING_`
+
+else
+
+  #
+  # Working folder name
+  #
+  build_dir=`scripts/set_working_folder_name $2` 
+
+  #
+  # Creating folder structure
+  #
+  echo
+  echo "Creating working folder $build_dir ..."
+  mkdir $build_dir
+
+  echo "Copying files from original_update to $build_dir ..."
+  cp original_update/PDA.tar $build_dir 2>/dev/null
+  cp original_update/CSC.tar $build_dir 2>/dev/null
+  cp original_update/PHONE.tar $build_dir 2>/dev/null
+
+fi
+
+echo
+echo "Unpacking PDA.tar ..."
+
+tar xvf $build_dir/PDA.tar -C $build_dir -x factoryfs.rfs 2>/dev/null
+rm -f $build_dir/PDA.tar
+
+if [ ! -e $build_dir/factoryfs.rfs ]
+then
+  echo
+  echo "Error: Cannot extract factoryfs.rfs!"
+  exit 1
+fi
+
+if [ -e $build_dir/CSC.tar ]
+then
+  echo
+  echo "Unpacking CSC.tar ..."
+
+  tar xvf $build_dir/CSC.tar -C $build_dir -x cache.rfs 2>/dev/null
+  rm -f $build_dir/CSC.tar
+
+  if [ ! -e $build_dir/cache.rfs ]
+  then
+    echo
+    echo "Error: Cannot extract cache.rfs!"
+    exit 1
+  fi
+fi
+
+if [ -e $build_dir/PHONE.tar ]
+then
+  echo
+  echo "Unpacking PHONE.tar ..."
+
+  tar xvf $build_dir/PHONE.tar -C $build_dir -x modem.bin 2>/dev/null
+  rm -f $build_dir/PHONE.tar
+
+  if [ ! -e $build_dir/modem.bin ]
+  then
+    echo
+    echo "Error: Cannot extract modem.bin!"
+    exit 1
+  fi
+fi
+
+
+echo
+
+cd $build_dir
+
+if [ -e zImage ]
+then
+  cd ..
+  scripts/show_rooted_kernel_msg
+  cd $build_dir
+fi
+
+cd ..
+scripts/rfs_files_to_working_folder no_create $2
+exit $?
+
+
