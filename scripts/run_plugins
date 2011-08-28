@@ -20,8 +20,8 @@ then
 fi
 
 cd scripts/plugins
-chmod 755 *
-grep_cmd=`find . | grep "\.plugin\$" | sed 's/.\///'`
+grep_cmd=`find . | grep "\.plugin\$" | sed -e 's/.\///'`
+grep_cmd2=`find . | grep "\.plugin\$" | sed -e 's/.\///' -e 's/.plugin//g'`
 cd ../..
 
 
@@ -65,15 +65,14 @@ else
     echo $long_line
     echo
 
-    for plugin_file in $grep_cmd 
+    for plugin_file in $grep_cmd2
     do
       count=$(($count+1))
 
       # Store file names in an array
       file_array[$count]=$plugin_file
 
-      no_ext=`echo $plugin_file | sed -e 's/.plugin[.]*[a-zA-Z0-9]*//' -e 's/_/ /g'`
-      echo "  ($count) $no_ext"
+      echo "  ($count) $plugin_file"
 
     done
 
@@ -99,7 +98,7 @@ else
     elif [ "`echo $enterOption | sed 's/[0-9]*//'`" == "" ]
     then
 
-      file_chosen=${file_array[$enterOption]}
+      file_chosen=${file_array[$enterOption]}.plugin
     
       if [ "$file_chosen" == "" ]
       then
@@ -112,6 +111,7 @@ else
       if [ -e scripts/plugins/$file_chosen ]
       then
         clear
+        chmod 755 scripts/plugins/$file_chosen
         scripts/plugins/$file_chosen
       else
         echo "Error: File not found!"
