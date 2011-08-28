@@ -11,6 +11,5 @@
 file_path=$1
 
 cat $file_path | tr -d '\r' > $file_path.temp
-rm -f $file_path
-mv $file_path.temp $file_path
-chmod +x $file_path
+mv -f $file_path.temp $file_path
+
