@@ -169,6 +169,66 @@ then
   cd ..
   scripts/rfs_files_to_working_folder no_create $2
   exit $?
+
+#
+# Galaxy S again
+#
+elif [ -e PDA.tar ]
+then
+  echo Found PDA.tar
+
+  if [ -e CSC.tar ]
+  then
+    echo Found CSC.tar
+  else
+    echo "Warning: No CSC.tar found"
+  fi
+
+  if [ -e PHONE.tar ]
+  then
+    echo Found PHONE.tar
+  fi
+
+  if [ -e zImage ]
+  then
+    echo "Found zImage"
+  else
+    echo "Warning: No zImage found"
+  fi
+
+  cd ..
+  scripts/sgs_tar_files_to_working_folder no_create $2
+  exit $?
+
+#
+# Galaxy S yet again
+#
+elif [ -e PDA.tar.md5 ]
+then
+  echo Found PDA.tar.md5
+
+  if [ -e CSC.tar.md5 ]
+  then
+    echo Found CSC.tar.md5
+  else
+    echo "Warning: No CSC.tar.md5 found"
+  fi
+
+  if [ -e PHONE.tar.md5 ]
+  then
+    echo Found PHONE.tar.md5
+  fi
+
+  if [ -e zImage ]
+  then
+    echo "Found zImage"
+  else
+    echo "Warning: No zImage found"
+  fi
+
+  cd ..
+  scripts/sgs_tarmd5_files_to_working_folder no_create $2
+  exit $?
 fi
 
 
