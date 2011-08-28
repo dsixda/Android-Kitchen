@@ -47,18 +47,9 @@ mkdir $build_dir
 echo
 echo "Extracting ROM ..."
 
-tar xvf original_update/$update_file -C $build_dir -x factoryfs.img cache.img modem.bin zImage factoryfs.rfs cache.rfs 2>/dev/null
+tar xvf original_update/$update_file -C $build_dir -x factoryfs.img cache.img modem.bin zImage factoryfs.rfs cache.rfs PDA.tar.md5 CSC.tar.md5 PHONE.tar.md5 PDA.tar CSC.tar PHONE.tar 2>/dev/null
 
 cd $build_dir
-
-if [ ! -e factoryfs.img ] && [ ! -e factoryfs.rfs ]
-then
-  echo
-  echo "Error: Cannot extract ROM!"
-  cd ..
-  exit 1
-fi
-
 
 echo
 
@@ -90,6 +81,20 @@ then
   scripts/rfs_files_to_working_folder no_create $2
   exit $?
 
+elif [ -e PDA.tar ]
+then
+
+  cd ..
+  scripts/sgs_tar_files_to_working_folder no_create $2
+  exit $?
+
+elif [ -e PDA.tar.md5 ]
+then
+
+  cd ..
+  scripts/sgs_tarmd5_files_to_working_folder no_create $2
+  exit $?
+
 else
   echo "Error: No image files found in TAR archive!"
   echo 
@@ -97,52 +102,4 @@ else
   exit 1
 fi
 
-
-
-if [ ! -d system ] && [ ! -d SYSTEM ]
-then
-
-  echo
-  echo "Error: No system folder found!"
-  cd ..
-  exit 1
-
-fi
-
-
-echo
-echo "Listing of META-INF/com/google/android:"
-
-cd WORKING_*
-cd META-INF/com/google/android
-ls -l 
-cd ../../../../..
-
-
-
-#
-# Completion
-#
-
-cd $build_dir
-
-echo
-echo Listing of $build_dir:
-ls -l 
-
-echo
-
-if [ -d system ]
-then
-  echo "Finished setting up working folder!"
-  cd ..
-
-else
-  echo "Error: Setup failed"
-  cd ..
-  scripts/press_enter
-  exit 1
-fi
-
-cd ..
 
