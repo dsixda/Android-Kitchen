@@ -37,69 +37,13 @@ then
   
 else
 
-  cd original_update
-
-  #
-  # Check for any ZIP files in original_update
-  #
-  zip_cmd=`find . ! -name . -prune -type f | grep -i -m 1 \\.zip$`
- 
-  #
-  # Check for any TAR files in original_update
-  #
-  tar_cmd=`find . ! -name . -prune -type f | grep -i -m 1 \\.tar$`
-
-  #
-  # Check for *.APP or *.app in original_update
-  #
-  app_cmd=`find . ! -name . -prune -type f | grep -i -m 1 \\.app$`
-
-  #
-  # Check for SGS factoryfs.rfs
-  #
-  facrfs_cmd=`find . ! -name . -prune -type f | grep -i factoryfs.rfs$`
-
-  #
-  # Check for SGS2 factoryfs.img
-  #
-  facimg_cmd=`find . ! -name . -prune -type f | grep -i factoryfs.img$`
-
-  #
-  # Check for WORKING_* folder in original_update
-  #
-  wkg_cmd=`find . ! -name . -prune -type d | grep "WORKING_"`
-
-  cd ..
-
-  if [ "$zip_cmd" == "" ] && [ "$tar_cmd" == "" ] && [ "$app_cmd" == "" ] && [ "$wkg_cmd" == "" ] \
-    && [ "$facrfs_cmd" == "" ] && [ "$facimg_cmd" == "" ]
-  then
-
-    #
-    # Check for system.img and boot.img in original_update  
-    #
-
-    # We'll prompt for a Null boot.img if no boot.img found
-    if [ ! -e original_update/system.img ]
-    then
-
-      # No system.img found, check for boot.img
-
-      if [ -e original_update/boot.img ]
-      then
-        echo "Error: No original_update/system.img found"
-      else
-        echo
-        echo "Error: No ROMs found under original_update folder!"
-      fi
-
-      exit 0
-    fi
-
-  fi
-
-
   grep_cmd=`scripts/grep_roms`
+
+  if [ "$grep_cmd" == "" ]
+  then
+    echo "Error: No ROMs found under original_update folder!"
+    exit 0
+  fi
 
   count=0
   rm -f temp.list
@@ -128,6 +72,14 @@ else
     elif [ "$filename" == "factoryfs.img" ]
     then
       filename="factoryfs.img, cache.img and zImage"
+
+    elif [ "$filename" == "PDA.tar.md5" ]
+    then
+      filename="PDA.tar.md5, CSC.tar.md5 and PHONE.tar.md5"
+
+    elif [ "$filename" == "PDA.tar" ]
+    then
+      filename="PDA.tar, CSC.tar and PHONE.tar"
     fi
 
     echo "  ($count) $filename" >> temp.list
@@ -178,6 +130,16 @@ then
   elif [ "$file_chosen" == "factoryfs.rfs" ]
   then
     scripts/rfs_files_to_working_folder create_working $1
+    exit $?
+
+  elif [ "$file_chosen" == "PDA.tar" ]
+  then
+    scripts/sgs_tar_files_to_working_folder create_working $1
+    exit $?
+
+  elif [ "$file_chosen" == "PDA.tar.md5" ]
+  then
+    scripts/sgs_tarmd5_files_to_working_folder create_working $1
     exit $?
 
   elif [ "$file_chosen" == "factoryfs.img" ]
