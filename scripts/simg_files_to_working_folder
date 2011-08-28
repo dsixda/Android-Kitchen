@@ -34,9 +34,8 @@ then
     mv $build_dir/cache.img $build_dir/system
   else
     echo
-    echo "Warning: No cache.img found.  You can unpack a cache.img"
-    echo "separately by running the plugin script in the kitchen's"
-    echo "Advanced menu."
+    echo "Warning: No cache.img found.  You can unpack a cache.img separately"
+    echo "by running the plugin script in the kitchen's Advanced menu options."
     echo
   fi
 
