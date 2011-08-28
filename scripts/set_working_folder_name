@@ -18,7 +18,7 @@ date_str=`date '+%m%d%y_%H%M%S'`
 working_dir=WORKING_$date_str
 
 if [ "$1" != "kernel_only" ] && [ "$1" != "name_given" ]
-  then
+then
 
   echo 1>&2
   echo "The new working folder will be named $working_dir" 1>&2
