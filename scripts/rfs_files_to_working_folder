@@ -34,9 +34,8 @@ then
     mv $build_dir/cache.rfs $build_dir/system
   else
     echo
-    echo "Warning: No cache.rfs found.  You can unpack a cache.rfs"
-    echo "separately by running the plugin script in the kitchen's"
-    echo "Advanced menu."
+    echo "Warning: No cache.rfs found.  You can unpack a cache.rfs separately"
+    echo "by running the plugin script in the kitchen's Advanced menu options."
     echo
   fi
 
