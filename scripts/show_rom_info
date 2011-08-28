@@ -53,8 +53,7 @@ fi
 
 if [ ! -d BOOT-EXTRACTED ] 
 then
-  echo "BOOT-EXTRACTED folder not found"
-  exit 0
+  echo "Warning: BOOT-EXTRACTED folder not found"
 fi
 
 
