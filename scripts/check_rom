@@ -51,14 +51,20 @@ then
   echo " - Working folder made with this kitchen (e.g. WORKING_old_rom)"
   echo
   echo " Other formats:"
-  echo 
-  echo " - factoryfs.rfs + optional cache.rfs/zImage    (e.g. SGS stock ROM)"
-  echo " - factoryfs.img + optional cache.img/zImage    (e.g. SGS2 stock ROM)"
-  echo " - TAR/ZIP file containing factoryfs.rfs + more (e.g. SGS stock ROM)"  
-  echo " - TAR/ZIP file containing factoryfs.img + more (e.g. SGS2 stock ROM)"  
-  echo " - APP file from Huawei software update         (e.g. UPDATE.APP)"
   echo
-  echo " (SGS=Samsung Galaxy S, SGS2=Samsung Galaxy SII)" 
+  echo " Samsung Galaxy S:"
+  echo " - factoryfs.rfs + optional cache.rfs/zImage"
+  echo " - PDA.tar.md5 + optional CSC.tar.md5/PHONE.tar.md5"
+  echo " - PDA.tar + optional CSC.tar/PHONE.tar"
+  echo " - TAR/ZIP file containing factoryfs.rfs + more" 
+  echo " - TAR/ZIP file containing PDA.tar.md5/PDA.tar + more"
+  echo
+  echo " Samsung Galaxy SII:"
+  echo " - factoryfs.img + optional cache.img/zImage"  
+  echo " - TAR/ZIP file containing factoryfs.img + more" 
+  echo
+  echo " Huawei:"
+  echo " - APP file from Huawei software update (e.g. UPDATE.APP)"
   echo
   echo "----------------------------------------------------------------------"
   echo
