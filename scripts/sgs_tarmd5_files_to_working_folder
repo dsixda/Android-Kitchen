@@ -45,7 +45,7 @@ fi
 echo
 echo "Unpacking PDA.tar.md5 ..."
 
-tar xvf $build_dir/PDA.tar.md5 -C $build_dir -x factoryfs.rfs 2>/dev/null
+tar xvf $build_dir/PDA.tar.md5 -C $build_dir -x factoryfs.rfs zImage 2>/dev/null
 rm -f $build_dir/PDA.tar.md5
 
 if [ ! -e $build_dir/factoryfs.rfs ]
@@ -54,6 +54,16 @@ then
   echo "Error: Cannot extract factoryfs.rfs!"
   exit 1
 fi
+
+if [ ! -e $build_dir/zImage ]
+then
+  echo
+  echo "Warning: No zImage found"
+else
+  scripts/show_rooted_kernel_msg
+fi
+
+cd ..
 
 if [ -e $build_dir/CSC.tar.md5 ]
 then
@@ -87,19 +97,6 @@ then
   fi
 fi
 
-
-echo
-
-cd $build_dir
-
-if [ -e zImage ]
-then
-  cd ..
-  scripts/show_rooted_kernel_msg
-  cd $build_dir
-fi
-
-cd ..
 scripts/rfs_files_to_working_folder no_create $2
 exit $?
 
