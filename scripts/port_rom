@@ -269,8 +269,8 @@ fi
 # Copy the zImage by itself if it's a Galaxy S2 or equivalent
 #
 
-sgs_exists=`echo $my_device | grep -c "GT-I9"`
-if [ $sgs_exists -gt 0 ]
+if [ -e tools/samsung_files/sgs_variants/$my_device ] || \
+    [ -e tools/samsung_files/sgs2_variants/$my_device ]
 then
   echo 
   echo "Copying zImage ..."
