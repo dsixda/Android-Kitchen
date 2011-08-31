@@ -10,12 +10,11 @@
 
 
 device=`scripts/get_build_prop_val ro.product.device`
-exists=`echo $device | grep -c "GT-I90"`
 
-if [ $exists == 0 ]
+if [ -e tools/samsung_files/sgs_variants/$device ]
 then
-  exit 0
-else
   exit 1
+else
+  exit 0
 fi
 
