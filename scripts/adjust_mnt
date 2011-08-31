@@ -14,16 +14,6 @@
 #
 
 
-# First check for Samsung Galaxy S/S2
-scripts/check_galaxy_s
-is_gs=$?
-if [ "$is_gs" == "0" ]
-then
-  scripts/check_galaxy_s2
-  is_gs2=$? 
-fi    
-
-
 if [ "$1" != "" ]
 then
 
@@ -33,7 +23,25 @@ then
     exit 1
   fi
 
-  device_name=`scripts/get_device_name`
+
+  # First check for Samsung Galaxy S/S2
+  scripts/check_galaxy_s
+  is_gs=$?
+
+  if [ "$is_gs" == "1" ]
+  then
+    device_name="GT-I9000"
+  else
+    scripts/check_galaxy_s2
+    is_gs2=$? 
+
+    if [ "$is_gs2" == "1" ]
+    then
+      device_name="GT-I9100"
+    else
+      device_name=`scripts/get_device_name`
+    fi
+  fi    
 
   change_mnt=`scripts/get_edify_def_val $device_name change_mnt`
   change_mnt_dell=`scripts/get_edify_def_val $device_name change_mnt_dell`
