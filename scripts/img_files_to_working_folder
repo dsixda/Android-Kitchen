@@ -214,7 +214,7 @@ then
 
     if [ "$is_gs2" == "1" ]
     then
-      cp_file=flash_zimage
+      cp_file=flash_image
     fi
   fi
 
@@ -229,7 +229,7 @@ then
     mv -v boot.img zImage
     echo
     cp -v ../tools/samsung_files/$cp_file .
-    echo $cp_file >> META-INF/com/google/android/update-script
+    echo flash_zimage >> META-INF/com/google/android/update-script
     cd ..
     scripts/check_no_bootimg 
   fi
