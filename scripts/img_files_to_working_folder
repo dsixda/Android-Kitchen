@@ -214,7 +214,7 @@ then
 
     if [ "$is_gs2" == "1" ]
     then
-      cp_file=flash_image
+      cp_file=flash_zimage
     fi
   fi
 
