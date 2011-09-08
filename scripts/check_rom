@@ -44,11 +44,11 @@ then
   echo
   echo "The format for each ROM must be one of the following:"
   echo
-  echo " - system.img + boot.img      (e.g. from shipped ROM or Nandroid)"
-  echo " - ZIP file for a custom ROM  (e.g. update.zip)"
-  echo " - ZIP file containing *.img  (e.g. rom.zip from shipped ROM)"
+  echo " - system.img + optional boot.img/lib.img (e.g. stock ROM or Nandroid)"
+  echo " - ZIP file for a custom ROM              (e.g. update.zip)"
+  echo " - ZIP file containing *.img              (e.g. stock rom.zip)"
   echo " - ZIP file containing shipped ROM in SYSTEM + BOOT folder format"
-  echo " - Working folder made with this kitchen (e.g. WORKING_old_rom)"
+  echo " - Working folder made with this kitchen  (e.g. WORKING_old_rom)"
   echo
   echo " Other formats:"
   echo
