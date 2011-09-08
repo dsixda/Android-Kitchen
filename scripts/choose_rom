@@ -37,6 +37,9 @@ then
   
 else
 
+  #
+  # This script will search original_update for available ROMs
+  #
   grep_cmd=`scripts/grep_roms`
 
   if [ "$grep_cmd" == "" ]
