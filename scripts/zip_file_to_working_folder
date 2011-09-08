@@ -61,7 +61,7 @@ cd $build_dir
 
 
 #
-# Check for system.img and boot.img
+# Check for the required IMG files
 #
 
 echo
@@ -80,37 +80,42 @@ then
   mv -v boot_*.img boot.img
 fi 
 
+if [ "`find . -maxdepth 1 | grep .img | grep -c lib_`" == "1" ]
+then
+  echo "Renaming ..."
+  mv -v lib_*.img lib.img
+fi 
+
 
 if [ -e system.img ] && [ ! -d system ]
 then
 
   echo
-  echo Found system.img
+  echo "Found system.img"
+  mkdir ../temp_img
+  mv system.img ../temp_img
 
   if [ -e boot.img ]
   then
-    echo Found boot.img
-
-    #
-    # Remove any other files
-    #
-    mkdir ../temp_img
-    mv system.img ../temp_img
+    echo "Found boot.img"
     mv boot.img ../temp_img
-    echo
-    rm -vf *
-    mv ../temp_img/* .
-    rmdir ../temp_img
-
-    cd ..
-    scripts/img_files_to_working_folder no_create $2
-    exit $?
-  else
-    echo "Error: No boot.img found"
-    echo
-    cd ..
-    exit 1
   fi
+
+  if [ -e lib.img ]
+  then
+    echo "Found lib.img"
+    mv lib.img ../temp_img
+  fi
+
+  echo
+  rm -vf *
+  mv ../temp_img/* .
+  rmdir ../temp_img
+
+  cd ..
+  scripts/img_files_to_working_folder no_create $2
+  exit $?
+fi
 
 
 #
