@@ -23,27 +23,38 @@ then
   mkdir $build_dir/system
   mv $build_dir/system.img $build_dir/system
 
+  if [ -e $build_dir/lib.img ]
+  then
+    mkdir -p $build_dir/system/lib
+    mv $build_dir/lib.img $build_dir/system/lib
+  fi
+
 else
 
   current_dir=`pwd`
   dest_dir=$current_dir/original_update
   scripts/check_no_bootimg $dest_dir
 
-
   #
-  # Check for system.img and boot.img in original_update  
+  # Check for system.img/boot.img/lib.img in original_update  
   #
   if [ -e original_update/system.img ]
   then
-    echo Found original_update/system.img
+    echo "Found original_update/system.img"
     if [ -e original_update/boot.img ]
     then
-      echo Found original_update/boot.img
+      echo "Found original_update/boot.img"
     else
       echo "Error: No original_update/boot.img found"
       echo
       exit 1
     fi
+
+    if [ -e original_update/lib.img ]
+    then
+      echo "Found original_update/lib.img"
+    fi
+
   else
 
     if [ -e original_update/boot.img ]
@@ -69,9 +80,17 @@ else
   mkdir $build_dir
   mkdir $build_dir/system
 
-  echo Copying boot.img and system.img ...
+  echo "Copying boot.img ..."
   cp original_update/boot.img $build_dir
+  echo "Copying system.img ..."
   cp original_update/system.img $build_dir/system
+
+  if [ -e original_update/lib.img ]
+  then
+    echo "Copying lib.img ..."
+    mkdir -p $build_dir/system/lib
+    cp original_update/lib.img $build_dir/system/lib
+  fi
 
 fi
 
@@ -186,8 +205,46 @@ then
   exit 1
 fi
 
-cd ..
 
+
+#
+# Extract the contents of lib.img, which will go under /system/lib
+#
+
+if [ -e system/lib/lib.img ]
+then
+
+  echo 
+  echo 
+  echo "--> Found lib.img, which contains contents of /system/lib ..."
+  echo
+
+  cd ..
+  scripts/press_enter
+  scripts/extract_ext3_img $system_dir/lib lib.img
+  
+  rm -f $system_dir/lib/lib.img 2>/dev/null
+
+  if [ "$?" == "1" ]
+  then
+    echo
+    echo "WARNING: lib.img is in use.  Remove file manually after application is closed."
+    echo
+  fi
+
+  #
+  # Check for empty /system/lib folder
+  #
+  lib_files=`ls $system_dir/lib`
+  if [ "$lib_files" == "lib.img" ] || [ "$lib_files" == "" ]
+  then
+    echo
+    echo "Error: No files extracted from lib.img"
+    exit 1
+  fi
+else
+  cd ..
+fi
 
 
 
