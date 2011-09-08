@@ -80,6 +80,15 @@ then
       echo "Invalid option"
     fi
 
+    if [ "$enterNumber" == "1" ] || [ "$enterNumber" == "2" ]
+    then
+      echo
+      echo "--> If you're satisfied with extraction, select option 3 in next menu"
+      echo
+
+      scripts/press_enter
+    fi
+
   done
 
 
