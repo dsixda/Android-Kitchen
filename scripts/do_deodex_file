@@ -22,6 +22,7 @@ classfile=$3
 # can be yes/no
 ignore_me=$4
 
+
 if [ "$odex_file" == "" ]
 then
   echo "Error: No .odex file specified"
@@ -31,6 +32,11 @@ then
   echo "Disassembling $odex_file ..."
 else
   echo "Error: $odex_file not found"
+fi
+
+if [ "$classfile" == "none" ]
+then
+	classfile=
 fi
 
 
