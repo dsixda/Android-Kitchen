@@ -39,7 +39,7 @@ then
 
   if [ "$add_it" != "n" ]
   then
-    echo "Copying ..."
+    echo "Copying null boot.img ..."
     cp $kitchen_dir/tools/nullBoot.img $dest_dir/boot.img
   else
     echo "Cancelled"
