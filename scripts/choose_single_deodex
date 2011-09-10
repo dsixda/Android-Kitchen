@@ -76,10 +76,19 @@ then
   while [ "$try_again" != "n" ]
   do
     echo
-    echo "Enter any JAR file dependencies separated by colon (Enter=none):"
-    echo -n "$file_chosen > "
+    echo "Enter any JAR file dependencies separated by colon (Enter=none)."
+		echo "NOTE: To ignore errors, type 'ignore' by itself or after dependencies"
+		echo    
+		echo -n "$file_chosen > "
     read classfiles
     echo
+
+		if [ "$classfiles" == "ignore" ]
+		then
+			classfiles="none yes"
+		else
+			classfiles=`echo $classfiles | sed -e 's/ ignore/ yes/g'`
+		fi
 
     ../scripts/do_deodex_file $file_chosen system/framework $classfiles 
 
