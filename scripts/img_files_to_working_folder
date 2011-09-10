@@ -215,12 +215,15 @@ if [ -e system/lib/lib.img ]
 then
 
   echo 
-  echo 
-  echo "--> Found lib.img, which contains contents of /system/lib ..."
-  echo
+  echo "Found lib.img, which contains contents of /system/lib ..."
 
   cd ..
-  scripts/press_enter
+
+  if [ `uname | grep CYGWIN` ]
+  then
+    scripts/press_enter
+  fi
+
   scripts/extract_ext3_img $system_dir/lib lib.img
   
   rm -f $system_dir/lib/lib.img 2>/dev/null
@@ -242,56 +245,69 @@ then
     echo "Error: No files extracted from lib.img"
     exit 1
   fi
+
 else
   cd ..
+  echo
 fi
 
 
 
-#
-# Check for location of Android header in boot.img so that it can be
-# added to working folder correctly
-#
+cd WORKING_*
 
-scripts/check_bootimg_header
-
-# Not a valid boot.img
-if [ "$?" == "1" ]
+if [ ! -e boot.img ]
 then
+	cd ..
+  scripts/check_no_bootimg
 
-  scripts/check_galaxy_s
-  is_gs=$?
+else
 
-  if [ "$is_gs" == "1" ]
-  then
-    cp_file=redbend_ua
-  else
-    scripts/check_galaxy_s2
-    is_gs2=$?
+	cd ..
 
-    if [ "$is_gs2" == "1" ]
-    then
-      cp_file=flash_image
-    fi
-  fi
+	#
+	# Check for location of Android header in boot.img so that it can be
+	# added to working folder correctly
+	#
 
-  if [ "$is_gs" == "1" ] || [ "$is_gs2" == "1" ]
-  then
-    echo
-    echo "NOTE: The boot.img may actually be a kernel (zImage) instead.  We will"
-    echo "rename it to zImage."
-    echo
+	scripts/check_bootimg_header
 
-    cd WORKING_*
-    mv -v boot.img zImage
-    echo
-    cp -v ../tools/samsung_files/$cp_file .
-    echo flash_zimage >> META-INF/com/google/android/update-script
-    cd ..
-    scripts/check_no_bootimg 
-  fi
+	# Not a valid boot.img
+	if [ "$?" == "1" ]
+	then
+
+		scripts/check_galaxy_s
+		is_gs=$?
+
+		if [ "$is_gs" == "1" ]
+		then
+		  cp_file=redbend_ua
+		else
+		  scripts/check_galaxy_s2
+		  is_gs2=$?
+
+		  if [ "$is_gs2" == "1" ]
+		  then
+		    cp_file=flash_image
+		  fi
+		fi
+
+		if [ "$is_gs" == "1" ] || [ "$is_gs2" == "1" ]
+		then
+		  echo
+		  echo "NOTE: The boot.img may actually be a kernel (zImage) instead.  We will"
+		  echo "rename it to zImage."
+		  echo
+
+		  cd WORKING_*
+		  mv -v boot.img zImage
+		  echo
+		  cp -v ../tools/samsung_files/$cp_file .
+		  echo flash_zimage >> META-INF/com/google/android/update-script
+		  cd ..
+		  scripts/check_no_bootimg 
+		fi
+	fi
 fi
-
 
 
 # Wi-fi fix - required for some Huawei devices
