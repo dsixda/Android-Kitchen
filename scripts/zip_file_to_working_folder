@@ -115,7 +115,6 @@ then
   cd ..
   scripts/img_files_to_working_folder no_create $2
   exit $?
-fi
 
 
 #
