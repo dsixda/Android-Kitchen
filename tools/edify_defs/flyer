@@ -11,7 +11,7 @@ param2_sdcard=MTD
 
 sys_mnt=\/dev\/block\/mmcblk0p25
 cache_mnt=???
-boot_mnt=???
+boot_mnt=\/dev\/block\/mmcblk0p22
 data_mnt=\/dev\/block\/mmcblk0p29
 sdcard_mnt=\/dev\/block\/mmcblk1p1
 
