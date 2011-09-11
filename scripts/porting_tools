@@ -17,11 +17,17 @@ do
   clear
 
   echo
-  echo "Porting - For advanced users only!"
-  echo "----------------------------------"
+  echo "Porting"
+  echo "-------"
   echo
-  echo "PLEASE NOTE: The porting option is only experimental, and may"
-  echo "not always work for your device."
+  echo "WARNING: The porting option is only experimental and for advanced"
+  echo "users only.  The scripts use a general set of rules for porting a"
+  echo "ROM, so additional steps may need to be performed manually by the"
+  echo "user for the ROM to be ported properly."
+  echo
+  echo "If you are new to ROM development, then do not use this option"
+  echo "until you have built some basic (non-ported!) ROMs and have"
+  echo "understood how they work!"
   echo
   echo "Enter a choice:"
   echo 

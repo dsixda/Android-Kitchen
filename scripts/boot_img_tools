@@ -80,6 +80,9 @@ do
   echo "  a = Extract kernel+ramdisk (regular format) from boot.img in any folder"
   echo "  x = Exit"
   echo
+  echo "  NOTE: Some options will not be shown in this menu until a specific"
+  echo "  action above is selected or a specific working folder is created."
+  echo
   echo -n "? "
 
   read enterLetter
