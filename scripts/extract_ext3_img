@@ -101,6 +101,7 @@ then
 elif [ `uname | grep Linux` ]
 then
 
+  echo
   echo "Mounting $img_file to loopback device and then extracting files ..."
   
   cd $img_dir
