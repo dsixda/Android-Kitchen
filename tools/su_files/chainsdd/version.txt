@@ -1,1 +1,1 @@
-ChainsDD Superuser 2.3.6.3
+ChainsDD Superuser 3.0.6
