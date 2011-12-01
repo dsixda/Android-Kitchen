@@ -1,1 +1,0 @@
-When the kitchen uses the 'brute-force' method to de-odex, it will first attempt with the smali/baksmali version in the upper level folder.  If that attempt is unsuccessful, it will try the smali/baksmali version mentioned in the 'use_this_version.txt' file in this folder.
