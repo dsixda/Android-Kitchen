@@ -27,7 +27,7 @@ grep_apk=`find . | grep -i \\.apk$ | sort -f`
 grep_zip=`find . | grep -i \\.zip$ | sort -f`
 grep_files="$grep_apk $grep_zip"
 
-if [ "$grep_files" != "" ]
+if [ "$grep_files" != " " ]
 then
 
   cp ../tools/signapk_files/testkey.* .
@@ -100,7 +100,7 @@ else
   echo
   cd ..
   echo "Removing $files_dir folder"
-  rm -rf $file_dir
+  rm -rf $files_dir
   exit 0
 fi      
   
