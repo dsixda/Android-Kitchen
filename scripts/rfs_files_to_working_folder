@@ -263,7 +263,7 @@ then
       fi
 
       rm -rf temp_csc/META-INF
-      mv temp_csc/system/* .
+      cp -rf temp_csc/system/* .
       rm -rf temp_csc
     fi
 
