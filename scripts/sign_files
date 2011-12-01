@@ -258,6 +258,7 @@ do
 
   elif [ "$enterChoice" == "z" ]
   then
+    cd $base_path
     scripts/sign_files_in_folder    
     scripts/press_enter
 
