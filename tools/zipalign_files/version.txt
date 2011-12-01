@@ -1,1 +1,1 @@
-ZipAlign - Android SDK R11
+ZipAlign - Android SDK R15
