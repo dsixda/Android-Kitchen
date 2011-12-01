@@ -8,19 +8,21 @@
 #
 ############################################################################
 
+# Mandatory
+api_level=$1
 
 # Mandatory
-odex_file=$1
+odex_file=$2
 
 # Mandatory
-bootclass_dir=$2
+bootclass_dir=$3
 
 # Optional; just have the file name, not path
-classfile=$3
+classfile=$4
 
 # Optional; this one is specified if classfile is specified
 # can be yes/no
-ignore_me=$4
+ignore_me=$5
 
 
 if [ "$odex_file" == "" ]
@@ -563,9 +565,9 @@ then
     echo
     echo "-> Ignoring errors for this file!"
     echo
-    java_cmd="java -Xmx512m -jar baksmali.jar -I -d $bootclass_dir -c :$classfile -x $odex_file"
+    java_cmd="java -Xmx512m -jar baksmali.jar -a $api_level -I -d $bootclass_dir -c :$classfile -x $odex_file"
   else
-    java_cmd="java -Xmx512m -jar baksmali.jar -d $bootclass_dir -c :$classfile -x $odex_file"
+    java_cmd="java -Xmx512m -jar baksmali.jar -a $api_level -d $bootclass_dir -c :$classfile -x $odex_file"
   fi
 
   echo $java_cmd
@@ -581,9 +583,9 @@ then
     echo
     echo "-> Ignoring errors for this file!"
     echo
-    java_cmd="java -Xmx512m -jar baksmali.jar -I -d $bootclass_dir -c :$classfile -x $odex_file"
+    java_cmd="java -Xmx512m -jar baksmali.jar -a $api_level -I -d $bootclass_dir -c :$classfile -x $odex_file"
   else
-    java_cmd="java -Xmx512m -jar baksmali.jar -d $bootclass_dir -c :$classfile -x $odex_file"
+    java_cmd="java -Xmx512m -jar baksmali.jar -a $api_level -d $bootclass_dir -c :$classfile -x $odex_file"
   fi
 
   echo $java_cmd
@@ -594,7 +596,7 @@ then
 elif [ "$classfile" == "" ] && [ "$ignore_errors" == "yes" ]
 then
   echo "-> Ignoring errors for this file!"
-  java_cmd="java -Xmx512m -jar baksmali.jar -I -d $bootclass_dir -x $odex_file"
+  java_cmd="java -Xmx512m -jar baksmali.jar -a $api_level -I -d $bootclass_dir -x $odex_file"
 
   echo $java_cmd
   $java_cmd
@@ -603,7 +605,7 @@ then
 # No classfiles and don't ignore error
 # OR classfile defined but doesn't exist
 else
-  java_cmd="java -Xmx512m -jar baksmali.jar -d $bootclass_dir -x $odex_file"
+  java_cmd="java -Xmx512m -jar baksmali.jar -a $api_level -d $bootclass_dir -x $odex_file"
 
   echo $java_cmd
   $java_cmd
@@ -621,7 +623,7 @@ if [ "$is_error" == "0" ] && [ -d out ]
 then
 
   echo "Assembling into classes.dex ..."
-  java_cmd="java -Xmx512m -jar smali.jar -o classes.dex out"
+  java_cmd="java -Xmx512m -jar smali.jar -a $api_level -o classes.dex out"
   
   echo $java_cmd
   $java_cmd

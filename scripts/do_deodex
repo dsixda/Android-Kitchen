@@ -83,6 +83,12 @@ do
     fi
 
 
+    cd ..
+    scripts/convert_to_unix tools/deodex_files/api_level.txt    
+    api_level=`scripts/get_api_level`
+    cd WORKING_*
+
+
     #
     # Show menu choices
     #
@@ -95,6 +101,9 @@ do
     then
       echo " bb  = Back up both folders (do first!)"
     fi
+
+    echo "  v  = Set your Android OS version (current API level = $api_level)"
+
     if [ $num_odex_fr -gt 0 ]
     then
       echo "  f  = Deodex /system/framework"
@@ -121,6 +130,11 @@ do
     if [ "$enterChoice" == "a" ]
     then
       dir_list=app
+    elif [ "$enterChoice" == "v" ]
+    then
+      cd ..
+      scripts/change_api_level
+      continue
     elif [ "$enterChoice" == "f" ] 
     then
       dir_list=framework
@@ -187,8 +201,6 @@ do
   fi
 
   cd ..
-  scripts/convert_to_unix tools/deodex_files/use_this_version.txt
-  scripts/convert_to_unix tools/deodex_files/old_version/use_this_version.txt
   scripts/do_deodex_folder "$dir_list"
 
   cd WORKING_*

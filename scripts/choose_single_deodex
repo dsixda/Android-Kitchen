@@ -13,6 +13,9 @@ clear
 
 
 echo
+
+api_level=`scripts/get_api_level`
+
 cd WORKING_*
 
 grep_cmd=`find . | grep \\.odex$ | sort -f`
@@ -67,9 +70,8 @@ then
     exit 0
   fi
 
-  version=`more ../tools/deodex_files/use_this_version.txt | sed 's/[ ]*$//g'`
-  cp -f ../tools/deodex_files/baksmali-$version.jar baksmali.jar
-  cp -f ../tools/deodex_files/smali-$version.jar smali.jar
+  cp -f ../tools/deodex_files/baksmali-*.jar baksmali.jar
+  cp -f ../tools/deodex_files/smali-*.jar smali.jar
 
   try_again=y
 
@@ -90,7 +92,7 @@ then
 			classfiles=`echo $classfiles | sed -e 's/ ignore/ yes/g'`
 		fi
 
-    ../scripts/do_deodex_file $file_chosen system/framework $classfiles 
+    ../scripts/do_deodex_file $api_level $file_chosen system/framework $classfiles 
 
     result=$?
 
