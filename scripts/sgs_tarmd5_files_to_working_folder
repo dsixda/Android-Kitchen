@@ -63,8 +63,6 @@ else
   scripts/show_rooted_kernel_msg
 fi
 
-cd ..
-
 if [ -e $build_dir/CSC.tar.md5 ]
 then
   echo
