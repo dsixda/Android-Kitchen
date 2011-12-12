@@ -26,11 +26,16 @@ echo "Creating folder `pwd`/$csc_dir ..."
 mkdir $csc_dir
 
 echo
-echo "---> Place stock cache.img into the folder mentioned above <--"
+echo "---> Place stock cache.img or cache.img.ext4 into the folder mentioned above <--"
 
 scripts/press_enter
 
 cd $csc_dir
+
+if [ -e cache.img.ext4 ]
+then
+  mv -fv cache.img.ext4 cache.img
+fi
 
 if [ -e cache.img ]
 then
