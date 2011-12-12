@@ -37,13 +37,15 @@ fi
 
 
 #
-# Check if Samsung Galaxy S2 or equivalent
+# Check if Samsung Galaxy S/S2
 #
 
-scripts/check_galaxy_sx
-is_galaxy_s=$?
+scripts/check_galaxy_s_and_s2
+is_galaxy_ss2=$?
+scripts/check_galaxy_s2x
+is_galaxy_s2x=$?
 
-if [ "$is_galaxy_s" == "1" ]
+if [ "$is_galaxy_ss2" == "1" ]
 then
   scripts/extract_initramfs
 else
@@ -288,7 +290,29 @@ cd ..
 
 
 
-if [ "$is_galaxy_s" == "1" ]
+if [ "$is_galaxy_ss2" == "1" ] || [ "$is_galaxy_s2x" == "1" ]
+then
+
+  #
+  # Check for CSC version
+  #
+
+	echo -n "."
+	cd WORKING_*
+
+  if [ -e system/CSCVersion.txt ]
+  then
+    csc_version=`more system/CSCVersion.txt | sed 's/[ ]*$//g'`
+  else
+    csc_version=UNKNOWN
+  fi
+
+	cd ..
+
+fi
+
+
+if [ "$is_galaxy_ss2" == "1" ]
 then
 
   #
@@ -303,17 +327,6 @@ then
     modem_status=YES
   else
     modem_status=NO
-  fi
-
-  #
-  # Check for CSC version
-  #
-
-  if [ -e system/CSCVersion.txt ]
-  then
-    csc_version=`more system/CSCVersion.txt | sed 's/[ ]*$//g'`
-  else
-    csc_version=UNKNOWN
   fi
 
   cd ..
@@ -433,7 +446,7 @@ echo " Device                         : $device_name"
 echo " Model                          : $model"
 echo " ROM Name                       : $rom_name"
 
-if [ "$is_galaxy_s" == "1" ]
+if [ "$is_galaxy_ss2" == "1" ] || [ "$is_galaxy_s2x" == "1" ]
 then
   echo " CSC version                    : $csc_version"
 fi
@@ -455,10 +468,11 @@ echo " Bash shell support             : $bash_status"
 echo " /system/framework is deodexed  : $deodex_fr_status"
 echo " /system/app is deodexed        : $deodex_app_status"
 
-if [ "$is_galaxy_s" == "1" ]
+if [ "$is_galaxy_ss2" == "1" ]
 then
   echo " modem.bin found                : $modem_status"
-else
+elif [ "$is_galaxy_s2x" != "1" ]
+then
   echo " radio.img found                : $radio_status"
 fi
 
