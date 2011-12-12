@@ -58,7 +58,7 @@ fi
   
 
 #
-# Check for YAFFS/EXT*
+# Check for YAFFS/TAR/EXT*
 #
 
 scripts/check_if_img_yaffs $img_dir data.img
@@ -89,17 +89,33 @@ then
 
 else
 
-  echo
-  echo "NON-YAFFS FILE FORMAT DETECTED"
-  echo
-
   cd $img_dir
 
-  # Get full path
-  imgr_dir=`pwd`
+  # Check for TAR archive
+  test_tar=`od -A n --strings -j 0 -N 7 data.img`
 
-  cd ..
-  scripts/extract_ext3_img $img_path data.img
+  if [ "$test_tar" == "data/" ]
+  then
+    echo "data.img is a TAR archive"
+    echo "Extracting files ..." 
+
+    # Don't show timestamp warning
+    tar xf data.img 2>/dev/null
+
+    cd ..
+
+  else
+
+    echo
+    echo "NON-YAFFS/NON-TAR FILE FORMAT DETECTED"
+    echo
+
+    # Get full path
+    imgr_dir=`pwd`
+
+    cd ..
+    scripts/extract_ext3_img $img_path data.img
+  fi
 fi
 
 

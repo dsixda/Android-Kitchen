@@ -107,7 +107,7 @@ cp tools/update_files/update-script $build_dir/META-INF/com/google/android/
 
 
 #
-# Check for YAFFS/EXT*
+# Check for YAFFS/TAR/EXT*
 #
 
 system_dir=$build_dir/system
@@ -139,18 +139,30 @@ then
 
 else
 
-  echo
-  echo "NON-YAFFS FILE FORMAT DETECTED IN ROM"
-  echo
-
   cd $system_dir
 
-  # Get full path
-  system_dir=`pwd`
+  # Check for TAR archive
+  test_tar=`od -A n --strings -j 0 -N 7 system.img`
 
-  cd ../..
-  scripts/extract_ext3_img $system_dir system.img
-  cd $system_dir
+  if [ "$test_tar" == "system/" ]
+  then
+    echo "system.img is a TAR archive"
+    echo "Extracting files ..."
+    tar xf system.img -C ../
+
+  else
+
+    echo
+    echo "NON-YAFFS/NON-TAR FILE FORMAT DETECTED IN ROM"
+    echo
+
+    # Get full path
+    system_dir=`pwd`
+
+    cd ../..
+    scripts/extract_ext3_img $system_dir system.img
+    cd $system_dir
+  fi
 
 fi
 
