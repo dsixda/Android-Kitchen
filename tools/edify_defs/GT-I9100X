@@ -1,0 +1,17 @@
+
+# Samsung Galaxy S2 (Non-Exynos variants)
+
+change_mnt=yes
+
+param1=ext4
+param2=EMMC
+
+param1_sdcard=vfat
+param2_sdcard=MTD
+
+sys_mnt=\/dev\/block\/mmcblk0p24
+cache_mnt=\/dev\/block\/mmcblk0p26
+boot_mnt=\/dev\/block\/mmcblk0p8
+data_mnt=\/dev\/block\/mmcblk0p25
+sdcard_mnt=\/dev\/block\/devices\/platform\/msm_sdcc.3\/mmc_host\/mmc2\/mmc2
+
