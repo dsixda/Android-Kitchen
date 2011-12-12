@@ -1,0 +1,17 @@
+
+# HTC Rezound
+
+change_mnt=yes
+
+param1=ext4
+param2=EMMC
+
+param1_sdcard=vfat
+param2_sdcard=MTD
+
+sys_mnt=\/dev\/block\/mmcblk0p29
+cache_mnt=\/dev\/block\/mmcblk0p36
+boot_mnt=\/dev\/block\/mmcblk0p22
+data_mnt=\/dev\/block\/mmcblk0p35
+sdcard_mnt=\/dev\/block\/mmcblk0p1
+
