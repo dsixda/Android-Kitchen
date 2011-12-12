@@ -9,7 +9,7 @@
 ############################################################################
 
 
-scripts/check_galaxy_sx
+scripts/check_galaxy_s_and_s2
 
 if [ "$?" == "1" ]
 then
