@@ -27,14 +27,21 @@ else
   exit 0
 fi
 
+
+#
+# See bootimg.h for details on the boot.img header format (boot_img_hdr)
+#
+
 cd ..
 echo -n "Please wait ."
-base_addr=`scripts/get_kernel_base_addr`
+
+kernel_base_addr=`scripts/get_kernel_base_addr`
+
 echo -n "."
 page_size=`scripts/get_boot_img_page_size`
+
 echo -n "."
 cmd_line=`scripts/get_cmdline`
-
 if [ "$cmd_line" == "" ]
 then
   cmd_line="(None)"
@@ -42,15 +49,52 @@ else
   cmd_line="\"$cmd_line\""
 fi
 
+
+cd WORKING_*
+
+echo -n "."
+kernel_size=`od -A n -D -j 8 -N 4 boot.img | sed 's/ //g'`
+
+echo -n "."
+ramdisk_size=`od -A n -D -j 16 -N 4 boot.img | sed 's/ //g'`
+
+echo -n "."
+temp=`od -A n -H -j 20 -N 4 boot.img | sed 's/ //g'`
+ramdisk_load_addr=0x$temp
+
+echo -n "."
+second_size=`od -A n -D -j 24 -N 4 boot.img | sed 's/ //g'`
+
+echo -n "."
+temp=`od -A n -H -j 28 -N 4 boot.img | sed 's/ //g'`
+second_load_addr=0x$temp
+
+echo -n "."
+asciiz_name=`od -A n --strings -j 48 -N 16 boot.img`
+if [ "$asciiz_name" == "" ]
+then
+  asciiz_name="(None)"
+else
+  asciiz_name="\"$asciiz_name\""
+fi
+
+cd ..
+
 clear
 
 echo
 echo "Working folder's boot.img information"
 echo "-------------------------------------"
 echo
-echo " Kernel Base Address  : $base_addr"
-echo " Page Size            : $page_size bytes"
-echo
+echo " Kernel Size                : $kernel_size bytes"
+echo " Kernel Base Address        : $kernel_base_addr"
+echo " Ramdisk Size               : $ramdisk_size bytes"
+echo " Ramdisk Load Address       : $ramdisk_load_addr"
+echo " Second Stage Size          : $second_size bytes"
+echo " Second Stage Load Address  : $second_load_addr"
+echo " Page Size                  : $page_size bytes"
+echo " ASCIIZ Product Name        : $asciiz_name"
+echo 
 echo " Command Line: $cmd_line"
 echo
 
