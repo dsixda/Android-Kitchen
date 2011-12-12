@@ -72,6 +72,10 @@ else
     then
       filename="factoryfs.rfs, cache.rfs and zImage"
 
+    elif [ "$filename" == "system.img.ext4" ]
+    then
+      filename="system.img.ext4, cache.img.ext4 and boot.img"
+
     elif [ "$filename" == "factoryfs.img" ]
     then
       filename="factoryfs.img, cache.img and zImage"
@@ -148,6 +152,11 @@ then
   elif [ "$file_chosen" == "factoryfs.img" ]
   then
     scripts/simg_files_to_working_folder create_working $1
+    exit $?
+  
+  elif [ "$file_chosen" == "system.img.ext4" ]
+  then
+    scripts/simg_ext4_files_to_working_folder create_working $1
     exit $?
 
   elif [ "`echo $file_chosen | grep -i \\.zip$`" != "" ]

@@ -61,7 +61,8 @@ then
   echo
   echo " Samsung Galaxy SII:"
   echo " - factoryfs.img + optional cache.img/zImage"  
-  echo " - TAR/ZIP file containing factoryfs.img + more" 
+  echo " - system.img.ext4 + optional cache.img.ext4/boot.img"
+  echo " - TAR/ZIP file containing factoryfs.img/system.img.ext4 + more" 
   echo
   echo " Huawei:"
   echo " - APP file from Huawei software update (e.g. UPDATE.APP)"

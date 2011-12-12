@@ -143,12 +143,15 @@ echo "- Initial formatting ..."
 # which was changed earlier
 #
 cd ../../../../..
-scripts/check_galaxy_sx
-res=$?
+scripts/check_galaxy_s_and_s2
+ss2=$?
+scripts/check_galaxy_s2x
+s2x=$?
+
 cd WORKING_*
 cd META-INF/com/google/android
 
-if [ "$res" == "1" ]
+if [ "$ss2" == "1" ] || [ "$s2x" == "1" ]
 then
   sed -i -e 's/format /delete_recursive /g' updater-script
 fi

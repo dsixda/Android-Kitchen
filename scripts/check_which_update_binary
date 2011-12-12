@@ -30,12 +30,15 @@ else
   cd ../../../../..
   scripts/check_galaxy_s2
   sgs2=$?
+  scripts/check_galaxy_s2x
+  sgs2x=$?
+
   cd $update_dir
 
   echo
   echo "Copying update-binary ..."
 
-  if [ "$sgs2" == "1" ] 
+  if [ "$sgs2" == "1" ] || [ "$sgs2x" = "1" ]
   then
     
     cp -vf ../../../../../tools/update_files/sgs2-update-binary update-binary

@@ -147,6 +147,39 @@ then
 
 
 #
+# Check for Samsung Galaxy S2 variants such as the Skyrocket
+#
+elif [ -e system.img.ext4 ] 
+then
+
+  echo
+  echo "Found system.img.ext4"
+  mkdir ../temp_img
+  mv system.img.ext4 ../temp_img
+
+  if [ -e boot.img ]
+  then
+    echo "Found boot.img"
+    mv boot.img ../temp_img
+  fi
+
+  if [ -e cache.img.ext4 ]
+  then
+    echo "Found cache.img.ext4"
+    mv cache.img.ext4 ../temp_img
+  fi
+
+  echo
+  rm -vf *
+  mv ../temp_img/* .
+  rmdir ../temp_img
+
+  cd ..
+  scripts/simg_ext4_files_to_working_folder no_create $2
+  exit $?
+
+
+#
 # Check for Samsung Galaxy S stock ROM
 #
 elif [ -e factoryfs.rfs ]

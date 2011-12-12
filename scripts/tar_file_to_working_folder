@@ -47,7 +47,9 @@ mkdir $build_dir
 echo
 echo "Extracting ROM ..."
 
-tar xvf original_update/$update_file -C $build_dir -x factoryfs.img cache.img modem.bin zImage factoryfs.rfs cache.rfs PDA.tar.md5 CSC.tar.md5 PHONE.tar.md5 PDA.tar CSC.tar PHONE.tar 2>/dev/null
+tar xvf original_update/$update_file -C $build_dir -x factoryfs.img cache.img modem.bin \
+      zImage factoryfs.rfs cache.rfs PDA.tar.md5 CSC.tar.md5 PHONE.tar.md5 PDA.tar CSC.tar \
+      PHONE.tar system.img.ext4 cache.img.ext4 boot.img 2>/dev/null
 
 cd $build_dir
 
@@ -65,6 +67,18 @@ then
 
   cd ..
   scripts/simg_files_to_working_folder no_create $2
+  exit $?
+
+elif [ -e system.img.ext4 ]
+then
+
+  if [ -e boot.img ]
+  then
+    echo "Found boot.img"
+  fi
+
+  cd ..
+  scripts/simg_ext4_files_to_working_folder no_create $2
   exit $?
 
 elif [ -e factoryfs.rfs ]
@@ -96,7 +110,7 @@ then
   exit $?
 
 else
-  echo "Error: No image files found in TAR archive!"
+  echo "Error: No image files identified in TAR archive!"
   echo 
   cd ..
   exit 1

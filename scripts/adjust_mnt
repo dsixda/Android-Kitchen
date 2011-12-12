@@ -38,8 +38,17 @@ then
     if [ "$is_gs2" == "1" ]
     then
       device_name="GT-I9100"
+    
     else
-      device_name=`scripts/get_device_name`
+      scripts/check_galaxy_s2x
+      is_gs2x=$?
+
+      if [ "$is_gs2x" == "1" ]
+      then
+        device_name="GT-I9100X"
+      else
+        device_name=`scripts/get_device_name`
+      fi
     fi
   fi    
 
@@ -146,7 +155,12 @@ then
       if [ "$fix_boot" == "yes" ]
       then
         sed -i -e ':a;N;$!ba;s/assert(package_extract_file("boot.img", "\/tmp\/boot.img"),\n[ ]*write_raw_image("\/tmp\/boot.img", "boot"),\n[ ]*delete("\/tmp\/boot.img"));/package_extract_file("boot.img", "'"$boot_mnt"'");/g' updater-script
+      
+      elif [ "$is_gs2x" == "1" ]
+      then
+        sed -i -e 's/write_raw_image("\/tmp\/boot.img", "boot")/write_raw_image("\/tmp\/boot.img", "'"$boot_mnt"'")/g' updater-script
       fi
+
 
 
       #
@@ -314,7 +328,7 @@ then
         #
         # For Samsung Galaxy S2 and equivalent
         #
-        if [ "$is_gs" == "1" ] || [ "$is_gs2" == "1" ]
+        if [ "$is_gs" == "1" ] || [ "$is_gs2" == "1" ] || [ "$is_gs2x" == "1" ]
         then
           use_sbin_mnt=1
         fi
@@ -346,9 +360,9 @@ then
       if [ "$is_gs2" == "1" ] 
       then
 
-        ####################
-        # Samsung Galaxy S2
-        ####################
+        ##############################
+        # Samsung Galaxy S2 (original)
+        ##############################
 
         if [ `grep -c flash_zimage updater-script` -gt 0 ] && [ `grep -c flash_modem updater-script` -gt 0 ]
         then
@@ -474,9 +488,8 @@ then
     # Convert 'delete_recursive' of a partition to 'format', for compatibility 
     # with all of the scripts.  This will be changed back when you build ROM.
     #
-    scripts/check_galaxy_sx
 
-    if [ "$?" == "1" ]
+    if [ "$is_gs" == "1" ] || [ "$is_gs2" == "1" ] || [ "$is_gs2x" == "1" ]
     then
       cd WORKING_*
       cd META-INF/com/google/android
@@ -526,7 +539,7 @@ then
   # Remove blank lines
   cd WORKING_*
   cd META-INF/com/google/android
-  sed -i -e '/^$/d' updater-script
+  sed -i -e '/^$/d' $1
   cd ../../../../..
 
 fi
