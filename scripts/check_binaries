@@ -50,10 +50,11 @@ do
   then
     echo
     echo
-    echo "Error:  The application '$bin' is not installed.  The kitchen"
-    echo "        will not function properly without it.  Refer to the"
-    echo "        FAQ for the Android Kitchen at xda-developers.com for"
-    echo "        assistance on installing the binary for '$bin'."
+    echo "Error:  The application '$bin' is not installed - the kitchen"
+    echo "        will not function properly without it.  Ensure you did"
+    echo "        not miss a step during installation!  Refer to the"
+    echo "        Android Kitchen FAQ at xda-developers.com for further"
+    echo "        assistance."
     echo 
 
     found_error=1
