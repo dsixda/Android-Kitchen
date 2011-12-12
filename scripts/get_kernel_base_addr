@@ -11,7 +11,11 @@
 
 cd WORKING_*
 
-base_temp=`od -A n -h -j 34 -N 2 boot.img | sed 's/ //g'`
+# Get offset 0xE and 0xF, then read in reverse order
+base_temp=`od -A n -h -j 14 -N 2 boot.img | sed 's/ //g'`
+
+# The actual 4-byte Kernel Load Address has an offset at the lower bytes,
+# but we want to get the base, ie. no offset.
 zeros=0000
 base=0x$base_temp$zeros
 
