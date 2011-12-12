@@ -1,0 +1,39 @@
+############################################################################
+#
+# Copyright (c) 2010-2011 dsixda - dislam@rocketmail.com
+#
+# Android Kitchen is 100% free.  This script file is intended for personal
+# and/or educational use only.  It may not be duplicated for monetary
+# benefit or any other purpose without the permission of the developer.
+#
+############################################################################
+
+simg2img_file=simg2img
+if [ `uname | grep CYGWIN` ]
+then
+  simg2img_file=$simg2img_file.exe
+fi
+
+if [ -e tools/samsung_files/simg2img_files/$simg2img_file ]
+then
+  echo "Found $simg2img_file"
+else
+  echo "Compiling simg2img ..."
+
+  cd tools/samsung_files/simg2img_files
+  gcc -c sparse_crc32.c
+  gcc sparse_crc32.o simg2img.c -w -o simg2img
+  rm *.o 
+  cd ../../..
+
+  if [ -e tools/samsung_files/simg2img_files/$simg2img_file ]
+  then
+    echo "$simg2img_file successfully compiled"
+  else
+    echo "Error: $simg2img_file not successfully compiled!"
+    exit 1
+  fi    
+fi
+
+exit 0
+
