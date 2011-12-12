@@ -111,33 +111,11 @@ echo
 # Compile sigm2img
 #
 
-simg2img_file=simg2img
-if [ `uname | grep CYGWIN` ]
+scripts/compile_simg2img
+if [ "$?" == "1" ]
 then
-  simg2img_file=$simg2img_file.exe
+  exit 1
 fi
-
-if [ -e tools/samsung_files/simg2img_files/$simg2img_file ]
-then
-  echo "Found $simg2img_file"
-else
-  echo "Compiling simg2img ..."
-
-  cd tools/samsung_files/simg2img_files
-  gcc -c sparse_crc32.c
-  gcc sparse_crc32.o simg2img.c -w -o simg2img
-  rm *.o 
-  cd ../../..
-
-  if [ -e tools/samsung_files/simg2img_files/$simg2img_file ]
-  then
-    echo "$simg2img_file successfully compiled"
-  else
-    echo "Error: $simg2img_file not successfully compiled!"
-    exit 1
-  fi    
-fi
-
 
 
 
