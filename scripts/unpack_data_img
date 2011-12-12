@@ -92,7 +92,7 @@ else
   cd $img_dir
 
   # Check for TAR archive
-  test_tar=`od -A n --strings -j 0 -N 7 data.img`
+  test_tar=`od -A n --strings -j 0 -N 5 data.img`
 
   if [ "$test_tar" == "data/" ]
   then
