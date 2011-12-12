@@ -1,4 +1,4 @@
-############################################################################
+e############################################################################
 #
 # Copyright (c) 2010-2011 dsixda - dislam@rocketmail.com
 #
@@ -9,7 +9,7 @@
 ############################################################################
 
 clear
-scripts/check_galaxy_sx
+scripts/check_galaxy_s_and_s2
 
 if [ "$?" == "1" ]
 then
@@ -122,6 +122,9 @@ do
 
     if [ "$read_val" == "x" ] 
     then
+			echo "Aborting"
+			cd ../..
+			rm -rf BOOT-EXTRACTED
       exit 0
     elif [ "$read_val" == "" ]
     then
