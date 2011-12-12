@@ -29,18 +29,9 @@ else
   cd $1
 fi
 
-# Mac OS X adds extra spaces between the numbers!
-hex_offset=`od -x -A x boot.img | grep -m 1 "0000 [ ]*e1a0" | sed -e 's/ .*//'`
-
-if [ "$hex_offset" != "" ]
-then
-  dec_offset=`printf "%d" 0x$hex_offset`
-else
-  dec_offset=""
-fi
+page_size=`od -A n -D -j 36 -N 4 boot.img | sed 's/ //g'`
 
 cd $base_dir
-
-echo $dec_offset
+echo $page_size
 
 
