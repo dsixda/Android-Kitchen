@@ -1,0 +1,28 @@
+############################################################################
+#
+# Copyright (c) 2011 - dsixda (dislam@rocketmail.com)
+#
+# Android Kitchen is 100% free.  This script file is intended for personal
+# and/or educational use only.  It may not be duplicated for monetary
+# benefit or any other purpose without the permission of the developer.
+#
+############################################################################
+
+
+scripts/check_galaxy_s2x
+is_gs2x=$?
+
+if [ "$is_gs2x" == "1" ]
+then
+  offset=0x01400000
+else
+  offset=0x01000000
+fi
+
+str=`sed '146q;d' tools/mkboot/mkbootimg.c`
+if [ "$str" != "            hdr.ramdisk_addr = base + $offset;" ]
+then
+  echo "Setting Ramdisk Address offset=$offset in mkbootimg.c, line 146"
+  sed -i -e '146s/.*/            hdr.ramdisk_addr = base + '$offset';/' tools/mkboot/mkbootimg.c
+fi  
+

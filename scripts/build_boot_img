@@ -77,30 +77,8 @@ then
       exit 0
     fi
     
-		scripts/check_galaxy_s2x
-		is_gs2x=$?
-
-		if [ "$is_gs2x" == "1" ]
-		then
-   
-		 	# 
-	    # Ensure the ramdisk address is unchanged after rebuilding the boot.img.
-	    # This is a hack for devices like the Samsung Galaxy S2 Skyrocket
-	    #
-	    cd WORKING_*
-	    rd_addr_old=`od -A n -H -j 20 -N 4 boot.img | sed 's/ //g'`
-
-	    # Arrange the bytes in reverse order for the purpose of writing with 'dd'
-	    # Also add "\x" in front so that it can be used with 'printf'
-	    # Use '-h' instead of '-H' so that the single byte is padded to 2 bytes instead of 4
-	    byte1=`od -A n -h -j 20 -N 1 boot.img | sed -e 's/ //g' -e 's/^00/\\\x/g'`
-	    byte2=`od -A n -h -j 21 -N 1 boot.img | sed -e 's/ //g' -e 's/^00/\\\x/g'`
-	    byte3=`od -A n -h -j 22 -N 1 boot.img | sed -e 's/ //g' -e 's/^00/\\\x/g'`
-	    byte4=`od -A n -h -j 23 -N 1 boot.img | sed -e 's/ //g' -e 's/^00/\\\x/g'`
-
-	    reversed_addr=$byte1$byte2$byte3$byte4
-	    cd ..
-		fi
+    # Modify mkbootimg.c
+    scripts/set_ramdisk_addr
 
   else
 
@@ -298,36 +276,6 @@ then
 
   if [ "$size_orig" != "" ]
   then
-
-    if [ "$is_gs2x" == "1" ]
-    then
-      rd_addr_new=`od -A n -H -j 20 -N 4 boot.img | sed 's/ //g'`
-      
-      if [ "$rd_addr_new" != "$rd_addr_old" ]
-      then
-        echo
-        echo "Warning: Ramdisk load address in new boot.img is 0x$rd_addr_new; originally was 0x$rd_addr_old"
-        echo "We will change back this value to prevent booting issues."
-
-        # Write value to a temp file
-        printf $reversed_addr | dd of=addr.bin bs=1 count=4 2>/dev/null
-        
-        # Replace the 4 bytes at offset 20 with the 4 bytes in the temp file
-        dd if=addr.bin seek=20 bs=1 of=boot.img conv=notrunc 2>/dev/null
-
-        # Remove temp file
-        rm -f addr.bin
-
-        rd_addr_new2=`od -A n -H -j 20 -N 4 boot.img | sed 's/ //g'`
-        echo
-        echo "Ramdisk load address is now 0x$rd_addr_new2"
-        if [ "$rd_addr_new2" != "$rd_addr_old" ]
-        then
-          echo "Error: Unable to change successfully!"
-        fi
-      fi
-
-    fi
 
     #
     # Get new size of boot.img
