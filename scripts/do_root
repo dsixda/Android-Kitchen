@@ -21,7 +21,7 @@ then
   exit 0
 fi
 
-scripts/check_galaxy_sx
+scripts/check_galaxy_s_and_s2
 sgs=$?
 
 
