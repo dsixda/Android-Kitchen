@@ -13,6 +13,14 @@ cd WORKING_*
 cd META-INF/com/google/android
 update_dir=`pwd`
 
+if [ ! -e updater-script ]
+then
+  echo
+  echo "Error: No updater-script found!"
+  cd ../../../../..
+  exit 0
+fi
+
 if [ -e update-binary.orig ]
 then
   echo
@@ -59,7 +67,8 @@ else
 
       cp -vf ../../../../../tools/update_files/emmc-update-binary update-binary
 
-   else
+   
+    else
 
       #
       # Three args for mount, but no MTD or assert
