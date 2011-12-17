@@ -40,57 +40,70 @@ fi
 if [ -e cache.img ]
 then
 
-  #
-  # Compile sigm2img
-  #
+  # Check if needs to be converted with simg2img
+  initial_bytes=`od -A n -h -j 0 -N 6 cache.img | sed 's/ //g'`
 
-  simg2img_file=simg2img
-  if [ `uname | grep CYGWIN` ]
+  if [ "$initial_bytes" == "000000000000" ]
   then
-    simg2img_file=$simg2img_file.exe
-  fi
-
-  if [ -e ../tools/samsung_files/simg2img_files/$simg2img_file ]
-  then
-    echo "Found $simg2img_file"
+    mv cache.img ext4_cache.img
     cd ..
+
   else
-    echo "Compiling simg2img ..."
 
-    cd ../tools/samsung_files/simg2img_files
-    gcc -c sparse_crc32.c
-    gcc sparse_crc32.o simg2img.c -w -o simg2img
-    rm *.o 
-    cd ../../..
+    #
+    # Compile simg2img
+    #
 
-    if [ -e tools/samsung_files/simg2img_files/$simg2img_file ]
+    simg2img_file=simg2img
+    if [ `uname | grep CYGWIN` ]
     then
-      echo "$simg2img_file successfully compiled"
+      simg2img_file=$simg2img_file.exe
+    fi
+
+    echo
+
+    if [ -e ../tools/samsung_files/simg2img_files/$simg2img_file ]
+    then
+      echo "Found $simg2img_file"
+      cd ..
     else
-      echo "Error: $simg2img_file not successfully compiled!"
-      rm -rfv $csc_dir
+      echo "Compiling simg2img ..."
+
+      cd ../tools/samsung_files/simg2img_files
+      gcc -c sparse_crc32.c
+      gcc sparse_crc32.o simg2img.c -w -o simg2img
+      rm *.o 
+      cd ../../..
+
+      if [ -e tools/samsung_files/simg2img_files/$simg2img_file ]
+      then
+        echo "$simg2img_file successfully compiled"
+      else
+        echo "Error: $simg2img_file not successfully compiled!"
+        rm -rfv $csc_dir
+        exit 1
+      fi    
+    fi
+
+    echo
+  
+
+    #
+    # Convert to ext4
+    #
+
+    echo "Unpacking cache.img into a format for unpacking ..."
+    tools/samsung_files/simg2img_files/simg2img $csc_dir/cache.img \
+      $csc_dir/ext4_cache.img 
+      
+    if [ ! -e $csc_dir/ext4_cache.img ]
+    then
+      echo "Unable to unpack cache.img!"
       exit 1
-    fi    
+    fi
+
+    rm -f $csc_dir/cache.img
   fi
-
-  echo
-
-
-  #
-  # Convert to ext4
-  #
-
-  echo "Unpacking cache.img into ext4 format ..."
-  tools/samsung_files/simg2img_files/simg2img $csc_dir/cache.img \
-    $csc_dir/ext4_cache.img
-    
-  if [ ! -e $csc_dir/ext4_cache.img ]
-  then
-    echo "Unable to unpack cache.img!"
-    exit 1
-  fi
-
-  rm -f $csc_dir/cache.img
 
   #
   # Extract files from ext4_cache.img
@@ -99,7 +112,7 @@ then
   if [ `uname | grep CYGWIN` ]
   then
     echo
-    echo "File is now in ext4 format.  Now we need to unpack the sec_csc.zip."
+    echo "Now we need to unpack the sec_csc.zip."
     scripts/press_enter
     scripts/show_linux_reader $csc_dir ext4_cache.img
   else
