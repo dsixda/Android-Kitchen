@@ -430,7 +430,7 @@ then
         -e 's/format '"$param1"' '"$boot_mnt"'/format '"$param1"' BOOT:/g' \
         -e 's/format '"$param1"' '"$data_mnt"'/format '"$param1"' DATA:/g' \
         \
-        -e 's/package_extract_file boot.img '"$boot_mnt"'/write_raw_image PACKAGE:boot.img BOOT:/g' \
+        -e 's/package_extract_file PACKAGE:boot.img '"$boot_mnt"'/write_raw_image PACKAGE:boot.img BOOT:/g' \
         update-script
 
 
