@@ -1,0 +1,34 @@
+
+----------------------------------------------------------------------
+
+The format for each ROM must be one of the following:
+ 
+ - system.img + optional boot.img/lib.img (e.g. stock ROM or Nandroid)
+ - ZIP file for a custom ROM              (e.g. update.zip)
+ - ZIP file containing *.img              (e.g. stock rom.zip)
+ - ZIP file containing shipped ROM in SYSTEM + BOOT folder format
+ - Working folder made with this kitchen  (e.g. WORKING_old_rom)
+ 
+ Other formats:
+ 
+ Samsung Galaxy S:
+ - factoryfs.rfs + optional cache.rfs/zImage
+ - PDA.tar.md5 + optional CSC.tar.md5/PHONE.tar.md5
+ - PDA.tar + optional CSC.tar/PHONE.tar
+ - TAR/ZIP file containing factoryfs.rfs + more 
+ - TAR/ZIP file containing PDA.tar.md5/PDA.tar + more
+
+ Samsung Galaxy S Plus:
+ - system.img.ext4 + optional cache.img.ext4/boot.img
+ - TAR/ZIP file containing system.img.ext4 + more 
+ 
+ Samsung Galaxy SII:
+ - factoryfs.img + optional cache.img/zImage  
+ - system.img.ext4 + optional cache.img.ext4/boot.img
+ - TAR/ZIP file containing factoryfs.img/system.img.ext4 + more 
+ 
+ Huawei:
+ - APP file from Huawei software update (e.g. UPDATE.APP)
+
+ ----------------------------------------------------------------------
+ 
