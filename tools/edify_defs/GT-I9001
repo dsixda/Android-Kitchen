@@ -1,0 +1,19 @@
+
+# Samsung Galaxy S Plus GT-I9001
+
+change_mnt=yes
+
+param1=ext4
+param2=EMMC
+
+param1_sdcard=vfat
+param2_sdcard=MTD
+
+sys_mnt=\/dev\/block\/mmcblk0p15
+cache_mnt=\/dev\/block\/mmcblk0p16
+boot_mnt=\/dev\/block\/mmcblk0p8
+data_mnt=\/dev\/block\/mmcblk0p17
+sdcard_mnt=\/dev\/block\/mmcblk0p28
+
+fix_boot=yes
+
