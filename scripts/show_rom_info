@@ -290,7 +290,7 @@ cd ..
 
 
 
-if [ "$is_galaxy_ss2" == "1" ] || [ "$is_galaxy_s2x" == "1" ]
+if [ "$is_galaxy_ss2" == "1" ] || [ "$is_galaxy_s2x" == "1" ] || [ "$device_name" == "GT-I9001" ]
 then
 
   #
@@ -446,7 +446,7 @@ echo " Device                         : $device_name"
 echo " Model                          : $model"
 echo " ROM Name                       : $rom_name"
 
-if [ "$is_galaxy_ss2" == "1" ] || [ "$is_galaxy_s2x" == "1" ]
+if [ "$is_galaxy_ss2" == "1" ] || [ "$is_galaxy_s2x" == "1" ] || [ "$device_name" == "GT-I9001" ]
 then
   echo " CSC version                    : $csc_version"
 fi
