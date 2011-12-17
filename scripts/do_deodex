@@ -102,7 +102,8 @@ do
       echo " bb  = Back up both folders (do first!)"
     fi
 
-    echo "  v  = Set your Android OS version (current API level = $api_level)"
+    echo "  v  = Set Android OS version (important!) - Current API level = $api_level"
+    echo
 
     if [ $num_odex_fr -gt 0 ]
     then
