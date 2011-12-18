@@ -52,6 +52,9 @@ then
     fi
   fi    
 
+  echo
+  echo "Device name = $device_name"
+
   change_mnt=`scripts/get_edify_def_val $device_name change_mnt`
   change_mnt_dell=`scripts/get_edify_def_val $device_name change_mnt_dell`
 
@@ -64,6 +67,7 @@ then
     param1_cache=`scripts/get_edify_def_val $device_name param1_cache`
     param2_cache=`scripts/get_edify_def_val $device_name param2_cache`
     fix_boot=`scripts/get_edify_def_val $device_name fix_boot`
+    fix_boot2=`scripts/get_edify_def_val $device_name fix_boot2`
     use_cache_not_tmp=`scripts/get_edify_def_val $device_name use_cache_not_tmp`
     sys_mnt=`scripts/get_edify_def_val $device_name sys_mnt`
     cache_mnt=`scripts/get_edify_def_val $device_name cache_mnt`
@@ -156,7 +160,7 @@ then
       then
         sed -i -e ':a;N;$!ba;s/assert(package_extract_file("boot.img", "\/tmp\/boot.img"),\n[ ]*write_raw_image("\/tmp\/boot.img", "boot"),\n[ ]*delete("\/tmp\/boot.img"));/package_extract_file("boot.img", "'"$boot_mnt"'");/g' updater-script
       
-      elif [ "$is_gs2x" == "1" ]
+      elif [ "$fix_boot2" == "yes" ]
       then
         sed -i -e 's/write_raw_image("\/tmp\/boot.img", "boot")/write_raw_image("\/tmp\/boot.img", "'"$boot_mnt"'")/g' updater-script
       fi
@@ -432,7 +436,6 @@ then
         \
         -e 's/package_extract_file PACKAGE:boot.img '"$boot_mnt"'/write_raw_image PACKAGE:boot.img BOOT:/g' \
         update-script
-
 
       #
       # Cover the case where the ROM uses a different filesystem, such that the update-script

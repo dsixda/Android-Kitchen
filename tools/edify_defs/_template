@@ -52,9 +52,14 @@ param2_sdcard=
 param1_cache=
 param2_cache=
 
-# If yes, the device does not require using a temp folder when
+# If yes, the device does not require using a 'tmp' folder when
 # flashing the boot.img in the updater-script
 fix_boot=no
+
+# If yes, the device requires a 'tmp' folder when flashing the
+# boot.img in the updater-script, PLUS the boot partition name
+# needs to be used, rather than just 'boot'
+fix_boot2=no
 
 # Device uses /cache instead of /tmp, e.g. when writing boot.img
 use_cache_not_tmp=no

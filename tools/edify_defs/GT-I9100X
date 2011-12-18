@@ -15,3 +15,4 @@ boot_mnt=\/dev\/block\/mmcblk0p8
 data_mnt=\/dev\/block\/mmcblk0p25
 sdcard_mnt=\/dev\/block\/devices\/platform\/msm_sdcc.3\/mmc_host\/mmc2\/mmc2
 
+fix_boot2=yes
