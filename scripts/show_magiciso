@@ -22,7 +22,7 @@ echo
 echo " 1) Ensure you have installed MagicISO, found under:"
 echo "    tools/magiciso_windows/Setup_MagicISO.exe"
 echo 
-echo " 2) Launch MagicISO, select 'Try It' and use 'File->Open Image' to"
+echo " 2) Launch MagicISO, select 'Try It' and use 'File->Open ...' to"
 echo "    mount:"
 echo "    $dos_path\\$img_file"
 echo
