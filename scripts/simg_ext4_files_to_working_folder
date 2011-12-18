@@ -26,7 +26,11 @@ then
     exit 1
   fi
 
-  mkdir $build_dir/system
+  if [ ! -d $build_dir/system ]
+  then
+    mkdir $build_dir/system
+  fi
+
   mv $build_dir/system.img.ext4 $build_dir/system
 
   if [ -e $build_dir/cache.img.ext4 ]
@@ -170,7 +174,7 @@ else
 
   if [ ! -e $system_dir/ext4_system.img ]
   then
-    echo "Unable to unpack system.img.ext4!"
+    echo "Unable to convert system.img.ext4!"
     exit 1
   fi
 
@@ -182,11 +186,13 @@ fi
 # Directory tree
 #
 
-mkdir -p $build_dir/META-INF/com/google/android
-echo
-echo "Adding an update-script ..."
-cp tools/update_files/update-script $build_dir/META-INF/com/google/android/
-
+if [ ! -e $build_dir/META-INF/com/google/android/update-script ]
+then
+  mkdir -p $build_dir/META-INF/com/google/android
+  echo
+  echo "Adding an update-script ..."
+  cp tools/update_files/update-script $build_dir/META-INF/com/google/android/
+fi
 
 
 #
@@ -279,7 +285,7 @@ then
 
       if [ ! -e $system_dir/ext4_cache.img ]
       then
-        echo "Unable to unpack cache.img.ext4!"
+        echo "Unable to convert cache.img.ext4!"
         exit 1
       fi
 
@@ -306,58 +312,8 @@ then
       echo
     fi
 
-    if [ ! -e sec_csc.zip ]
-    then
-      echo "WARNING: sec_csc.zip not found!"
-    else
-      echo "Extracting the required files from sec_csc.zip ..."
-      unzip -q sec_csc.zip -d temp_csc
-
-      # 
-      # Carrier bloatware
-      #
-			# (Check for multi-CSC by the presence of empty app folder)
-			#
-
-      if [ -d temp_csc/system/app ]
-      then
-		
-				dir_str=`ls temp_csc/system/app`
-				
-				if [ "$dir_str" != "" ]
-				then
-
-	        echo
-	        echo "These are the apps found in sec_csc.zip:"
-	        ls temp_csc/system/app
-	        echo
-	        echo -n "Copy the apps to your working folder (y/n)? (default: n): "
-
-	        read do_copy
-	        echo
-
-	        if [ "$do_copy" != "y" ]
-	        then
-	          rm -vrf temp_csc/system/app
-	        fi
-				fi
-      fi
-
-      rm -rf temp_csc/META-INF
-      cp -rf temp_csc/system/* .
-      rm -rf temp_csc
-    fi
-
-    rm -f sec_csc.zip 2>/dev/null
-    if [ "$?" == "1" ]
-    then
-      echo
-      echo "WARNING: sec_csc.zip is in use.  Remove file manually."
-      echo
-    fi
-
     cd ../..
-
+    scripts/unzip_csc $build_dir
   fi
 fi
 
