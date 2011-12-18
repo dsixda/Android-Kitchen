@@ -141,7 +141,9 @@ else
 
   cd $system_dir
 
+  #
   # Check for TAR archive
+  #
   test_tar=`od -A n --strings -j 0 -N 7 system.img`
 
   if [ "$test_tar" == "system/" ]
@@ -152,16 +154,32 @@ else
 
   else
 
-    echo
-    echo "NON-YAFFS/NON-TAR FILE FORMAT DETECTED IN ROM"
-    echo
+    #
+    # Check for Samsung EXT4
+    #
+    test_ext4=`od -A n -h -j 0 -N 5 system.img | sed 's/ //g'`
 
-    # Get full path
-    system_dir=`pwd`
+    if [ "$test_ext4" == "ff3aed260001" ]
+    then
 
-    cd ../..
-    scripts/extract_ext3_img $system_dir system.img
-    cd $system_dir
+      mv -fv system.img ../system.img.ext4
+      cd ../..
+      scripts/simg_ext4_files_to_working_folder no_create
+      exit $?
+
+    else
+
+      echo
+      echo "NON-YAFFS/NON-TAR FILE FORMAT DETECTED IN ROM"
+      echo
+
+      # Get full path
+      system_dir=`pwd`
+
+      cd ../..
+      scripts/extract_ext3_img $system_dir system.img
+      cd $system_dir
+    fi
   fi
 
 fi
