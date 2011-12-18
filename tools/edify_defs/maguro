@@ -1,0 +1,15 @@
+
+# Samsung Galaxy Nexus
+
+change_mnt=yes
+
+param1=ext4
+param2=HSMMC
+
+sys_mnt=\/dev\/block\/platform\/omap\/omap_hsmmc.0\/by-name\/system
+cache_mnt=\/dev\/block\/platform\/omap\/omap_hsmmc.0\/by-name\/cache
+boot_mnt=\/dev\/block\/platform\/omap\/omap_hsmmc.0\/by-name\/boot
+data_mnt=???
+sdcard_mnt=???
+
+fix_boot2=yes
