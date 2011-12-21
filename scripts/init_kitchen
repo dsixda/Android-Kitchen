@@ -14,6 +14,7 @@ chmod 755 tools/mkboot/*
 chmod 755 tools/unyaffs_files/*
 chmod 755 tools/zipalign_files/*
 chmod 755 tools/samsung_files/unpack-initramfs
+chmod 755 scripts/plugins/*
 rm -f symlinks.log
 rm -f tools/explore2fs_windows/explore*.txt
 rm -f tools/ext2read_windows/ext2*.log
