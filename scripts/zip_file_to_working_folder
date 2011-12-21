@@ -189,8 +189,6 @@ then
   if [ -e cache.rfs ]
   then
     echo Found cache.rfs
-  else
-    echo "Warning: No cache.rfs found"
   fi
 
   if [ -e zImage ]
