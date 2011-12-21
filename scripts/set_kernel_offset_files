@@ -22,18 +22,21 @@ then
   exit 1
 fi
 
-str=`sed '74q;d' tools/mkboot/mkbootimg.c`
+pad_line_num=`sed -n -e '/static unsigned char padding/{=;q}' tools/mkboot/mkbootimg.c`
+pgsz_line_num=`sed -n -e '/    unsigned pagesize = /{=;q}' tools/mkboot/mkbootimg.c`
+
+str=`sed ''$pad_line_num'q;d' tools/mkboot/mkbootimg.c`
 if [ "$str" != "static unsigned char padding[$dec_offset] = { 0, };" ]
 then
-  echo "Setting offset=$dec_offset in mkbootimg.c, line 74"
-  sed -i -e '74s/.*/static unsigned char padding\['$dec_offset'\] = { 0, };/' tools/mkboot/mkbootimg.c
+  echo "Setting offset=$dec_offset in mkbootimg.c, line $pad_line_num"
+  sed -i -e ''$pad_line_num's/.*/static unsigned char padding\['$dec_offset'\] = { 0, };/' tools/mkboot/mkbootimg.c
 fi  
 
-str=`sed '107q;d' tools/mkboot/mkbootimg.c`
+str=`sed ''$pgsz_line_num'q;d' tools/mkboot/mkbootimg.c`
 if [ "$str" != "    unsigned pagesize = $dec_offset;" ]
 then
-  echo "Setting offset=$dec_offset in mkbootimg.c, line 107"
-  sed -i -e '107s/.*/    unsigned pagesize = '$dec_offset';/' tools/mkboot/mkbootimg.c
+  echo "Setting offset=$dec_offset in mkbootimg.c, line $pgsz_line_num"
+  sed -i -e ''$pgsz_line_num's/.*/    unsigned pagesize = '$dec_offset';/' tools/mkboot/mkbootimg.c
 fi
 
 str=`sed '23q;d' tools/extract_boot_files/extract-kernel.pl`

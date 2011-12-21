@@ -19,10 +19,12 @@ else
   offset=0x01000000
 fi
 
-str=`sed '146q;d' tools/mkboot/mkbootimg.c`
+addr_line_num=`sed -n -e '/            hdr.ramdisk_addr = base + /{=;q}' tools/mkboot/mkbootimg.c`
+
+str=`sed ''$addr_line_num'q;d' tools/mkboot/mkbootimg.c`
 if [ "$str" != "            hdr.ramdisk_addr = base + $offset;" ]
 then
-  echo "Setting Ramdisk Address offset=$offset in mkbootimg.c, line 146"
-  sed -i -e '146s/.*/            hdr.ramdisk_addr = base + '$offset';/' tools/mkboot/mkbootimg.c
+  echo "Setting Ramdisk Address offset=$offset in mkbootimg.c, line $addr_line_num"
+  sed -i -e ''$addr_line_num's/.*/            hdr.ramdisk_addr = base + '$offset';/' tools/mkboot/mkbootimg.c
 fi  
 
