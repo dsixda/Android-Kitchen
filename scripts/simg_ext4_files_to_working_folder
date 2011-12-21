@@ -39,7 +39,8 @@ then
   else
     echo
     echo "Warning: No cache.img.ext4 found.  You can unpack a cache.img.ext4 separately"
-    echo "by running the plugin script in the kitchen's Advanced menu options."
+    echo "by running the plugin script in the kitchen's Advanced menu options.  If your"
+    echo "device doesn't use a CSC, then just ignore this message."
     echo
   fi
 
