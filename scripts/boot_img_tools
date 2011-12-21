@@ -80,8 +80,10 @@ do
   echo "  a = Extract kernel+ramdisk (regular format) from boot.img in any folder"
   echo "  x = Exit"
   echo
-  echo "  NOTE: Some options will not be shown in this menu until a specific"
+  echo "  NOTE: Some options will not be shown in this menu *until* a specific"
   echo "  action above is selected or a specific working folder is created."
+  echo "  e.g. You won't see the option to re-pack a boot.img unless you unpack"
+  echo "  the boot.img first!"
   echo
   echo -n "? "
 

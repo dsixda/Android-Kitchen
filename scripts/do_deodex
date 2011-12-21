@@ -102,7 +102,9 @@ do
       echo " bb  = Back up both folders (do first!)"
     fi
 
-    echo "  v  = Set Android OS version (important!) - Current API level = $api_level"
+    echo "  v  = Set Android OS version (Current API level = $api_level)"
+    echo
+    echo "       IMPORTANT: Set the correct API level before you de-odex!"
     echo
 
     if [ $num_odex_fr -gt 0 ]
