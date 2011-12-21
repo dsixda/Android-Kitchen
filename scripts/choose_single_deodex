@@ -70,6 +70,8 @@ then
     exit 0
   fi
 
+  # Fix Linux issue with blank lines
+  sed -i -e '/^$/d' ../tools/deodex_files/use_this_version.txt
   version=`more ../tools/deodex_files/use_this_version.txt | sed 's/[ ]*$//g'`
   cp -f ../tools/deodex_files/baksmali-$version.jar baksmali.jar
   cp -f ../tools/deodex_files/smali-$version.jar smali.jar
