@@ -55,7 +55,16 @@ fi
 
 date_str=`date '+%m%d%y_%H%M%S'`
 log_file=deodex_$date_str.log
+version=`more ../tools/deodex_files/use_this_version.txt | sed 's/[ ]*$//g'`
 
+if [ "$do_log" == "y" ]
+then
+  echo
+  echo "Creating log file $log_file ..."
+
+  echo "" >> ../$log_file
+  echo "smali/baksmali version: $version" >> ../$log_file
+fi
 
 #
 # Go through each folder specified
@@ -66,9 +75,6 @@ do
 
   if [ "$do_log" == "y" ]
   then
-    echo
-    echo "Creating log file $log_file ..."
-
     echo "" >> ../$log_file
     echo "Folder: $folder" >> ../$log_file
     echo "-------------------" >> ../$log_file
@@ -119,8 +125,8 @@ do
     #
     # Finally, deodex each file
     #
-    cp -f ../../../tools/deodex_files/baksmali-*.jar baksmali.jar
-    cp -f ../../../tools/deodex_files/smali-*.jar smali.jar
+    cp -f ../../../tools/deodex_files/baksmali-$version.jar baksmali.jar
+    cp -f ../../../tools/deodex_files/smali-$version.jar smali.jar
 
     for odex_file in $grep_cmd
     do
@@ -143,7 +149,7 @@ do
          
           if [ "$do_log" == "y" ]
           then
-            echo "* Warning: $odex_file" >> ../../../$log_file
+            echo "* Warning: $odex_file (trying brute-force method)" >> ../../../$log_file
           fi
 
           current_dir=`pwd`
@@ -167,11 +173,6 @@ do
            
           if [ -e $odex_file ] 
           then
-
-            if [ "$do_log" == "y" ]
-            then
-              echo "* Warning: $odex_file" >> ../../../$log_file
-            fi
 
             echo "ERROR: Aborting $odex_file"
             found_error=1
@@ -211,6 +212,7 @@ do
 
     if [ "$found_error" == "1" ]
     then
+      echo
       echo "Could not deodex the following (you can try to deodex these files again):"
       echo `ls *.odex`
       echo
