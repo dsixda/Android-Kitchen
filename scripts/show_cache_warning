@@ -1,0 +1,29 @@
+############################################################################
+#
+# Copyright (c) 2011 - dsixda (dislam@rocketmail.com)
+#
+# Android Kitchen is 100% free.  This script file is intended for personal
+# and/or educational use only.  It may not be duplicated for monetary
+# benefit or any other purpose without the permission of the developer.
+#
+############################################################################
+
+#
+# This script has two optional arguments:
+#
+# $1 = file name (cache.img/cache.rfs/cache.img.ext4/etc.)
+#
+
+
+if [ "$1" == "" ]
+then
+  cache_file=cache.img
+else
+  cache_file=$1
+fi
+
+echo
+echo "Warning: No $cache_file found.  You can unpack this file separately"
+echo "by running the plugin script in the kitchen's Advanced menu options." 
+echo "If your device doesn't use a CSC, then just ignore this message."
+echo
