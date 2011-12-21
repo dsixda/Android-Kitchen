@@ -104,7 +104,7 @@ do
 
     echo "  v  = Set Android OS version (Current API level = $api_level)"
     echo
-    echo "       IMPORTANT: Set the correct API level before you de-odex!"
+    echo "       IMPORTANT: Ensure you set the correct API level"
     echo
 
     if [ $num_odex_fr -gt 0 ]
