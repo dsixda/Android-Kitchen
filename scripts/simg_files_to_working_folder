@@ -33,10 +33,7 @@ then
   then
     mv $build_dir/cache.img $build_dir/system
   else
-    echo
-    echo "Warning: No cache.img found.  You can unpack a cache.img separately"
-    echo "by running the plugin script in the kitchen's Advanced menu options."
-    echo
+    scripts/show_cache_warning cache.img 
   fi
 
   # Sometimes images have zero permissions set when extracted from TAR archive,
@@ -56,11 +53,7 @@ else
     then
       echo "Found original_update/cache.img"
     else
-      echo
-      echo "Warning: original_update/cache.img Not found.  You can unpack a"
-      echo "cache.img separately by running the plugin script in the kitchen's"
-      echo "Advanced menu."
-      echo
+      scripts/show_cache_warning original_update/cache.img
     fi
   else
 

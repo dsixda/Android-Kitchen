@@ -37,11 +37,7 @@ then
   then
     mv $build_dir/cache.img.ext4 $build_dir/system
   else
-    echo
-    echo "Warning: No cache.img.ext4 found.  You can unpack a cache.img.ext4 separately"
-    echo "by running the plugin script in the kitchen's Advanced menu options.  If your"
-    echo "device doesn't use a CSC, then just ignore this message."
-    echo
+    scripts/show_cache_warning cache.img.ext4
   fi
 
   # Sometimes images have zero permissions set when extracted from TAR archive,
@@ -61,11 +57,7 @@ else
     then
       echo "Found original_update/cache.img.ext4"
     else
-      echo
-      echo "Warning: original_update/cache.img.ext4 Not found.  You can unpack a"
-      echo "cache.img.ext4 separately by running the plugin script in the kitchen's"
-      echo "Advanced menu."
-      echo
+      scripts/show_cache_warning original_update/cache.img.ext4
     fi
   else
 
