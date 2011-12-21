@@ -51,6 +51,16 @@
 #define AID_SDCARD_RW     1015  /* external storage write access */
 #define AID_VPN           1016  /* vpn system */
 #define AID_KEYSTORE      1017  /* keystore subsystem */
+#define AID_USB           1018  /* USB devices */
+#define AID_DRM           1019  /* DRM server */
+#define AID_AVAILABLE     1020  /* available for use */
+#define AID_GPS           1021  /* GPS daemon */
+#define AID_UNUSED1       1022  /* deprecated, DO NOT USE */
+#define AID_MEDIA_RW      1023  /* internal media storage write access */
+#define AID_MTP           1024  /* MTP USB driver access */
+#define AID_UNUSED2       1025  /* deprecated, DO NOT USE */
+#define AID_DRMRPC        1026  /* group for drm rpc */
+#define AID_NFC           1027  /* nfc subsystem */
 
 #define AID_SHELL         2000  /* adb and debug shell user */
 #define AID_CACHE         2001  /* cache access */
@@ -63,6 +73,9 @@
 #define AID_INET          3003  /* can create AF_INET and AF_INET6 sockets */
 #define AID_NET_RAW       3004  /* can create raw INET sockets */
 #define AID_NET_ADMIN     3005  /* can configure interfaces and routing tables. */
+#define AID_NET_BW_STATS  3006  /* read bandwidth statistics */
+#define AID_NET_BW_ACCT   3007  /* change bandwidth statistics accounting */
+#define AID_QCOM_ONCRPC   3008  /* can read/write /dev/oncrpc files */
 
 #define AID_MISC          9998  /* access to misc storage */
 #define AID_NOBODY        9999
@@ -75,7 +88,7 @@ struct android_id_info {
     unsigned aid;
 };
 
-static struct android_id_info android_ids[] = {
+static const struct android_id_info android_ids[] = {
     { "root",      AID_ROOT, },
     { "system",    AID_SYSTEM, },
     { "radio",     AID_RADIO, },
@@ -92,17 +105,28 @@ static struct android_id_info android_ids[] = {
     { "adb",       AID_ADB, },
     { "install",   AID_INSTALL, },
     { "media",     AID_MEDIA, },
+    { "drm",       AID_DRM, },
+    { "available", AID_AVAILABLE, },
+    { "nfc",       AID_NFC, },
+    { "drmrpc",    AID_DRMRPC, },
     { "shell",     AID_SHELL, },
     { "cache",     AID_CACHE, },
     { "diag",      AID_DIAG, },
     { "net_bt_admin", AID_NET_BT_ADMIN, },
     { "net_bt",    AID_NET_BT, },
     { "sdcard_rw", AID_SDCARD_RW, },
+    { "media_rw",  AID_MEDIA_RW, },
     { "vpn",       AID_VPN, },
     { "keystore",  AID_KEYSTORE, },
+    { "usb",       AID_USB, },
+    { "mtp",       AID_MTP, },
+    { "gps",       AID_GPS, },
     { "inet",      AID_INET, },
     { "net_raw",   AID_NET_RAW, },
     { "net_admin", AID_NET_ADMIN, },
+    { "net_bw_stats", AID_NET_BW_STATS, },
+    { "net_bw_acct", AID_NET_BW_ACCT, },
+    { "qcom_oncrpc", AID_QCOM_ONCRPC, },
     { "misc",      AID_MISC, },
     { "nobody",    AID_NOBODY, },
 };
@@ -133,9 +157,12 @@ static struct fs_path_config android_dirs[] = {
     { 00771, AID_SHELL,  AID_SHELL,  "data/local" },
     { 01771, AID_SYSTEM, AID_MISC,   "data/misc" },
     { 00770, AID_DHCP,   AID_DHCP,   "data/misc/dhcp" },
+    { 00775, AID_MEDIA_RW, AID_MEDIA_RW, "data/media" },
+    { 00775, AID_MEDIA_RW, AID_MEDIA_RW, "data/media/Music" },
     { 00771, AID_SYSTEM, AID_SYSTEM, "data" },
     { 00750, AID_ROOT,   AID_SHELL,  "sbin" },
     { 00755, AID_ROOT,   AID_SHELL,  "system/bin" },
+    { 00755, AID_ROOT,   AID_SHELL,  "system/vendor" },
     { 00755, AID_ROOT,   AID_SHELL,  "system/xbin" },
     { 00755, AID_ROOT,   AID_ROOT,   "system/etc/ppp" },
     { 00777, AID_ROOT,   AID_ROOT,   "sdcard" },
@@ -156,30 +183,42 @@ static struct fs_path_config android_files[] = {
     { 00550, AID_ROOT,      AID_SHELL,     "system/etc/init.testmenu" },
     { 00550, AID_DHCP,      AID_SHELL,     "system/etc/dhcpcd/dhcpcd-run-hooks" },
     { 00440, AID_BLUETOOTH, AID_BLUETOOTH, "system/etc/dbus.conf" },
-    { 00440, AID_BLUETOOTH, AID_BLUETOOTH, "system/etc/bluez/hcid.conf" },
-    { 00440, AID_BLUETOOTH, AID_BLUETOOTH, "system/etc/bluez/input.conf" },
-    { 00440, AID_BLUETOOTH, AID_BLUETOOTH, "system/etc/bluez/audio.conf" },
-    { 00440, AID_RADIO,     AID_AUDIO,     "system/etc/AudioPara4.csv" },
+    { 00440, AID_BLUETOOTH, AID_BLUETOOTH, "system/etc/bluetooth/main.conf" },
+    { 00440, AID_BLUETOOTH, AID_BLUETOOTH, "system/etc/bluetooth/input.conf" },
+    { 00440, AID_BLUETOOTH, AID_BLUETOOTH, "system/etc/bluetooth/audio.conf" },
+    { 00440, AID_BLUETOOTH, AID_BLUETOOTH, "system/etc/bluetooth/network.conf" },
+    { 00444, AID_NET_BT,    AID_NET_BT,    "system/etc/bluetooth/blacklist.conf" },
+    { 00640, AID_SYSTEM,    AID_SYSTEM,    "system/etc/bluetooth/auto_pairing.conf" },
+    { 00444, AID_RADIO,     AID_AUDIO,     "system/etc/AudioPara4.csv" },
     { 00555, AID_ROOT,      AID_ROOT,      "system/etc/ppp/*" },
+    { 00555, AID_ROOT,      AID_ROOT,      "system/etc/rc.*" },
     { 00644, AID_SYSTEM,    AID_SYSTEM,    "data/app/*" },
+    { 00644, AID_MEDIA_RW,  AID_MEDIA_RW,  "data/media/*" },
     { 00644, AID_SYSTEM,    AID_SYSTEM,    "data/app-private/*" },
     { 00644, AID_APP,       AID_APP,       "data/data/*" },
         /* the following two files are INTENTIONALLY set-gid and not set-uid.
          * Do not change. */
     { 02755, AID_ROOT,      AID_NET_RAW,   "system/bin/ping" },
-    { 02755, AID_ROOT,      AID_INET,      "system/bin/netcfg" },
-    	/* the following four files are INTENTIONALLY set-uid, but they
+    { 02750, AID_ROOT,      AID_INET,      "system/bin/netcfg" },
+    	/* the following five files are INTENTIONALLY set-uid, but they
 	 * are NOT included on user builds. */
     { 06755, AID_ROOT,      AID_ROOT,      "system/xbin/su" },
     { 06755, AID_ROOT,      AID_ROOT,      "system/xbin/librank" },
     { 06755, AID_ROOT,      AID_ROOT,      "system/xbin/procrank" },
     { 06755, AID_ROOT,      AID_ROOT,      "system/xbin/procmem" },
     { 06755, AID_ROOT,      AID_ROOT,      "system/xbin/tcpdump" },
+    { 04770, AID_ROOT,      AID_RADIO,     "system/bin/pppd-ril" },
+		/* the following file is INTENTIONALLY set-uid, and IS included
+		 * in user builds. */
+    { 06750, AID_ROOT,      AID_SHELL,     "system/bin/run-as" },
     { 00755, AID_ROOT,      AID_SHELL,     "system/bin/*" },
+    { 00755, AID_ROOT,      AID_ROOT,      "system/lib/valgrind/*" },
     { 00755, AID_ROOT,      AID_SHELL,     "system/xbin/*" },
+    { 00755, AID_ROOT,      AID_SHELL,     "system/vendor/bin/*" },
     { 00750, AID_ROOT,      AID_SHELL,     "sbin/*" },
     { 00755, AID_ROOT,      AID_ROOT,      "bin/*" },
     { 00750, AID_ROOT,      AID_SHELL,     "init*" },
+    { 00750, AID_ROOT,      AID_SHELL,     "charger*" },
     { 00644, AID_ROOT,      AID_ROOT,       0 },
 };
 
@@ -216,4 +255,3 @@ static inline void fs_config(const char *path, int dir,
 }
 #endif
 #endif
-

@@ -39,7 +39,7 @@ static int total_size = 0;
 
 static void fix_stat(const char *path, struct stat *s)
 {
-    fs_config(path, S_ISDIR(s->st_mode), (unsigned *)&s->st_uid, (unsigned *)&s->st_gid, &s->st_mode);
+    fs_config(path, S_ISDIR(s->st_mode), &s->st_uid, &s->st_gid, &s->st_mode);
 }
 
 static void _eject(struct stat *s, char *out, int olen, char *data, unsigned datasize)

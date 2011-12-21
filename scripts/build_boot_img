@@ -146,7 +146,7 @@ else
   echo
   echo "Compiling mkbootfs ..."
   cd tools/mkboot
-  gcc -o mkbootfs mkbootfs.c
+  gcc -o mkbootfs mkbootfs.c 2>/dev/null
   cd ../..
 
   if [ -e tools/mkboot/$mkbootfs_file ]
