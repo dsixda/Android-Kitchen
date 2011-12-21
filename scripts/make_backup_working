@@ -16,7 +16,7 @@ then
   echo
   echo "Before you proceed:"
   echo "The existing working folders under the main folder can be backed up"
-  echo "to the folder 'orignal_update' for later use; otherwise they will be"
+  echo "to the folder 'original_update' for later use; otherwise they will be"
   echo "deleted."
 
   echo
