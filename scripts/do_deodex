@@ -97,7 +97,7 @@ do
     echo "Enter a choice:"
     echo
 
-    if [ $num_odex_app -gt 0 ] && [ $num_odex_fr -gt 0 ]
+    if [ $num_odex_app -gt 0 ] || [ $num_odex_fr -gt 0 ]
     then
       echo " bb  = Back up both folders (do first!)"
     fi
