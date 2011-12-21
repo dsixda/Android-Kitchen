@@ -1,0 +1,24 @@
+############################################################################
+#
+# Copyright (c) 2011 - dsixda (dislam@rocketmail.com)
+#
+# Android Kitchen is 100% free.  This script file is intended for personal
+# and/or educational use only.  It may not be duplicated for monetary
+# benefit or any other purpose without the permission of the developer.
+#
+############################################################################
+
+if [ ! -e tools/deodex_files/use_this_version.txt ]
+then
+  ver=UNKNOWN
+else
+  sed -i -e '/^$/d' tools/deodex_files/use_this_version.txt
+  ver=`more tools/deodex_files/use_this_version.txt | sed 's/[ ]*$//g'`
+  if [ "$ver" == "" ]
+  then
+    ver=UNKNOWN
+  fi
+fi  
+
+echo $ver
+
