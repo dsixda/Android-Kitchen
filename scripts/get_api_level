@@ -12,6 +12,7 @@ if [ ! -e tools/deodex_files/api_level.txt ]
 then
   api_level=UNKNOWN
 else
+  sed -i -e '/^$/d' tools/deodex_files/api_level.txt
   api_level=`more tools/deodex_files/api_level.txt | sed 's/[ ]*$//g'`
   if [ "$api_level" == "" ]
   then

@@ -56,9 +56,9 @@ fi
 date_str=`date '+%m%d%y_%H%M%S'`
 log_file=deodex_$date_str.log
 
-# Fix Linux issue with blank lines
-sed -i -e '/^$/d' ../tools/deodex_files/use_this_version.txt
-version=`more ../tools/deodex_files/use_this_version.txt | sed 's/[ ]*$//g'`
+cd ..
+version=`scripts/get_smali_version`
+cd WORKING_*
 
 if [ "$do_log" == "y" ]
 then
