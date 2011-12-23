@@ -68,6 +68,7 @@ then
     param2_cache=`scripts/get_edify_def_val $device_name param2_cache`
     fix_boot=`scripts/get_edify_def_val $device_name fix_boot`
     fix_boot2=`scripts/get_edify_def_val $device_name fix_boot2`
+    fix_boot3=`scripts/get_edify_def_val $device_name fix_boot3`
     use_cache_not_tmp=`scripts/get_edify_def_val $device_name use_cache_not_tmp`
     sys_mnt=`scripts/get_edify_def_val $device_name sys_mnt`
     cache_mnt=`scripts/get_edify_def_val $device_name cache_mnt`
@@ -163,6 +164,10 @@ then
       elif [ "$fix_boot2" == "yes" ]
       then
         sed -i -e 's/write_raw_image("\/tmp\/boot.img", "boot")/write_raw_image("\/tmp\/boot.img", "'"$boot_mnt"'")/g' updater-script
+
+      elif [ "$fix_boot3" == "yes" ]
+      then
+        sed -i -e 's/write_raw_image("\/tmp\/boot.img", "boot")/run_program("\/sbin\/busybox", "dd", "if=\/tmp\/boot.img", "of='"$boot_mnt"'")/g' updater-script
       fi
 
 
@@ -435,6 +440,11 @@ then
         -e 's/format '"$param1"' '"$data_mnt"'/format '"$param1"' DATA:/g' \
         \
         -e 's/package_extract_file PACKAGE:boot.img '"$boot_mnt"'/write_raw_image PACKAGE:boot.img BOOT:/g' \
+        -e 's/run_program PACKAGE:sbin\/busybox dd if=TMP:boot.img of='"$boot_mnt"'/write_raw_image PACKAGE:boot.img BOOT:/g' \
+        update-script
+
+      sed -i \
+        -e ':a;N;$!ba;s/package_extract_file PACKAGE:boot.img TMP:boot.img\nwrite_raw_image PACKAGE:boot.img BOOT:\ndelete TMP:boot.img/write_raw_image PACKAGE:boot.img BOOT:/g' \
         update-script
 
       #

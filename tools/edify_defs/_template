@@ -54,12 +54,23 @@ param2_cache=
 
 # If yes, the device does not require using a 'tmp' folder when
 # flashing the boot.img in the updater-script
+#
+# e.g. package_extract_file("boot.img", "/dev/block/blah1");
 fix_boot=no
 
 # If yes, the device requires a 'tmp' folder when flashing the
 # boot.img in the updater-script, PLUS the boot partition name
 # needs to be used, rather than just 'boot'
+#
+# e.g. Replace: write_raw_image("/tmp/boot.img", "boot")
+#      with:    write_raw_image("/tmp/boot.img", "/dev/block/blah1")
 fix_boot2=no
+
+# If yes, the device requires a 'dd' command to write the boot.img
+# 
+# e.g. Replace: write_raw_image("/tmp/boot.img", "boot")
+#      with:    run_program("/sbin/busybox", "dd", "if=/tmp/boot.img", "of=/dev/block/blah")
+fix_boot3=no
 
 # Device uses /cache instead of /tmp, e.g. when writing boot.img
 use_cache_not_tmp=no
