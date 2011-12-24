@@ -290,15 +290,19 @@ cd ..
 
 
 
-if [ "$is_galaxy_ss2" == "1" ] || [ "$is_galaxy_s2x" == "1" ] || [ "$device_name" == "GT-I9001" ]
+#
+# Check for CSC version
+#
+
+echo -n "."
+cd WORKING_*
+
+show_csc=no
+
+if [ -e system/CSCVersion.txt ] || [ "$is_galaxy_ss2" == "1" ] || [ "$is_galaxy_s2x" == "1" ] || [ "$device_name" == "GT-I9001" ]
 then
 
-  #
-  # Check for CSC version
-  #
-
-	echo -n "."
-	cd WORKING_*
+  show_csc=yes
 
   if [ -e system/CSCVersion.txt ]
   then
@@ -307,9 +311,11 @@ then
     csc_version=UNKNOWN
   fi
 
-	cd ..
-
 fi
+
+cd ..
+
+
 
 
 if [ "$is_galaxy_ss2" == "1" ]
@@ -446,7 +452,7 @@ echo " Device                         : $device_name"
 echo " Model                          : $model"
 echo " ROM Name                       : $rom_name"
 
-if [ "$is_galaxy_ss2" == "1" ] || [ "$is_galaxy_s2x" == "1" ] || [ "$device_name" == "GT-I9001" ]
+if [ "$show_csc" == "yes" ]
 then
   echo " CSC version                    : $csc_version"
 fi
