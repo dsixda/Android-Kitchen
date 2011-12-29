@@ -66,10 +66,7 @@ else
 
       if [ "$do_copy" != "y" ]
       then
-        for apk in $apk_files
-        do
-          rm -vf $apk
-        done
+        rm -vf $apk_files
       fi
     fi
 
