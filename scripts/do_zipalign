@@ -89,7 +89,7 @@ fi
 echo
 cd WORKING_*
 
-grep_cmd=`find . | grep .apk$ | sort -f`
+grep_cmd=`find . -type f | grep \\.apk$ | sort -f`
 
 name1=
 
