@@ -200,7 +200,7 @@ else
 
       if [ "$test_start" == "0" ] && [ "$test_property" == "0" ]
       then
-        sed -i -e 's/class_start default/start sysinit\n\n    class_start default/' init.rc
+        sed -i -e '0,/class_start /s//start sysinit\n\n    class_start /' init.rc
      
       elif [ "$test_start" == "0" ] && [ "$test_property" != "0" ]
       then
