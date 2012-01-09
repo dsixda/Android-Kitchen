@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright (c) 2011 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
@@ -20,7 +20,19 @@ then
   then
     echo "boot.img not found!"
     exit 0
-  fi
+  else
+    boot_dir=`pwd`
+    cd ..
+    scripts/check_bootimg_header $boot_dir
+    res=$?
+
+    if [ "$res" == "1" ]
+    then
+      exit 0
+    else
+      cd WORKING_*
+    fi
+  fi    
 
 else
   echo "Working folder not found!"
