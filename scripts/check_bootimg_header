@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright (c) 2011 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
@@ -33,7 +33,8 @@ if [ "$check_header" != "4e415244494f2144" ]
 then
 
   echo
-  echo "Android header not found at start of boot.img"
+  echo "Android 'magic' header not found at start of boot.img"
+  echo "Checking if it exists elsewhere ..."
 
   # Mac OS X adds extra spaces between the numbers!
   hex_offset=`od -x -A x boot.img | grep -m 1 "4e41 [ ]*5244 [ ]*494f [ ]*2144" | sed -e 's/ .*//'`
@@ -57,7 +58,7 @@ then
     exit 0
 
   else
-    echo "Warning: Android header not located anywhere in boot.img"
+    echo "Warning: Android header not found in boot.img (unsupported format)"
     cd $base_dir
     exit 1
   fi
