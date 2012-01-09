@@ -1,12 +1,16 @@
 ############################################################################
 #
-# Copyright (c) 2011 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
 # benefit or any other purpose without the permission of the developer.
 #
 ############################################################################
+
+#
+# This scripts extracts the contents of the boot.img from any folder
+#
 
 clear
 
@@ -52,6 +56,12 @@ then
   if [ ! -e zImage ]
   then
     echo "Error: No zImage found!"
+  else
+    test_z=`od -A n -j 1 -N 4 zImage | sed 's/ //g'`
+    if [ "$test_z" == "" ]
+    then
+      echo "Error: zImage is empty!"
+    fi
   fi
 
   echo Extracting ramdisk ... 
