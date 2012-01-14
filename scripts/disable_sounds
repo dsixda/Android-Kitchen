@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright (c) 2011 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
@@ -82,7 +82,7 @@ else
   echo
   echo "/system/media/bootscreen/boot_animation.xml not found in this ROM"
 
-  file_list="system/customize/resource/android_audio.mp3 system/media/android_audio.mp3 system/sounds/lgeSounds/PowerOn.mp3 system/etc/PowerOn.wav"
+  file_list="system/customize/resource/android_audio.mp3 system/media/android_audio.mp3 system/sounds/lgeSounds/PowerOn.mp3 system/etc/PowerOn.wav system/etc/PowerOn.ogg"
 
   for snd in $file_list 
   do
