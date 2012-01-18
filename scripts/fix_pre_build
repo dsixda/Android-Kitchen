@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright (c) 2011 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
@@ -325,7 +325,35 @@ then
       cp ../tools/samsung_files/redbend_ua .
     fi
   fi
+
+elif [ -e flash_image ] 
+then
+  echo "Removing flash_image from ROM ..."
+  rm -f flash_image
+elif [ -e redbend_ua ]
+then
+  echo "Removing redbend_ua from ROM ..."
+  rm -f redbend_ua
 fi
+
+
+#
+# ICS font issue (for Galaxy S2 problem with Samsung keypad not opening)
+#
+# Remove symbolic links to Roboto font and make copies of Roboto instead
+#
+
+if [ -e system/fonts/Roboto-Regular.ttf ] 
+then
+  rm -f system/fonts/DroidSans.ttf
+  cp -f system/fonts/Roboto-Regular.ttf system/fonts/DroidSans.ttf
+fi
+if [ -e system/fonts/Roboto-Bold.ttf ] 
+then
+  rm -f system/fonts/DroidSans-Bold.ttf
+  cp -f system/fonts/Roboto-Bold.ttf system/fonts/DroidSans-Bold.ttf
+fi
+
 
 
 #
