@@ -1,0 +1,229 @@
+############################################################################
+#
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
+#
+# Android Kitchen is 100% free.  This script file is intended for personal
+# and/or educational use only.  It may not be duplicated for monetary
+# benefit or any other purpose without the permission of the developer.
+#
+############################################################################
+
+#
+# This script has two optional arguments:
+#
+# $1 = "no_create" or "create" or "create_working 
+#         - must specify no_create if working folder already exists
+# $2 = "kernel_only" or "name_given" - if this is specified then $1 is mandatory
+#
+
+if [ "$1" == "no_create" ] 
+then
+  build_dir=`ls | grep -m 1 ^WORKING_`
+
+  mkdir $build_dir/system
+  mv $build_dir/system.ext4.tar $build_dir/system
+
+else
+
+  current_dir=`pwd`
+  dest_dir=$current_dir/original_update
+  scripts/check_no_bootimg $dest_dir
+
+  #
+  # Check for system.ext4.tar/boot.img in original_update  
+  #
+  if [ -e original_update/system.ext4.tar ]
+  then
+    echo "Found original_update/system.ext4.tar"
+    if [ -e original_update/boot.img ]
+    then
+      echo "Found original_update/boot.img"
+    else
+      echo "Error: No original_update/boot.img found"
+      echo
+      exit 1
+    fi
+
+  else
+
+    if [ -e original_update/boot.img ]
+    then
+      echo "Found original_update/boot.img"
+      echo "Error: No original_update/system.ext4.tar found"
+    else
+      echo
+      echo "Error: No ROMs found under original_update folder!"
+    fi
+
+    exit 1
+  fi
+
+
+  #
+  # Working folder name
+  #
+  build_dir=`scripts/set_working_folder_name $2`
+
+  echo
+  echo "Creating working folder $build_dir ..."
+  mkdir $build_dir
+  mkdir $build_dir/system
+
+  echo "Copying boot.img ..."
+  cp original_update/boot.img $build_dir
+  echo "Copying system.ext4.tar ..."
+  cp original_update/system.ext4.tar $build_dir/system
+
+fi
+
+
+#
+# Directory tree
+#
+
+mkdir -p $build_dir/META-INF/com/google/android
+echo
+echo "Adding an update-script ..."
+cp tools/update_files/update-script $build_dir/META-INF/com/google/android/
+
+
+#
+# Check for TAR
+#
+
+system_dir=$build_dir/system
+
+cd $system_dir
+
+#
+# Check for TAR archive
+#
+test_tar=`od -A n --strings -j 0 -N 7 system.ext4.tar`
+
+if [ "$test_tar" == "system/" ]
+then
+  echo
+  echo "system.ext4.tar is a TAR archive"
+  echo "Extracting files ..."
+  tar xf system.ext4.tar -C ../
+
+else
+  echo "Error: system.ext4.tar is not a tar archive!"
+  cd ../..
+  exit 1
+fi
+
+
+rm -f system.ext4.tar 2>/dev/null
+
+cd ..
+
+if [ ! -d system ]
+then
+  echo
+  echo "Error:  No /system folder found!"
+  exit 1
+fi
+
+if [ ! -d system/framework ]
+then
+  echo
+  echo "Error: No /system/framework folder found!"
+  exit 1
+fi
+
+if [ ! -d system/app ]
+then
+  echo
+  echo "Error: No /system/app folder found!"
+  exit 1
+fi
+
+if [ "`ls system`" == "" ]
+then
+  echo 
+  echo "Error: /system folder is empty!"
+  echo
+  exit 1
+fi
+
+
+cd ..
+echo
+
+
+
+cd WORKING_*
+
+if [ ! -e boot.img ]
+then
+	cd ..
+  scripts/check_no_bootimg
+
+else
+
+	cd ..
+
+	#
+	# Check for location of Android header in boot.img so that it can be
+	# added to working folder correctly
+	#
+
+	scripts/check_bootimg_header
+
+	# Not a valid boot.img
+	if [ "$?" == "1" ]
+	then
+
+		scripts/check_galaxy_s
+		is_gs=$?
+
+		if [ "$is_gs" == "1" ]
+		then
+		  cp_file=redbend_ua
+		else
+		  scripts/check_galaxy_s2
+		  is_gs2=$?
+
+		  if [ "$is_gs2" == "1" ]
+		  then
+		    cp_file=flash_image
+		  fi
+		fi
+
+		if [ "$is_gs" == "1" ] || [ "$is_gs2" == "1" ]
+		then
+		  echo
+		  echo "NOTE: The boot.img may actually be a kernel (zImage) instead.  We will"
+		  echo "rename it to zImage."
+		  echo
+
+		  cd WORKING_*
+		  mv -v boot.img zImage
+		  echo
+		  cp -v ../tools/samsung_files/$cp_file .
+		  echo flash_zimage >> META-INF/com/google/android/update-script
+		  cd ..
+		  scripts/check_no_bootimg 
+		fi
+	fi
+fi
+
+
+if [ "$2" != "kernel_only" ] && [ "$2" != "name_given" ]
+then
+  scripts/fix_update_script 
+
+  # Modify the update-script with features found in Nandroid backup
+  scripts/fix_update_script_with_features
+
+  scripts/remove_recovery
+fi
+
+echo Listing of $build_dir:
+echo
+ls -l $build_dir
+
+echo
+echo "Finished setting up working folder!"
+
