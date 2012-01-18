@@ -26,6 +26,7 @@ The format for each ROM must be one of the following:
  - factoryfs.img + optional cache.img/zImage  
  - system.img.ext4 + optional cache.img.ext4/boot.img
  - TAR/ZIP file containing factoryfs.img/system.img.ext4 + more 
+ - system.ext4.tar + optional boot.img (Nandroid backup)
  
  Huawei:
  - APP file from Huawei software update (e.g. UPDATE.APP)
