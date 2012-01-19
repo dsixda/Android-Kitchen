@@ -343,12 +343,12 @@ fi
 # Remove symbolic links to Roboto font and make copies of Roboto instead
 #
 
-if [ -e system/fonts/Roboto-Regular.ttf ] 
+if [ -e system/fonts/Roboto-Regular.ttf ] && [ -e system/fonts/DroidSans.ttf ]
 then
   rm -f system/fonts/DroidSans.ttf
   cp -f system/fonts/Roboto-Regular.ttf system/fonts/DroidSans.ttf
 fi
-if [ -e system/fonts/Roboto-Bold.ttf ] 
+if [ -e system/fonts/Roboto-Bold.ttf ] && [ -e system/fonts/DroidSans-Bold.ttf ]
 then
   rm -f system/fonts/DroidSans-Bold.ttf
   cp -f system/fonts/Roboto-Bold.ttf system/fonts/DroidSans-Bold.ttf
