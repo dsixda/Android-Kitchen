@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright (c) 2011 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
@@ -33,10 +33,44 @@ then
   cd system
 
   echo
-  echo "Looking for symbolic links under /system/bin ..."
+  echo -n "Looking for symbolic links under /system/bin ..."
   
   symlinks=`find bin -type l -exec ls -l {} \; | sed 's/.* bin\/\([^ ]*\).*/\1/g'`
   source_files=`find bin -type l -exec ls -l {} \; | sed 's/.*-> //g'`
+
+  #
+  # Fix for newer RFS-based ROMs (e.g. on Samsung Infuse 4G)
+  # The symlink files contain a hex-encoded reference to 'toolbox'
+  #
+  if [ "$symlinks" == "" ]
+  then
+
+    if [ -e bin/cat ]
+    then
+
+      toolbox_hex="0074006f006f006c0062006f0078"
+      test_toolbox=`od -A n -h -j 8 -N 13 bin/cat | sed 's/ //g'`
+   
+      if [ "$test_toolbox" == "$toolbox_hex" ]
+      then
+
+        file_list=`ls bin`
+
+        for curr_file in $file_list
+        do
+          check_toolbox=`od -A n -h -j 8 -N 13 bin/$curr_file | sed 's/ //g'`
+        
+          if [ "$check_toolbox" == "$toolbox_hex" ]
+          then
+            echo -n "."
+            symlinks="$symlinks $curr_file"
+          fi
+        done
+      fi
+    fi
+  fi
+
+  echo
 
   symlinks=( $symlinks )
   source_files=( $source_files )
@@ -113,25 +147,32 @@ then
       link=${symlinks[$i]}
       src=${source_files[$i]}
 
-      # Deleting the symbolic link
-      rm -f bin/$link
-
-      #
-      #  Remove full paths for some binaries
-      #
-      if [ `echo $src | grep -c /busybox$` == 1 ]
-      then
-        src=busybox
-      elif [ `echo $src | grep -c /toolbox$` == 1 ]
+      if [ "$src" == "" ]
       then
         src=toolbox
-      elif [ `echo $src | grep -c /dumpstate$` == 1 ]
-      then
-        src=dumpstate
-      elif [ `echo $src | grep -c /iwmulticall$` == 1 ]
-      then
-        src=iwmulticall
+      else
+
+        #
+        #  Remove full paths for some binaries
+        #
+        if [ `echo $src | grep -c /busybox$` == 1 ]
+        then
+          src=busybox
+        elif [ `echo $src | grep -c /toolbox$` == 1 ]
+        then
+          src=toolbox
+        elif [ `echo $src | grep -c /dumpstate$` == 1 ]
+        then
+          src=dumpstate
+        elif [ `echo $src | grep -c /iwmulticall$` == 1 ]
+        then
+          src=iwmulticall
+        fi
+
       fi
+
+      # Deleting the symbolic link
+      rm -f bin/$link
 
       export LINK=$link
       export SRC=$src
