@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright (c) 2011 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
@@ -9,8 +9,8 @@
 ############################################################################
 
 
-bin_list=( clear gcc java perl sed wget od wc cpio )
-arg_list=( foo dumpversion version v -version V -version -version -version )
+bin_list=( clear gcc java perl sed wget od wc cpio zip unzip )
+arg_list=( foo dumpversion version v -version V -version -version -version -help -help )
 
 show_header=1
 
@@ -55,6 +55,8 @@ do
     echo "        not miss a step during installation!  Refer to the"
     echo "        Android Kitchen FAQ at xda-developers.com for further"
     echo "        assistance."
+    echo
+    echo "        PLEASE READ THE FAQ BEFORE ASKING QUESTIONS!"
     echo 
 
     found_error=1
