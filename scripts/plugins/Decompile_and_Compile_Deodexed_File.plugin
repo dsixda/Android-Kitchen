@@ -27,6 +27,9 @@ fi
 
 orig_folder=`pwd`
 
+scripts/change_api_level
+api_level=`scripts/get_api_level`
+
 echo
 cd WORKING_*
 
@@ -138,9 +141,9 @@ then
   fi
 
   echo
-  echo "-> java -Xmx512m -jar baksmali.jar classes.dex"
+  echo "-> java -Xmx512m -jar baksmali.jar -a $api_level classes.dex"
   echo
-  java -Xmx512m -jar baksmali.jar classes.dex
+  java -Xmx512m -jar baksmali.jar -a $api_level classes.dex
 
   if [ -d out ]
   then
@@ -166,9 +169,9 @@ then
       echo
       echo "Compiling $file_chosen ..."
       echo
-      echo "-> java -Xmx512m -jar smali.jar out -o classes.dex"
+      echo "-> java -Xmx512m -jar smali.jar -a $api_level out -o classes.dex"
       echo
-      java -Xmx512m -jar smali.jar out -o classes.dex      
+      java -Xmx512m -jar smali.jar -a $api_level out -o classes.dex      
       
       if [ "$?" != "0" ]
       then
