@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright (c) 2011 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
@@ -170,9 +170,9 @@ else
     echo "Unable to convert system.img.ext4!"
     exit 1
   fi
-
-  rm -rf $system_dir/system.img.ext4
 fi
+
+rm -rf $system_dir/system.img.ext4
 
 
 #
@@ -281,9 +281,10 @@ then
         echo "Unable to convert cache.img.ext4!"
         exit 1
       fi
-
-      rm -rf $system_dir/cache.img.ext4
     fi
+
+    rm -rf $system_dir/cache.img.ext4
+
 
     #
     # Extract files from ext4_cache.img
