@@ -260,6 +260,7 @@ then
 
         if [ -e META-INF/com/google/android/updater-script ]
         then
+          ../scripts/convert_to_unix META-INF/com/google/android/updater-script 
           zip update.zip META-INF/com/google/android/updater-script META-INF/com/google/android/update-binary
           zip -d update.zip META-INF/com/google/android/update-script
         else
