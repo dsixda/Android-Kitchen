@@ -29,6 +29,8 @@ then
 elif [ -e META-INF/com/google/android/updater-script ]
 then
 
+  # Fix file in case EOL formatting is incompatible with Android
+  ../scripts/convert_to_unix META-INF/com/google/android/updater-script
   cd ..
   scripts/check_which_update_binary
   exit 0
@@ -51,6 +53,11 @@ fi
 
 
 ########### update-script enhancements follow ###########
+
+
+# Fix EOL formatting if required
+../scripts/convert_to_unix META-INF/com/google/android/update-script
+
 
 
 #
@@ -470,5 +477,4 @@ fi
 echo
 
 cd ..
-
 
