@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright (c) 2011 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
@@ -145,60 +145,123 @@ elif [ `sw_vers | grep -o Mac` ]
 then
   
   #
-  # Mac support - with help from he8us
+  # Mac support - FUSE help from he8us
   #
 
-  res=`which fuse-ext2 2>/dev/null`
-  result=$?
+  cd $img_dir
+
+  rfs_list=`ls | grep -i \\.rfs$`
+
+  # For RFS
+  if [ "$rfs_list" != "" ]
+  then
+
+    mount_dir=/Volumes/RFS
+
+    echo "We'll need to do some superuser stuff here"
+    if [ -d $mount_dir ]
+    then
+      sudo umount $mount_dir 2>/dev/null
+    fi
+
+    sudo mkdir $mount_dir 2>/dev/null
+    sudo hdiutil attach -imagekey diskimage-class=CRawDiskImage -nomount $img_file > temp.log
+    mydisk=`more temp.log | sed -e 's/[ \t]*$//g'`
+    rm -f temp.log
+
+    sudo mount_msdos $mydisk $mount_dir
+    result=0
+
+  else
+
+    res=`which fuse-ext2 2>/dev/null`
+    result=$?
+
+    if [ "$result" != "0" ]
+    then
+      fuse_cmd="/usr/local/bin/fuse-ext2"
+      res=`which $fuse_cmd 2>/dev/null`
+      result=$?
+    else
+      fuse_cmd=fuse-ext2
+    fi
+
+    mount_dir=/tmp/for_kitchen
+
+  fi
+
 
   if [ "$result" == "0" ]
   then
 
+    cd $base_dir
     cd $img_dir
 
-    echo "Fuse installed"
+    echo
+    echo "Ready to extract files from $img_file"
     mv $img_file ../$img_file
     cd ..
-    mkdir /tmp/for_kitchen/
 
-    echo "Trying to mount the filesystem"
-    buffer=`fuse-ext2 $img_file /tmp/for_kitchen/`
-    echo "Filesystem mounted"
-    listing=`ls /tmp/for_kitchen/`
-    echo "File system listed, analyzing"
+    # For FUSE
+    if [ "$rfs_list" == "" ] 
+    then
+      if [ -d $mount_dir ]
+      then
+        umount $mount_dir
+        rm -rf $mount_dir
+      fi
+
+      mkdir $mount_dir
+
+      echo "Trying to mount the filesystem"
+      buffer=`$fuse_cmd $img_file $mount_dir`
+      echo "Filesystem mounted"
+    fi
+
+    listing=`ls $mount_dir`
+    echo "File system listed, analyzing ..."
     
     if [ "$listing" != "" ]
     then
 
       echo "Copying files"
 
-      if [ "$img_file" == "ext4_cache.img" ]
+      if [ "$img_file" == "ext4_cache.img" ] || [ "$img_file" == "cache.rfs" ]
       then
-        cp /tmp/for_kitchen/recovery/sec_csc.zip .
+        cp $mount_dir/recovery/sec_csc.zip system/
       else
-        cp -R /tmp/for_kitchen/ $img_dir/
+        cp -R $mount_dir/ $img_dir/
       fi
 
-      umount /tmp/for_kitchen/
-      rmdir /tmp/for_kitchen/
-      mv $img_file $img_dir/$img_file
-      cd system
-
-      rm -f unyaffs*stackdump
-
-      cd $base_dir
-
     else
-      echo "Failed to mount the filesystem: mount point empty"
+      echo "Error: Mount point empty"
       echo $listing
-      rmdir /tmp/for_kitchen/
+    fi
+
+    if [ "$rfs_list" == "" ]
+    then
+      umount $mount_dir
+      rm -rf $mount_dir
+    else
+      sudo umount $mount_dir
+      hdiutil detach $mydisk
+    fi
+
+    mv $img_file $img_dir/$img_file
+    cd system
+
+    if [ "$listing" != "" ]
+    then
+      rm -f unyaffs*stackdump
       cd $base_dir
+    else
       exit 1
     fi
 
   else
+    echo
     echo "Your system does not have fuse installed."
-    echo "Please install it by searching Google for MacFuse and fuse-ext2."
+    echo "Search Google for MacFUSE (install first) and fuse-ext2 (install second)."
   fi
 fi
 
