@@ -61,19 +61,19 @@ do
 
     found_error=1
 
-  elif [ "$bin" == "sed" ]
+  elif [ "$bin" == "sed" ] || [ "$bin" == "od" ]
   then
 
-    grep_cmd=`sed --version | grep -m 1 GNU`
+    grep_cmd=`$bin --version | grep -m 1 GNU`
 
     if [ "$grep_cmd" == "" ]
     then
       echo
       echo
-      echo "Error:  You do not have the correct version of 'sed' installed."
+      echo "Error:  You do not have the correct version of '$bin' installed."
       echo "        Refer to the FAQ for the Android Kitchen at"
       echo "        xda-developers.com to ensure you have installed the GNU"
-      echo "        version of sed."
+      echo "        version of $bin."
       echo
 
       found_error=1
