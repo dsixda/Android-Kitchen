@@ -145,7 +145,8 @@ elif [ `sw_vers | grep -o Mac` ]
 then
   
   #
-  # Mac support - FUSE help from he8us
+  # Mac support 
+  # - Thanks to he8us for adding the FUSE routine
   #
 
   cd $img_dir
@@ -172,6 +173,7 @@ then
     sudo mount_msdos $mydisk $mount_dir
     result=0
 
+  # For EXT2/EXT3 (use FUSE)
   else
 
     res=`which fuse-ext2 2>/dev/null`
@@ -230,7 +232,7 @@ then
       then
         cp $mount_dir/recovery/sec_csc.zip system/
       else
-        cp -R $mount_dir/ $img_dir/
+        cp -r $mount_dir/* $img_dir/
       fi
 
     else
@@ -261,7 +263,7 @@ then
   else
     echo
     echo "Your system does not have fuse installed."
-    echo "Search Google for MacFUSE (install first) and fuse-ext2 (install second)."
+    echo "Read the Android Kitchen FAQ to install MacFUSE, followed by fuse-ext2."
   fi
 fi
 
