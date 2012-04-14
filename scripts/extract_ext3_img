@@ -153,7 +153,7 @@ then
 
   rfs_list=`ls | grep -i \\.rfs$`
 
-  # For RFS
+  # Mount files for RFS
   if [ "$rfs_list" != "" ]
   then
 
@@ -162,7 +162,8 @@ then
     echo "We'll need to do some superuser stuff here"
     if [ -d $mount_dir ]
     then
-      sudo umount $mount_dir 2>/dev/null
+      #sudo umount $mount_dir 2>/dev/null
+      sudo diskutil umount force $mount_dir 2>/dev/null
     fi
 
     sudo mkdir $mount_dir 2>/dev/null
@@ -171,9 +172,8 @@ then
     rm -f temp.log
 
     sudo mount_msdos $mydisk $mount_dir
-    result=0
 
-  # For EXT2/EXT3 (use FUSE)
+  # Check FUSE - for EXT2/EXT3
   else
 
     res=`which fuse-ext2 2>/dev/null`
@@ -184,6 +184,15 @@ then
       fuse_cmd="/usr/local/bin/fuse-ext2"
       res=`which $fuse_cmd 2>/dev/null`
       result=$?
+
+      if [ "$result" != "0" ]
+      then
+        echo
+        echo "Your system does not have FUSE installed."
+        echo "Read the Android Kitchen FAQ to install MacFUSE, followed by fuse-ext2."
+        exit 1
+      fi
+
     else
       fuse_cmd=fuse-ext2
     fi
@@ -193,78 +202,75 @@ then
   fi
 
 
-  if [ "$result" == "0" ]
+  #
+  # Now extract the files for Mac
+  #
+
+  cd $base_dir
+  cd $img_dir
+
+  echo
+  echo "Ready to extract files from $img_file"
+  mv $img_file ../$img_file
+  cd ..
+
+  # For FUSE
+  if [ "$rfs_list" == "" ] 
   then
-
-    cd $base_dir
-    cd $img_dir
-
-    echo
-    echo "Ready to extract files from $img_file"
-    mv $img_file ../$img_file
-    cd ..
-
-    # For FUSE
-    if [ "$rfs_list" == "" ] 
-    then
-      if [ -d $mount_dir ]
-      then
-        umount $mount_dir
-        rm -rf $mount_dir
-      fi
-
-      mkdir $mount_dir
-
-      echo "Trying to mount the filesystem"
-      buffer=`$fuse_cmd $img_file $mount_dir`
-      echo "Filesystem mounted"
-    fi
-
-    listing=`ls $mount_dir`
-    echo "File system listed, analyzing ..."
-    
-    if [ "$listing" != "" ]
-    then
-
-      echo "Copying files"
-
-      if [ "$img_file" == "ext4_cache.img" ] || [ "$img_file" == "cache.rfs" ]
-      then
-        cp $mount_dir/recovery/sec_csc.zip system/
-      else
-        cp -r $mount_dir/* $img_dir/
-      fi
-
-    else
-      echo "Error: Mount point empty"
-      echo $listing
-    fi
-
-    if [ "$rfs_list" == "" ]
+    if [ -d $mount_dir ]
     then
       umount $mount_dir
       rm -rf $mount_dir
-    else
-      sudo umount $mount_dir
-      hdiutil detach $mydisk
     fi
 
-    mv $img_file $img_dir/$img_file
-    cd system
+    mkdir $mount_dir
 
-    if [ "$listing" != "" ]
+    echo "Trying to mount the filesystem"
+    buffer=`$fuse_cmd $img_file $mount_dir`
+    echo "Filesystem mounted"
+  fi
+
+  listing=`ls $mount_dir`
+  echo "File system listed, analyzing ..."
+  
+  if [ "$listing" != "" ]
+  then
+
+    echo "Copying files"
+
+    if [ "$img_file" == "ext4_cache.img" ] || [ "$img_file" == "cache.rfs" ]
     then
-      rm -f unyaffs*stackdump
-      cd $base_dir
+      cp $mount_dir/recovery/sec_csc.zip system/
     else
-      exit 1
+      cp -r $mount_dir/* $img_dir/
     fi
 
   else
-    echo
-    echo "Your system does not have fuse installed."
-    echo "Read the Android Kitchen FAQ to install MacFUSE, followed by fuse-ext2."
+    echo "Error: Mount point empty"
+    echo $listing
   fi
+
+  if [ "$rfs_list" == "" ]
+  then
+    umount $mount_dir
+    rm -rf $mount_dir
+  else
+    #sudo umount $mount_dir
+    sudo diskutil umount force $mount_dir    
+    hdiutil detach $mydisk
+  fi
+
+  mv $img_file $img_dir/$img_file
+  cd system
+
+  if [ "$listing" != "" ]
+  then
+    rm -f unyaffs*stackdump
+    cd $base_dir
+  else
+    exit 1
+  fi
+
 fi
 
 
