@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright (c) 2011 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
@@ -21,6 +21,9 @@ rm -f tools/explore2fs_windows/explore*.txt
 rm -f tools/ext2read_windows/ext2*.log
 rm -f ext2*.log
 rm -f sh.exe.stackdump
+rm -f scripts/.DS_Store
+rm -f original_update/.DS_Store
+rm -f .DS_Store
 
 bin_list=( mkbootfs mkbootfs.exe mkbootimg mkbootimg.exe rsa.o sha.o )
 
