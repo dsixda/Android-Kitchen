@@ -2,6 +2,7 @@ symlink toolbox SYSTEM:bin/cat
 symlink toolbox SYSTEM:bin/chmod
 symlink toolbox SYSTEM:bin/chown
 symlink toolbox SYSTEM:bin/cmp
+symlink debuggerd SYSTEM:bin/csview
 symlink toolbox SYSTEM:bin/date
 symlink toolbox SYSTEM:bin/dd
 symlink toolbox SYSTEM:bin/df
@@ -40,12 +41,14 @@ symlink toolbox SYSTEM:bin/schedtop
 symlink toolbox SYSTEM:bin/sendevent
 symlink toolbox SYSTEM:bin/setconsole
 symlink toolbox SYSTEM:bin/setprop
+symlink mksh SYSTEM:bin/sh
 symlink toolbox SYSTEM:bin/sleep
 symlink toolbox SYSTEM:bin/smd
 symlink toolbox SYSTEM:bin/start
 symlink toolbox SYSTEM:bin/stop
 symlink toolbox SYSTEM:bin/sync
 symlink toolbox SYSTEM:bin/top
+symlink toolbox SYSTEM:bin/touch
 symlink toolbox SYSTEM:bin/umount
 symlink toolbox SYSTEM:bin/uptime
 symlink toolbox SYSTEM:bin/vmstat
