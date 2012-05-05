@@ -194,6 +194,16 @@ then
   # Modify the update-script if certain files are missing under /system
   #
 
+  if [ ! -e system/bin/debuggerd ] 
+  then
+    sed -i -e '/symlink debuggerd /d' META-INF/com/google/android/update-script
+  fi
+
+  if [ ! -e system/bin/mksh ] 
+  then
+    sed -i -e '/symlink mksh /d' META-INF/com/google/android/update-script
+  fi
+
   if [ ! -e system/bin/ip ] 
   then
     perl -pi -e 's/set_perm 0 3003 06755 SYSTEM:bin\/ip\n//g' META-INF/com/google/android/update-script
