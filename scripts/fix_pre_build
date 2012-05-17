@@ -476,5 +476,50 @@ fi
 
 echo
 
+
+#
+# Cygwin may not handle symlinks correctly
+#
+if [ `uname | grep CYGWIN` ]
+then
+
+  cd system
+  symlinks=`find . -type l`
+
+  if [ "$symlinks" != "" ]
+  then
+    echo 
+    echo "=================================================================="
+    echo 
+    echo "WARNING! The following symlinks were found in the system/ folder:"
+    echo
+
+    for curr_file in $symlinks
+    do
+      echo " $curr_file"
+    done  
+
+    echo 
+    echo "Cygwin may not process them correctly when building the ROM. To"
+    echo "ensure they get flashed to your device uncorrupted, copy an"
+    echo "existing version of the same files from your device (e.g. using"
+    echo "Root Explorer or ADB) to your PC.  Overwrite the files above"
+    echo "with the ones you copied from your device."
+    echo
+    echo "=================================================================="
+    echo 
+
+    cd ../..
+    scripts/press_enter
+    cd WORKING_*
+    cd system
+
+  fi
+
+  cd ..
+
+fi
+
+
 cd ..
 
