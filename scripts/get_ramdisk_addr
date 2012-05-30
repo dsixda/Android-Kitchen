@@ -1,0 +1,20 @@
+############################################################################
+#
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
+#
+# Android Kitchen is 100% free.  This script file is intended for personal
+# and/or educational use only.  It may not be duplicated for monetary
+# benefit or any other purpose without the permission of the developer.
+#
+############################################################################
+
+
+cd WORKING_*
+
+temp=`od -A n -H -j 20 -N 4 boot.img | sed 's/ //g'`
+ramdisk_load_addr=0x$temp
+
+cd ..
+
+echo $ramdisk_load_addr
+
