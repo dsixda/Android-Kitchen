@@ -50,6 +50,9 @@ echo -n "Please wait ."
 kernel_base_addr=`scripts/get_kernel_base_addr`
 
 echo -n "."
+ramdisk_load_addr=`scripts/get_ramdisk_addr`
+
+echo -n "."
 page_size=`scripts/get_boot_img_page_size`
 
 echo -n "."
@@ -69,10 +72,6 @@ kernel_size=`od -A n -D -j 8 -N 4 boot.img | sed 's/ //g'`
 
 echo -n "."
 ramdisk_size=`od -A n -D -j 16 -N 4 boot.img | sed 's/ //g'`
-
-echo -n "."
-temp=`od -A n -H -j 20 -N 4 boot.img | sed 's/ //g'`
-ramdisk_load_addr=0x$temp
 
 echo -n "."
 second_size=`od -A n -D -j 24 -N 4 boot.img | sed 's/ //g'`
