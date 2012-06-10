@@ -13,6 +13,6 @@ sys_mnt=\/dev\/block\/mmcblk0p24
 cache_mnt=\/dev\/block\/mmcblk0p26
 boot_mnt=\/dev\/block\/mmcblk0p8
 data_mnt=\/dev\/block\/mmcblk0p25
-sdcard_mnt=\/dev\/block\/devices\/platform\/msm_sdcc.3\/mmc_host\/mmc2\/mmc2
+sdcard_mnt=\/dev\/block\/mmcblk0p28
 
 fix_boot2=yes
