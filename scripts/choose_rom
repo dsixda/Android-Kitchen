@@ -37,95 +37,113 @@ then
   
 else
 
-  #
-  # This script will search original_update for available ROMs
-  #
-  grep_cmd=`scripts/grep_roms`
-
-  if [ "$grep_cmd" == "" ]
-  then
-    echo "Error: No ROMs found under original_update folder!"
-    exit 0
-  fi
-
-  count=0
-  rm -f temp.list
-
-  echo >> temp.list
-  echo "Available ROMs:" >> temp.list
-  echo >> temp.list
-
-  for filename in $grep_cmd 
+  while [ 1==1 ]
   do
-    count=$(($count+1))
 
-    filename=`echo $filename | sed 's/temp_space/ /g'`
+    echo
+    echo "Please wait ..."
+    echo
 
-    # Store file names in an array
-    file_array[$count]=$filename
+    #
+    # This script will search original_update for available ROMs
+    #
+    grep_cmd=`scripts/grep_roms`
 
-    if [ "$filename" == "system.img" ]
+    if [ "$grep_cmd" == "" ]
     then
-      filename="system.img and boot.img"
-
-    elif [ "$filename" == "factoryfs.rfs" ]
-    then
-      filename="factoryfs.rfs, cache.rfs and zImage"
-
-    elif [ "$filename" == "system.img.ext4" ]
-    then
-      filename="system.img.ext4, cache.img.ext4 and boot.img"
-
-    elif [ "$filename" == "system.ext4.tar" ]
-    then
-      filename="system.ext4.tar and boot.img"
-
-    elif [ "$filename" == "factoryfs.img" ]
-    then
-      filename="factoryfs.img, cache.img and zImage"
-
-    elif [ "$filename" == "PDA.tar.md5" ]
-    then
-      filename="PDA.tar.md5, CSC.tar.md5 and PHONE.tar.md5"
-
-    elif [ "$filename" == "PDA.tar" ]
-    then
-      filename="PDA.tar, CSC.tar and PHONE.tar"
+      echo "Error: No ROMs found under original_update folder!"
+      exit 0
     fi
 
-    echo "  ($count) $filename" >> temp.list
-  done
+    count=0
+    rm -f temp.list
 
-  more temp.list
-  rm -f temp.list
+    echo >> temp.list
+    echo "Available ROMs:" >> temp.list
+    echo >> temp.list
 
-  echo
-  echo -n "Enter selection number (default=1, cancel=0): "
+    for filename in $grep_cmd 
+    do
+      count=$(($count+1))
 
-  read enterNumber
-  echo
+      filename=`echo $filename | sed 's/temp_space/ /g'`
 
-  if [ "$enterNumber" == "0" ]
-  then
-    exit 0
-  fi
+      # Store file names in an array
+      file_array[$count]=$filename
 
-  if [ "$enterNumber" == "" ]
-  then
-    enterNumber=1
-  fi
+      if [ "$filename" == "system.img" ]
+      then
+        filename="system.img and boot.img"
 
-  if [ "`echo $enterNumber | sed 's/[0-9]*//'`" == "" ] || [ "enterNumber"=="1" ]
-  then
-    file_chosen=${file_array[$enterNumber]}
+      elif [ "$filename" == "factoryfs.rfs" ]
+      then
+        filename="factoryfs.rfs, cache.rfs and zImage"
 
-    if [ "$file_chosen" == "" ]
+      elif [ "$filename" == "system.img.ext4" ]
+      then
+        filename="system.img.ext4, cache.img.ext4 and boot.img"
+
+      elif [ "$filename" == "system.ext4.tar" ]
+      then
+        filename="system.ext4.tar and boot.img"
+
+      elif [ "$filename" == "factoryfs.img" ]
+      then
+        filename="factoryfs.img, cache.img and zImage"
+
+      elif [ "$filename" == "PDA.tar.md5" ]
+      then
+        filename="PDA.tar.md5, CSC.tar.md5 and PHONE.tar.md5"
+
+      elif [ "$filename" == "PDA.tar" ]
+      then
+        filename="PDA.tar, CSC.tar and PHONE.tar"
+      fi
+
+      echo "  ($count) $filename" >> temp.list
+    done
+
+    more temp.list
+    rm -f temp.list
+
+    echo
+    echo -n "Enter selection number (default=1, cancel=0, r=refresh): "
+
+    read enterNumber
+    echo
+
+    if [ "$enterNumber" == "0" ]
     then
       exit 0
     fi
-  else
-    exit 0
-  fi
+
+    if [ "$enterNumber" == "" ]
+    then
+      enterNumber=1
+    fi
+
+    if [ "$enterNumber" == "r" ]
+    then
+      continue
+    fi
+
+    if [ "`echo $enterNumber | sed 's/[0-9]*//'`" == "" ] || [ "enterNumber"=="1" ]
+    then
+      file_chosen=${file_array[$enterNumber]}
+
+      if [ "$file_chosen" == "" ]
+      then
+        echo "Error: Invalid selection"
+        continue
+      else
+        break
+      fi
+    else
+      echo "Error: Invalid selection"
+      continue
+    fi
+
+  done
 
 fi
 
