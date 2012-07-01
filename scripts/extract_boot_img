@@ -22,14 +22,20 @@ echo "Creating folder `pwd`/$boot_dir ..."
 mkdir $boot_dir
 
 echo
-echo "---> Place boot.img into the folder mentioned above <--"
+echo "---> Place boot.img/recovery.img into the folder mentioned above <--"
 
 scripts/press_enter
 
 cd $boot_dir
 
-if [ -e boot.img ]
+if [ -e boot.img ] || [ -e recovery.img ]
 then
+
+  if [ -e recovery.img ]
+  then
+    echo "Renaming recovery.img to boot.img (for convenience of scripts)"
+    mv -f recovery.img boot.img
+  fi
 
   cd ..
   scripts/check_bootimg_header $boot_dir
@@ -82,7 +88,7 @@ then
 
 
 else
-  echo "Error: boot.img not found!"
+  echo "Error: boot.img or recovery.img not found!"
   echo
   cd ..
   echo "Removing $boot_dir folder"
