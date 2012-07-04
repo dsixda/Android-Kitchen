@@ -1,0 +1,15 @@
+# Jewel HTC EVO 4G LTE
+
+change_mnt=yes
+
+sys_mnt=\/dev\/block\/mmcblk0p35
+cache_mnt=\/dev\/block\/mmcblk0p36
+boot_mnt=\/dev\/block\/mmcblk0p21
+data_mnt=\/dev\/block\/mmcblk0p37
+sdcard_mnt=\/dev\/block\/mmcblk0p38
+
+param1=ext4
+param2=EMMC
+
+param1_sdcard=vfat
+param2_sdcard=EMMC
