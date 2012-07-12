@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright (c) 2011 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
@@ -76,41 +76,8 @@ then
   cp -f ../tools/deodex_files/baksmali-$version.jar baksmali.jar
   cp -f ../tools/deodex_files/smali-$version.jar smali.jar
 
-  try_again=y
-
-  while [ "$try_again" != "n" ]
-  do
-    echo
-    echo "Enter any JAR file dependencies separated by colon (Enter=none)."
-		echo "NOTE: To ignore errors, type 'ignore' by itself or after dependencies"
-		echo    
-		echo -n "$file_chosen > "
-    read classfiles
-    echo
-
-		if [ "$classfiles" == "ignore" ]
-		then
-			classfiles="none yes"
-		else
-			classfiles=`echo $classfiles | sed -e 's/ ignore/ yes/g'`
-		fi
-
-    ../scripts/do_deodex_file $api_level $file_chosen system/framework $classfiles 
-
-    result=$?
-
-    if [ "$result" == 1 ]
-    then
-      echo
-      echo -n "Try $file_chosen again (y/n)? (default: y): "
-      read try_again
-      echo
-    else
-      break
-    fi
-
-  done
-
+  ../scripts/do_deodex_file $api_level $file_chosen system/framework
+  result=$?
   rm -f *smali.jar
 
 fi
