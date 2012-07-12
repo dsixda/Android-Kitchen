@@ -79,8 +79,12 @@ else
   else
 
     echo "An update was found ($latest_ver)."
-   
-    echo "$notes"
+    echo
+    echo "Release notes are found online."
+
+    # xda-developers updates the formatting of the page, so this routine would need to
+    # updated every time.  Comment out for now.
+    #echo "$notes"
 
     echo 
     echo -n "Download (y/n)? (default: y): "
