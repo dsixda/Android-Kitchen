@@ -1,0 +1,8 @@
+original_update/*
+*.log
+.gitignore
+old_app*
+old_framework*
+OUTPUT_ZIP
+BOOT-EXTRACTED
+WORKING*
