@@ -1,4 +1,3 @@
-
 # HTC One XL
 
 change_mnt=yes
@@ -10,8 +9,8 @@ param1_sdcard=vfat
 param2_sdcard=MTD
 
 sys_mnt=\/dev\/block\/mmcblk0p33
-cache_mnt=???
+cache_mnt=\/dev\/block\/mmcblk0p34
 boot_mnt=\/dev\/block\/mmcblk0p21
 data_mnt=\/dev\/block\/mmcblk0p35
-sdcard_mnt=??
+sdcard_mnt=\/dev\/block\/mmcblk0p36
 
