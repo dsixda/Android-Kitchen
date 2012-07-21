@@ -56,8 +56,15 @@ do
     echo "        Android Kitchen FAQ at xda-developers.com for further"
     echo "        assistance."
     echo
-    echo "        PLEASE READ THE FAQ BEFORE ASKING QUESTIONS!"
+    echo "        ** PLEASE READ THE FAQ BEFORE ASKING QUESTIONS!! **"
     echo 
+
+    if [ "$bin" == "clear" ]
+    then
+      echo "        YES, THIS ERROR IS ALREADY COVERED IN THE FAQ.  DO NOT"
+      echo "        WASTE YOUR TIME MESSAGING ME. JUST READ IT, PLEASE. ;)"
+      echo 
+    fi
 
     found_error=1
 
