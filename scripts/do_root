@@ -91,7 +91,7 @@ echo
 
 if [ "`grep -c ro.build.version.release=1 build.prop`" != "0" ]
 then
-  echo " d - ChainsDD's Cupcake/Donut  (Android 1.x)" 
+  echo " d - ChainsDD's Cupcake/Donut    (Android 1.x)" 
 else
   echo " f - ChainsDD's version          (Android 2.x+)" 
 fi
