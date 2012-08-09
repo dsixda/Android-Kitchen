@@ -20,7 +20,7 @@ echo
 echo "-----------------------------------------------------------------"
 echo
 
-echo -n "Proceed with disabling boot screen sound (y/n)? (default: y): "
+echo -n "Proceed with disabling boot screen sounds (y/n)? (default: y): "
 read do_disable
 
 if [ "$do_disable" == "n" ]
@@ -45,44 +45,78 @@ else
   exit 0
 fi
 
-if [ -e system/media/bootscreen/boot_animation.xml ]
-then
-  cd system/media/bootscreen/
 
-  echo
-  echo "CURRENTLY IN boot_animation.xml:"
-  grep useAudio boot_animation.xml
-  echo
+xml_dir_list=( system/media system/media/bootscreen )
+found_xml=0
 
-  if [ "`grep useAudio='"1"' boot_animation.xml`" == "" ]
+for (( i=0 ; i < ${#xml_dir_list[@]}; i++ ))
+do
+
+  xml_dir=${xml_dir_list[$i]}
+
+  if [ -e $xml_dir/boot_animation.xml ]
   then
-    echo Sound is already turned off, no need to change
-  else
-    echo Modifying boot_animation.xml ...
-    perl -pi -e 's/useAudio="1"/useAudio="0"/g' boot_animation.xml
+
+    found_xml=1
+    orig_dir=`pwd`
+    cd $xml_dir/
 
     echo
-    echo "NOW:"
+    echo "CURRENTLY IN $xml_dir/boot_animation.xml:"
     grep useAudio boot_animation.xml
-  fi
-
-  if [ -e boot_animation.xml.bak ]
-  then
     echo
-    echo "Removing boot_animation.xml.bak"  
-    rm boot_animation.xml.bak
+
+    if [ "`grep useAudio='"1"' boot_animation.xml`" == "" ]
+    then
+      echo Sound is already turned off, no need to change
+    else
+      echo Modifying boot_animation.xml ...
+      perl -pi -e 's/useAudio="1"/useAudio="0"/g' boot_animation.xml
+
+      echo
+      echo "CHANGED TO:"
+      grep useAudio boot_animation.xml
+    fi
+
+    if [ -e boot_animation.xml.bak ]
+    then
+      echo
+      echo "Removing boot_animation.xml.bak"  
+      rm boot_animation.xml.bak
+    fi
+
+    cd $orig_dir
   fi
+done
 
 
-  cd ../../../..
 
+if [ $found_xml == 0 ]
+then
 
-else
+  success=0
 
   echo
-  echo "/system/media/bootscreen/boot_animation.xml not found in this ROM"
+  echo "boot_animation.xml not found in this ROM"
 
-  file_list="system/customize/resource/android_audio.mp3 system/media/android_audio.mp3 system/sounds/lgeSounds/PowerOn.mp3 system/etc/PowerOn.wav system/etc/PowerOn.ogg"
+  file_list="\
+              data/local/android_media.mp3 \
+              data/local/android_audio.mp3 \
+              data/local/boot.mp3 \
+              data/local/SPC_animation_final.mp3 \
+              system/customize/resource/android_audio.mp3 \
+              system/customize/resource/android_media.mp3 \
+              system/customize/resource/boot.mp3 \
+              system/customize/resource/SPC_animation_final.mp3 \
+              system/etc/PowerOn.ogg \
+              system/etc/PowerOn.wav \
+              system/media/android_audio.mp3 \
+              system/media/android_media.mp3 \
+              system/media/droidhd.ogg \
+              system/media/SPC_animation_final.mp3 \
+              system/media/audio/poweron/poweron.mp3 \
+              system/sounds/lgeSounds/PowerOn.mp3 \
+             "
 
   for snd in $file_list 
   do
@@ -93,11 +127,29 @@ else
     then
       echo "--> Renaming /$snd"
       mv $snd $snd.bak
+      success=1
+    elif [ -e $snd.bak ]
+    then
+      echo "--> Found $snd.bak (boot sound already disabled?)"
+      success=-1
     else
       echo "/$snd not found in this ROM"
     fi
   
   done
+
+  echo
+  echo
+
+  if [ "$success" == "1" ]
+  then
+    echo "--> Boot sounds successfully disabled!"
+  elif [ "$success" == "-1" ]
+  then
+    echo "--> Nothing was changed"
+  else
+    echo "--> Unable to disable any boot sounds!"
+  fi
 
   cd ..
 fi
