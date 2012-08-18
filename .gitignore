@@ -3,6 +3,7 @@ original_update/*
 .gitignore
 old_app*
 old_framework*
+.DS_Store
 OUTPUT_ZIP
 BOOT-EXTRACTED
 WORKING*
