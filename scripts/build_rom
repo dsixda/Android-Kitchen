@@ -121,13 +121,16 @@ echo
 echo "  1 = Interactive Mode - recommended for most users"
 echo "      (Guide me through the build)"
 echo
-echo "  2 = Express Mode - for advanced users"
+echo "  2 = Lazy Mode - trust the kitchen to do everything without asking"
+echo "      (Zipalign, Edify, sign ROM, auto-name ZIP)"
+echo
+echo "  3 = Express Mode - for advanced users"
 echo "      (Zipalign, Edify, don't sign ROM, auto-name ZIP)"
 echo 
-echo "  3 = Extreme Mode - for advanced users"
+echo "  4 = Extreme Mode - for advanced users"
 echo "      (No zipalign, no script conversion, don't sign ROM, auto-name ZIP)"
 echo 
-echo "  4 = Cancel - Don't build now"
+echo "  5 = Cancel - Don't build now"
 echo
 echo "=========================================================================="
 echo
@@ -136,16 +139,20 @@ echo -n "Number (default: 1): "
 read build_mode
 
 # Default is 1, so remember to account for Enter key
-if [ "$build_mode" == "4" ]
+if [ "$build_mode" == "5" ]
 then
   echo "Cancelled"
   exit 0
-elif [ "$build_mode" == "3" ]
+elif [ "$build_mode" == "4" ]
 then
   extreme=yes  
-elif [ "$build_mode" == "2" ]
+elif [ "$build_mode" == "3" ]
 then
   express=yes 
+elif [ "$build_mode" == "2" ]
+then
+  lazy=yes
+  express=yes
 else
   interactive=yes
 fi
@@ -333,18 +340,25 @@ cd WORKING_*
 sign_update=no
 sign_str=unsigned
 
+if [ "$lazy" == "yes" ]
+then
+  do_sign=y
+else
+  do_sign=n
+fi
+
 if [ "$interactive" == "yes" ]
 then
   echo
   echo "It is recommended that you sign your ROM."
   echo -n "Sign it (y/n)? (default: y): "
   read do_sign
+fi
 
-  if [ "$do_sign" != "n" ]
-  then
-    sign_update=yes
-    sign_str=signed
-  fi
+if [ "$do_sign" != "n" ]
+then
+  sign_update=yes
+  sign_str=signed
 fi
 
 final_file=$device\_$sign_str\_$date_str.zip
@@ -414,7 +428,7 @@ then
   echo "----> OUTPUT_ZIP/$final_file" 
   echo
   echo
-  echo "Copy this to your device and flash from recovery menu."
+  echo "Copy this to your device and flash from custom recovery menu."
   echo
 
   echo "Remember to do a data and/or cache wipe if necessary!"
