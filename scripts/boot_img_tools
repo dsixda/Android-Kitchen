@@ -80,13 +80,14 @@ do
   echo "  a = Extract kernel+ramdisk from boot.img/recovery.img in any folder"
   echo "  x = Exit"
   echo
-  echo "  NOTE: Some options will not be shown in this menu *until* a specific"
+  echo "  NOTE: Other options may not be shown in this menu *until* a specific"
   echo "  action above is selected or a specific working folder is created."
+  echo "  (A working folder is created with Option 1 of the kitchen main menu!)"
   echo
   echo "  e.g. You won't see the option to re-pack a boot.img unless you unpack"
   echo "  the boot.img first!  For re-packing you also need a working folder "
   echo "  with the original boot.img so that the kitchen can use its header" 
-  echo "  information."
+  echo "  information to construct the new boot.img."
   echo
   echo -n "? "
 
