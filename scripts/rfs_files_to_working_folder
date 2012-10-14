@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright (c) 2011 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
@@ -20,20 +20,25 @@ if [ "$1" == "no_create" ]
 then
   build_dir=`ls | grep -m 1 ^WORKING_`
 
-  if [ ! -e $build_dir/factoryfs.rfs ]
+  if [ -e $build_dir/factoryfs.rfs ]
   then
-    echo "Error: No $build_dir/factoryfs.rfs found!"
+    system_img=factoryfs.rfs
+    csc_img=cache.rfs
+  elif [ -e $build_dir/system.rfs ]
+  then
+    system_img=system.rfs
+    csc_img=csc.rfs
+  else
+    echo "Error: No system RFS image found in $build_dir!"
     exit 1
   fi
 
   mkdir $build_dir/system
-  mv $build_dir/factoryfs.rfs $build_dir/system
+  mv $build_dir/$system_img $build_dir/system
 
-  if [ -e $build_dir/cache.rfs ]
+  if [ -e $build_dir/$csc_img ]
   then
-    mv $build_dir/cache.rfs $build_dir/system
-  else
-    scripts/show_cache_warning cache.rfs
+    mv $build_dir/$csc_img $build_dir/system
   fi
 
   # Sometimes images have zero permissions set when extracted from TAR archive,
@@ -43,38 +48,46 @@ then
 else
 
   #
-  # Check for factoryfs.rfs, cache.rfs and zImage in original_update  
+  # Check for $system_img, $csc_img and zImage/boot.img in original_update  
   #
+
   if [ -e original_update/factoryfs.rfs ]
   then
-    echo "Found original_update/factoryfs.rfs"
+    system_img=factoryfs.rfs
+    csc_img=cache.rfs
 
-    if [ -e original_update/cache.rfs ]
+    if [ -e original_update/zImage ]
     then
-      echo "Found original_update/cache.rfs"
+      echo "Found original_update/zImage"
+      scripts/show_rooted_kernel_msg
+      kernel_img=zImage
     else
-      scripts/show_cache_warning original_update/cache.rfs
+      echo "Warning: No original_update/zImage found"
     fi
+
+  elif [ -e original_update/system.rfs ]
+  then
+    system_img=system.rfs
+    csc_img=csc.rfs
+
+    if [ -e original_update/boot.img ]
+    then
+      echo "Found original_update/boot.img"
+      kernel_img=boot.img
+    else
+      echo "Warning: No original_update/boot.img found"
+    fi
+
   else
-
-    if [ -e original_update/cache.rfs ]
-    then
-      echo "Found original_update/cache.rfs"
-      echo "Error: No original_update/factoryfs.rfs found"
-    else
-      echo
-      echo "Error: No ROMs found under original_update folder!"
-    fi
-
+    echo "Error: No system RFS image found in original_update folder!"
     exit 1
   fi
 
-  if [ -e original_update/zImage ]
+  echo "Found original_update/$system_img"
+
+  if [ -e original_update/$csc_img ]
   then
-    echo "Found original_update/zImage"
-    scripts/show_rooted_kernel_msg
-  else
-    echo "Warning: No original_update/zImage found"
+    echo "Found original_update/$csc_img"
   fi
 
 
@@ -91,18 +104,18 @@ else
   echo
 
   # Kernel is optional
-  if [ -e original_update/zImage ]
+  if [ -e original_update/$kernel_img ]
   then
-    cp -vf original_update/zImage $build_dir
+    cp -vf original_update/$kernel_img $build_dir
   fi
 
   # Cache is optional
-  if [ -e original_update/cache.rfs ]
+  if [ -e original_update/$csc_img ]
   then
-    cp -vf original_update/cache.rfs $build_dir/system
+    cp -vf original_update/$csc_img $build_dir/system
   fi
 
-  cp -vf original_update/factoryfs.rfs $build_dir/system
+  cp -vf original_update/$system_img $build_dir/system
 
 fi
 
@@ -133,23 +146,23 @@ cp tools/update_files/update-script $build_dir/META-INF/com/google/android/
 echo
 
 #
-# Extract files from factoryfs.rfs
+# Extract files from $system_img
 #
 
 if [ `uname | grep CYGWIN` ]
 then
-  scripts/show_magiciso $system_dir factoryfs.rfs
+  scripts/show_magiciso $system_dir $system_img
 else
-  scripts/extract_ext3_img $system_dir factoryfs.rfs
+  scripts/extract_ext3_img $system_dir $system_img
 fi
 
 cd $system_dir
 
-rm -f factoryfs.rfs 2>/dev/null
+rm -f $system_img 2>/dev/null
 if [ "$?" == "1" ]
 then
   echo
-  echo "WARNING: factoryfs.rfs is in use.  Remove file manually after application is closed."
+  echo "WARNING: $system_img is in use.  Remove file manually after application is closed."
   echo
 fi
 
@@ -188,42 +201,42 @@ fi
 cd ..
 
 echo
-echo "The file factoryfs.rfs has been fully unpacked into:"
+echo "The file $system_img has been fully unpacked into:"
 echo "  $system_dir"
 
 
-if [ -e $src_dir/cache.rfs ]
+if [ -e $src_dir/$csc_img ]
 then
   echo
   echo "Do you wish to extract the Customer Software Customization (CSC)"
-  echo -n "from the cache.rfs (y/n)? (default: y): "
+  echo -n "from the $csc_img (y/n)? (default: y): "
 
   read do_extract
   echo
 
   if [ "$do_extract" == "n" ]
   then
-    rm -vf $src_dir/cache.rfs
+    rm -vf $src_dir/$csc_img
     echo
   else
 
     #
-    # Extract files from cache.rfs
+    # Extract files from $csc_img
     #
     if [ `uname | grep CYGWIN` ]
     then
-      scripts/show_magiciso $system_dir cache.rfs
+      scripts/show_magiciso $system_dir $csc_img
     else
-      scripts/extract_ext3_img $system_dir cache.rfs
+      scripts/extract_ext3_img $system_dir $csc_img
     fi
 
     cd $system_dir 
 
-    rm -f cache.rfs 2>/dev/null
+    rm -f $csc_img 2>/dev/null
     if [ "$?" == "1" ]
     then
       echo
-      echo "WARNING: cache.rfs is in use.  Remove file manually after application is closed."
+      echo "WARNING: $csc_img is in use.  Remove file manually after application is closed."
       echo
     fi
 

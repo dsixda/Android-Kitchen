@@ -28,6 +28,10 @@ The format for each ROM must be one of the following:
  - TAR/ZIP file containing factoryfs.img/system.img.ext4 + more 
  - system.ext4.tar + optional boot.img (Nandroid backup)
  
+ Samsung - untested devices (e.g. Galaxy Mini):
+ - system.rfs + optional csc.rfs/boot.img
+ - TAR file containing system.rfs + more
+
  Huawei:
  - APP file from Huawei software update (e.g. UPDATE.APP)
 

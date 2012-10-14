@@ -79,6 +79,10 @@ else
       then
         filename="factoryfs.rfs, cache.rfs and zImage"
 
+      elif [ "$filename" == "system.rfs" ]
+      then
+        filename="system.rfs, csc.rfs and boot.img"
+
       elif [ "$filename" == "system.img.ext4" ]
       then
         filename="system.img.ext4, cache.img.ext4 and boot.img"
@@ -156,7 +160,7 @@ then
     scripts/img_files_to_working_folder create_working $1
     exit $?
 
-  elif [ "$file_chosen" == "factoryfs.rfs" ]
+  elif [ "$file_chosen" == "factoryfs.rfs" ] || [ "$file_chosen" == "system.rfs" ]
   then
     scripts/rfs_files_to_working_folder create_working $1
     exit $?

@@ -23,8 +23,10 @@ grep_cmd8=`find . -maxdepth 1 -type f -name PDA.tar.md5 2>/dev/null`
 
 grep_cmd9=`find . -maxdepth 1 -type d | grep "\./WORKING_" | sed 's/ /temp_space/g' 2>/dev/null`
 
+grep_cmd10=`find . -maxdepth 1 -type f -name system.rfs 2>/dev/null`
+
 grep_cmd=`echo $grep_cmd1 $grep_cmd2 $grep_cmd3 $grep_cmd4 $grep_cmd5 $grep_cmd6 $grep_cmd7 \
-         $grep_cmd8 $grep_cmd9 | sed -e 's/\.\///g' | sort -f`
+         $grep_cmd8 $grep_cmd9 $grep_cmd10 | sed -e 's/\.\///g' | sort -f`
 
 cd ..
 echo $grep_cmd

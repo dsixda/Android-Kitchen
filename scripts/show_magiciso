@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright (c) 2011 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
@@ -30,6 +30,8 @@ echo "    NOTE: To see your file there, type '*.rfs' in the 'File name' box"
 echo "    at the bottom of the dialog"
 echo
 
+next_num=5
+
 if [ "$img_file" == "cache.rfs" ]
 then
   echo " 3) In the top right window, open the 'recovery' folder so that "
@@ -37,6 +39,14 @@ then
   echo
   echo " 4) Right-click on sec_csc.zip, select 'Extract' and choose folder"
   echo "    $dos_path"
+
+elif [ "$img_file" == "csc.rfs" ]
+then
+  echo " 3) In the top right window, right-click on csc.zip, select"
+  echo "    'Extract' and choose folder"
+  echo "    $dos_path"
+
+  next_num=4
 
 else
   echo " 3) In the top right window, right-click on the folders and choose "
@@ -47,7 +57,7 @@ else
 fi
 
 echo
-echo " 5) Wait for extraction to finish and then close MagicISO"
+echo " $next_num) Wait for extraction to finish and then close MagicISO"
 echo      
 echo "#####################################################################"
 echo

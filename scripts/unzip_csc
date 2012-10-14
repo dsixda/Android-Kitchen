@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright (c) 2011 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
@@ -32,12 +32,20 @@ fi
 
 system_dir=`pwd`
 
-if [ ! -e sec_csc.zip ]
+if [ -e sec_csc.zip ]
 then
-  echo "WARNING: sec_csc.zip not found!"
-else
-  echo "Extracting the required files from sec_csc.zip ..."
-  unzip -q sec_csc.zip -d temp_csc
+  csc_zip=sec_csc.zip
+elif [ -e csc.zip ]
+then
+  csc_zip=csc.zip
+else 
+  echo "WARNING: CSC ZIP file not found!"
+fi
+
+if [ $csc_zip ]
+then
+  echo "Extracting the required files from $csc_zip ..."
+  unzip -q $csc_zip -d temp_csc
 
   # 
   # Carrier bloatware removal
@@ -51,7 +59,7 @@ else
     if [ "$apk_files" != "" ]
     then
       echo
-      echo "These are the apps found in sec_csc.zip:"
+      echo "These are the apps found in $csc_zip:"
       echo 
       for apk in $apk_files
       do
@@ -78,11 +86,11 @@ else
   fi
 fi
 
-rm -f sec_csc.zip 2>/dev/null
+rm -f $csc_zip 2>/dev/null
 if [ "$?" == "1" ]
 then
   echo
-  echo "WARNING: sec_csc.zip is in use.  Remove file manually."
+  echo "WARNING: $csc_zip is in use.  Remove file manually."
   echo
 fi
 
