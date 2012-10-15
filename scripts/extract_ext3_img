@@ -126,6 +126,9 @@ then
     if [ "$img_file" == "ext4_cache.img" ] || [ "$img_file" == "cache.rfs" ]
     then
       sudo cp ../tmp/recovery/sec_csc.zip .
+    elif [ "$img_file" == "csc.rfs" ]
+    then
+      sudo cp ../tmp/csc.zip .
     else
       sudo cp -R ../tmp/* .
     fi
@@ -241,6 +244,9 @@ then
     if [ "$img_file" == "ext4_cache.img" ] || [ "$img_file" == "cache.rfs" ]
     then
       cp $mount_dir/recovery/sec_csc.zip system/
+    elif [ "$img_file" == "csc.rfs" ]
+    then
+      cp $mount_dir/csc.zip system/
     else
       cp -r $mount_dir/* $img_dir/
     fi
