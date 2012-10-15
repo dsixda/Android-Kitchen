@@ -40,9 +40,9 @@ else
   sgs2=$?
   scripts/check_galaxy_s2x
   sgs2x=$?
-  scripts/check_galaxy_s3_t999
-  sgs3_t999=$?
-  
+  scripts/check_galaxy_s3_common
+  sgs3_common=$?
+
   cd $update_dir
 
   echo
@@ -53,10 +53,10 @@ else
     
     cp -vf ../../../../../tools/update_files/sgs2-update-binary update-binary
 
-  elif [ "$sgs3_t999" == "1" ]
+  elif [ "$sgs3_common" == "1" ]
   then
 
-    cp -vf ../../../../../tools/update_files/sgs3-t999-update-binary update-binary
+    cp -vf ../../../../../tools/update_files/sgs3-update-binary update-binary
 
   else
 

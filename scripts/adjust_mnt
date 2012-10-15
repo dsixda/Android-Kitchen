@@ -48,13 +48,34 @@ then
         device_name="GT-I9100X"
       else
 
+        scripts/check_galaxy_s3_common
+        is_gs3_common=$?
         scripts/check_galaxy_s3_t999
         is_gs3_t999=$? 
+        scripts/check_galaxy_s3_i747
+        is_gs3_i747=$?
+        scripts/check_galaxy_s3_i9300
+        is_gs3_i9300=$?
+        scripts/check_galaxy_s3_l710
+        is_gs3_l710=$?
+        scripts/check_galaxy_s3_i535
+        is_gs3_i535=$?
 
         if [ "$is_gs3_t999" == "1" ]
         then
           device_name="SGH-T999"
-
+        elif [ "$is_gs3_i747" == "1" ]
+        then  
+          device_name="SGH-I747"
+        elif [ "$is_gs3_i9300" == "1" ]
+        then
+          device_name="GT-I9300"
+        elif [ "$is_gs3_l710" == "1" ]
+        then
+          device_name="SPH-L710"
+        elif [ "$is_gs3_i535" == "1" ]
+        then
+          device_name="SCH-I535"
         else
           device_name=`scripts/get_device_name`
         fi
@@ -513,7 +534,7 @@ then
     # with all of the scripts.  This will be changed back when you build ROM.
     #
 
-    if [ "$is_gs" == "1" ] || [ "$is_gs2" == "1" ] || [ "$is_gs2x" == "1" ] || [ "$is_gs3_t999" == "1" ]
+    if [ "$is_gs" == "1" ] || [ "$is_gs2" == "1" ] || [ "$is_gs2x" == "1" ] || [ "$is_gs3_common" == "1" ]
     then
       cd WORKING_*
       cd META-INF/com/google/android
@@ -557,9 +578,9 @@ then
     done
 
     #
-    # Galaxy S3 SGH-T999 system partition fix
+    # Galaxy S3 system partition fix
     #
-    if [ "$is_gs3_t999" == "1" ]
+    if [ "$is_gs3_common" == "1" ]
     then
       sed -i \
         -e 's/mount("'"$param1"'", "'"$param2"'", "'"$sys_mnt"'", "\/system");//g' \

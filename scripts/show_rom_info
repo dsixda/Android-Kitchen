@@ -44,8 +44,8 @@ scripts/check_galaxy_s_and_s2
 is_galaxy_ss2=$?
 scripts/check_galaxy_s2x
 is_galaxy_s2x=$?
-scripts/check_galaxy_s3_t999
-is_galaxy_s3_t999=$?
+scripts/check_galaxy_s3_common
+is_galaxy_s3_common=$?
 
 if [ "$is_galaxy_ss2" == "1" ]
 then
@@ -301,7 +301,7 @@ cd WORKING_*
 
 show_csc=no
 
-if [ -e system/CSCVersion.txt ] || [ "$is_galaxy_ss2" == "1" ] || [ "$is_galaxy_s2x" == "1" ] || [ "$device_name" == "GT-I9001" ] || [ "$is_galaxy_s3_t999" == "1" ]
+if [ -e system/CSCVersion.txt ] || [ "$is_galaxy_ss2" == "1" ] || [ "$is_galaxy_s2x" == "1" ] || [ "$device_name" == "GT-I9001" ] || [ "$is_galaxy_s3_common" == "1" ]
 then
 
   show_csc=yes

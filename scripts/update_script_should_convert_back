@@ -51,10 +51,10 @@ else
   sgss2=$?
   scripts/check_galaxy_s2x
   sgs2x=$?
-  scripts/check_galaxy_s3_t999
-  sgs3_t999=$? 
-    
-  if [ -e tools/edify_defs/$device_name ] || [ "$sgss2" == "1" ] || [ "$sgs2x" == "1" ] || [ "$sgs3_t999" == "1" ]
+  scripts/check_galaxy_s3_common
+  sgs3_common=$? 
+
+  if [ -e tools/edify_defs/$device_name ] || [ "$sgss2" == "1" ] || [ "$sgs2x" == "1" ] || [ "$sgs3_common" == "1" ] 
   then
 
     if [ "$1" == "" ]
