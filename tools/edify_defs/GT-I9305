@@ -1,0 +1,20 @@
+
+# International LTE Samsung Galaxy S3 GT-I9305
+
+change_mnt=yes
+
+param1=ext4
+param2=EMMC
+
+param1_sdcard=vfat
+param2_sdcard=MTD
+
+sys_mnt=\/dev\/block\/mmcblk0p13
+cache_mnt=\/dev\/block\/mmcblk0p12
+boot_mnt=\/dev\/block\/mmcblk0p8
+data_mnt=\/dev\/block\/mmcblk0p16
+sdcard_mnt=???
+
+modem_mnt=\/dev\/block\/mmcblk0p10
+
+fix_boot2=yes
