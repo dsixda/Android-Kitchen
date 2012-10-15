@@ -15,23 +15,27 @@ The format for each ROM must be one of the following:
  - factoryfs.rfs + optional cache.rfs/zImage
  - PDA.tar.md5 + optional CSC.tar.md5/PHONE.tar.md5
  - PDA.tar + optional CSC.tar/PHONE.tar
- - TAR/ZIP file containing factoryfs.rfs + more 
- - TAR/ZIP file containing PDA.tar.md5/PDA.tar + more
+ - TAR/ZIP file containing the above 
 
  Samsung Galaxy S Plus:
  - system.img.ext4 + optional cache.img.ext4/boot.img
- - TAR/ZIP file containing system.img.ext4 + more 
+ - TAR/ZIP file containing the above
  
- Samsung Galaxy SII / SIII:
+ Samsung Galaxy SII:
  - factoryfs.img + optional cache.img/zImage  
  - system.img.ext4 + optional cache.img.ext4/boot.img
- - system.img + optional cache.img/boot.img/modem.bin
- - TAR/ZIP file containing factoryfs.img/system.img.ext4 + more 
+ - TAR/ZIP file containing the above
  - system.ext4.tar + optional boot.img (Nandroid backup)
  
+ Samsung Galaxy SIII
+ - system.img.ext4 + optional cache.img.ext4/boot.img
+ - system.img + optional cache.img/boot.img/modem.bin
+ - TAR/ZIP file containing the above
+ - system.ext4.tar + optional boot.img (Nandroid backup)
+
  Samsung - untested devices (e.g. Galaxy Mini):
  - system.rfs + optional csc.rfs/boot.img
- - TAR file containing system.rfs + more
+ - TAR file containing the above
 
  Huawei:
  - APP file from Huawei software update (e.g. UPDATE.APP)
