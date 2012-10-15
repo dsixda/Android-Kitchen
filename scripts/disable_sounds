@@ -110,6 +110,9 @@ then
               system/customize/resource/SPC_animation_final.mp3 \
               system/etc/PowerOn.ogg \
               system/etc/PowerOn.wav \
+              system/media/audio/ui/PowerOn.ogg \
+              system/media/audio/ui/PowerOff.ogg \
+              system/media/audio/ui/PowerOff.wav \
               system/media/android_audio.mp3 \
               system/media/android_media.mp3 \
               system/media/droidhd.ogg \

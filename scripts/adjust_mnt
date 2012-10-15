@@ -47,7 +47,17 @@ then
       then
         device_name="GT-I9100X"
       else
-        device_name=`scripts/get_device_name`
+
+        scripts/check_galaxy_s3_t999
+        is_gs3_t999=$? 
+
+        if [ "$is_gs3_t999" == "1" ]
+        then
+          device_name="SGH-T999"
+
+        else
+          device_name=`scripts/get_device_name`
+        fi
       fi
     fi
   fi    
@@ -429,6 +439,7 @@ then
     elif [ "$1" == "update-script" ]
     then
       sed -i \
+        -e 's/format '"$param1"' '"$param2"' '"$sys_mnt"' 0/format SYSTEM:/g' \
         -e 's/format '"$param1"' '"$param2"' '"$sys_mnt"'/format SYSTEM:/g' \
         -e 's/format '"$param1_cache"' '"$param2_cache"' '"$cache_mnt"'/format CACHE:/g' \
         -e 's/format '"$param1"' '"$param2"' '"$boot_mnt"'/format BOOT:/g' \
@@ -502,7 +513,7 @@ then
     # with all of the scripts.  This will be changed back when you build ROM.
     #
 
-    if [ "$is_gs" == "1" ] || [ "$is_gs2" == "1" ] || [ "$is_gs2x" == "1" ]
+    if [ "$is_gs" == "1" ] || [ "$is_gs2" == "1" ] || [ "$is_gs2x" == "1" ] || [ "$is_gs3_t999" == "1" ]
     then
       cd WORKING_*
       cd META-INF/com/google/android
@@ -544,6 +555,17 @@ then
         break
       fi
     done
+
+    #
+    # Galaxy S3 SGH-T999 system partition fix
+    #
+    if [ "$is_gs3_t999" == "1" ]
+    then
+      sed -i \
+        -e 's/mount("'"$param1"'", "'"$param2"'", "'"$sys_mnt"'", "\/system");//g' \
+        -e 's/delete_recursive("\/system");/unmount("\/system");\nformat("'"$param1"'", "'"$param2"'", "'"$sys_mnt"'", "0");\nmount("'"$param1"'", "'"$param2"'", "'"$sys_mnt"'", "\/system");/g' \
+        updater-script
+    fi
 
     cd ../../../../..
   fi

@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright (c) 2011 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
@@ -40,7 +40,9 @@ else
   sgs2=$?
   scripts/check_galaxy_s2x
   sgs2x=$?
-
+  scripts/check_galaxy_s3_t999
+  sgs3_t999=$?
+  
   cd $update_dir
 
   echo
@@ -50,6 +52,11 @@ else
   then
     
     cp -vf ../../../../../tools/update_files/sgs2-update-binary update-binary
+
+  elif [ "$sgs3_t999" == "1" ]
+  then
+
+    cp -vf ../../../../../tools/update_files/sgs3-t999-update-binary update-binary
 
   else
 
