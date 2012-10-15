@@ -15,4 +15,6 @@ boot_mnt=\/dev\/block\/mmcblk0p5
 data_mnt=\/dev\/block\/mmcblk0p12
 sdcard_mnt=???
 
+modem_mnt=\/dev\/block\/mmcblk0p7
+
 fix_boot2=yes

@@ -46,6 +46,9 @@ scripts/check_galaxy_s2x
 is_galaxy_s2x=$?
 scripts/check_galaxy_s3_common
 is_galaxy_s3_common=$?
+scripts/check_galaxy_s3_exynos
+is_galaxy_s3_exynos=$?
+
 
 if [ "$is_galaxy_ss2" == "1" ]
 then
@@ -320,7 +323,7 @@ cd ..
 
 
 
-if [ "$is_galaxy_ss2" == "1" ]
+if [ "$is_galaxy_ss2" == "1" ] || [ "$is_galaxy_s3_exynos" == "1" ]
 then
 
   #
@@ -476,7 +479,7 @@ echo " Bash shell support             : $bash_status"
 echo " /system/framework is deodexed  : $deodex_fr_status"
 echo " /system/app is deodexed        : $deodex_app_status"
 
-if [ "$is_galaxy_ss2" == "1" ]
+if [ "$is_galaxy_ss2" == "1" ] || [ "$is_galaxy_s3_exynos" == "1" ]
 then
   echo " modem.bin found                : $modem_status"
 elif [ "$is_galaxy_s2x" != "1" ]

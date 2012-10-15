@@ -50,6 +50,9 @@ then
 
         scripts/check_galaxy_s3_common
         is_gs3_common=$?
+        scripts/check_galaxy_s3_exynos
+        is_gs3_exynos=$?
+
         scripts/check_galaxy_s3_t999
         is_gs3_t999=$? 
         scripts/check_galaxy_s3_i747
@@ -60,6 +63,8 @@ then
         is_gs3_l710=$?
         scripts/check_galaxy_s3_i535
         is_gs3_i535=$?
+        scripts/check_galaxy_s3_i9305
+        is_gs3_i9305=$?
 
         if [ "$is_gs3_t999" == "1" ]
         then
@@ -76,6 +81,9 @@ then
         elif [ "$is_gs3_i535" == "1" ]
         then
           device_name="SCH-I535"
+        elif [ "$is_gs3_i9305" == "1" ]
+        then
+          device_name="GT-I9305"          
         else
           device_name=`scripts/get_device_name`
         fi
@@ -448,6 +456,20 @@ then
         then
 
           sed -i -e 's/^flash_modem[ ]*$/package_extract_file("redbend_ua", "\/tmp\/redbend_ua");\nset_perm(0, 0, 0777, "\/tmp\/redbend_ua");\nassert(package_extract_file("modem.bin", "\/tmp\/modem.bin"),\n       run_program("\/tmp\/redbend_ua", "restore", "\/tmp\/modem.bin", "'"$modem_mnt"'"),\n       delete("\/tmp\/modem.bin"));\ndelete("\/tmp\/redbend_ua");\n/g' updater-script
+     
+        fi
+
+      elif [ "$is_gs3_exynos" == "1" ]
+      then
+
+        #################################
+        # Samsung Galaxy S3 International
+        #################################
+
+        if [ `grep -c flash_modem updater-script` -gt 0 ]
+        then
+
+          sed -i -e 's/^flash_modem[ ]*$/package_extract_file("flash_image", "\/tmp\/flash_image");\nset_perm(0, 0, 0777, "\/tmp\/flash_image");\nassert(package_extract_file("modem.bin", "\/tmp\/modem.bin"),\n       run_program("\/tmp\/flash_image", "'"$modem_mnt"'", "\/tmp\/modem.bin"),\n       delete("\/tmp\/modem.bin"));\ndelete("\/tmp\/flash_image");\n/g' updater-script
      
         fi
       fi

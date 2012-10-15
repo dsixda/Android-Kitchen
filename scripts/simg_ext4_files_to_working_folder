@@ -33,6 +33,11 @@ then
 
   mv $build_dir/system.img.ext4 $build_dir/system
 
+  if [ -e $build_dir/cache.img ]
+  then
+    mv $build_dir/cache.img -fv $build_dir/cache.img.ext4
+  fi
+
   if [ -e $build_dir/cache.img.ext4 ]
   then
     mv $build_dir/cache.img.ext4 $build_dir/system
