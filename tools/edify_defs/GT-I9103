@@ -1,0 +1,17 @@
+# Samsung Galaxy R GT-I9103
+
+change_mnt=yes
+
+param1=ext4
+param2=EMMC
+
+param1_sdcard=vfat
+param2_sdcard=MTD
+
+sys_mnt=\/dev\/block\/mmcblk0p2
+cache_mnt=\/dev\/block\/mmcblk0p3
+boot_mnt=\/dev\/block\/mmcblk0p9
+data_mnt=\/dev\/block\/mmcblk0p6
+sdcard_mnt=\/dev\/block\/mmcblk0p4
+
+fix_boot3=yes
