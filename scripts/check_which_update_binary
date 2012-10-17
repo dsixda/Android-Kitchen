@@ -43,6 +43,8 @@ else
   scripts/check_galaxy_s3_common
   sgs3_common=$?
 
+  device_name=`scripts/get_device_name`
+
   cd $update_dir
 
   echo
@@ -57,6 +59,10 @@ else
   then
 
     cp -vf ../../../../../tools/update_files/sgs3-update-binary update-binary
+
+  elif [ "$device_name" == "GT-I9103" ]
+  then
+    cp -vf ../../../../../tools/update_files/emmc-not-neon-update-binary update-binary
 
   else
 
