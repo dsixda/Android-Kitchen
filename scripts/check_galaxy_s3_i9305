@@ -11,7 +11,7 @@
 
 model=`scripts/get_build_prop_val ro.product.model`
 
-if [ -e tools/samsung_files/sgs3_i9305_variants/$model ]
+if [ -e "tools/samsung_files/sgs3_i9305_variants/$model" ]
 then
   exit 1
 else
