@@ -22,16 +22,16 @@ do
   echo " Android Kitchen $version - by dsixda (xda-developers.com)"
   echo "============================================================"
   echo
-  echo "> ADVANCED OPTIONS"
+  echo "> LEGACY OPTIONS"
   echo
-  echo " 11 - De-odex files in your ROM"
-  echo " 12 - Tools for boot image (unpack/re-pack/etc.)" 
-  echo " 13 - Add /data/app functionality"
-  echo " 14 - Add /etc/init.d scripts support (busybox run-parts)"
-  echo " 15 - Unpack data.img"
-  echo " 16 - Sign APK or ZIP file(s)" 
-  echo " 17 - Convert update-script or updater-script"
-  echo " 18 - Miscellaneous options / Plugin scripts"
+  echo " 21 - Check update-script for errors"
+  echo " 22 - Add wireless tethering"
+  echo " 23 - Add task killer tweak for speed (stock ROM only)"
+  echo " 24 - Add Nano text editor + sysro/sysrw"
+  echo " 25 - Add Bash (command shell)"
+  echo " 26 - Add Apps2SD"
+  echo " 27 - Add custom boot animation functionality"
+  echo " 28 - Porting tools (experimental)"
   echo
   echo " 99 - Build ROM from working folder"
   echo "  0 - BACK TO MAIN MENU"
@@ -47,14 +47,14 @@ do
   if [ "$?" != "1" ]
   then
     case $opt in
-      11) scripts/do_deodex; continue;; 
-      12) scripts/boot_img_tools; continue;; 
-      13) scripts/add_data_app show_help;;
-      14) scripts/add_busybox_run_parts show_help;;  
-      15) scripts/unpack_data_img;; 
-      16) scripts/sign_files; continue;;
-      17) scripts/update_script_convert_menu; continue;;
-      18) scripts/run_plugins; continue;;
+      21) scripts/verify_update_script; continue;;
+      22) scripts/add_tether;;
+      23) scripts/task_killer;;
+      24) scripts/add_nano show_help;;
+      25) scripts/add_bash show_help;;
+      26) scripts/add_apps2sd show_help;;
+      27) scripts/add_custom_boot_anim;;
+      28) scripts/porting_tools; continue;;
       99) scripts/build_rom;;
       0) exit 1;;
       *) echo "Invalid option"; continue;;

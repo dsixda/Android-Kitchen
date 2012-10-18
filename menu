@@ -10,7 +10,7 @@
 #
 ############################################################################
 
-version=0.204
+version=0.205
 
 
 if [ ! -e menu ]
@@ -69,22 +69,23 @@ do
   echo "============================================================"
   echo " Android Kitchen $version - by dsixda (xda-developers.com)"
   echo "============================================================"
+  echo 
+  echo "> MAIN MENU"
   echo
   echo "  1 - Set up working folder from ROM"
   echo "  2 - Add root permissions"
   echo "  3 - Add BusyBox"
   echo "  4 - Disable boot screen sounds"
-  echo "  5 - Add wireless tethering"
   echo "  6 - Zipalign all *.apk files to optimize RAM usage"
   echo "  7 - Change wipe status of ROM"
   echo "  8 - Change name of ROM"
-  echo "  9 - Check update-script for errors"
-  echo " 10 - Show working folder information"
+  echo "  9 - Show working folder information"
   echo 
   echo "  0 - ADVANCED OPTIONS"
+  echo " 00 - LEGACY OPTIONS (old and rarely used)"
   echo " 99 - Build ROM from working folder"
   echo
-  echo "  u - Update/About kitchen"
+  echo "  u - Kitchen Info/Update/Donate"
   echo "  x - Exit"
   echo
   echo 
@@ -103,13 +104,12 @@ do
       2) scripts/do_root; continue;;
       3) scripts/add_busybox show_help;;
       4) scripts/disable_sounds;;
-      5) scripts/add_tether;;
       6) scripts/do_zipalign;;
       7) scripts/change_wipe;;
       8) scripts/change_rom_name;;
-      9) scripts/verify_update_script; continue;;
-      10) scripts/show_rom_info;;
+      9) scripts/show_rom_info;;
       0) scripts/menu_advanced $version; continue;;
+      00) scripts/menu_legacy $version; continue;;
       99) scripts/build_rom;;
       u) scripts/about $version; continue;;
       x) scripts/init_kitchen; clear; echo; echo "Goodbye."; echo; exit 1;;
