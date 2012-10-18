@@ -10,7 +10,7 @@
 #
 ############################################################################
 
-version=0.205
+version=0.206
 
 
 if [ ! -e menu ]
@@ -76,10 +76,10 @@ do
   echo "  2 - Add root permissions"
   echo "  3 - Add BusyBox"
   echo "  4 - Disable boot screen sounds"
-  echo "  6 - Zipalign all *.apk files to optimize RAM usage"
-  echo "  7 - Change wipe status of ROM"
-  echo "  8 - Change name of ROM"
-  echo "  9 - Show working folder information"
+  echo "  5 - Zipalign all *.apk files to optimize RAM usage"
+  echo "  6 - Change wipe status of ROM"
+  echo "  7 - Change name of ROM"
+  echo "  8 - Show working folder information"
   echo 
   echo "  0 - ADVANCED OPTIONS"
   echo " 00 - LEGACY OPTIONS (old and rarely used)"
@@ -104,10 +104,10 @@ do
       2) scripts/do_root; continue;;
       3) scripts/add_busybox show_help;;
       4) scripts/disable_sounds;;
-      6) scripts/do_zipalign;;
-      7) scripts/change_wipe;;
-      8) scripts/change_rom_name;;
-      9) scripts/show_rom_info;;
+      5) scripts/do_zipalign;;
+      6) scripts/change_wipe;;
+      7) scripts/change_rom_name;;
+      8) scripts/show_rom_info;;
       0) scripts/menu_advanced $version; continue;;
       00) scripts/menu_legacy $version; continue;;
       99) scripts/build_rom;;
