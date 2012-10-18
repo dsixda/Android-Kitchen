@@ -38,82 +38,74 @@ then
 
   cd WORKING_*
 
-  if [ -d system ]
+  if [ -e boot.img ]
   then
 
-    if [ -e boot.img ]
+    cd ..
+    scripts/check_bootimg_header
+    scripts/check_kernel_offset
+    res=$?
+
+    if [ "$res" == "0" ]
     then
+      kernel_file=extract-kernel.pl
+      ramdisk_file=extract-ramdisk.pl
+    else
+      exit 0
+    fi
 
-      cd ..
-      scripts/check_bootimg_header
-      scripts/check_kernel_offset
-      res=$?
+    echo Making folder 'BOOT-EXTRACTED' ...
+    cd WORKING_*
+    mkdir ../BOOT-EXTRACTED
+    cp boot.img ../BOOT-EXTRACTED/
+    
+    cd ..
+    cp tools/extract_boot_files/$kernel_file BOOT-EXTRACTED/extract-kernel.pl
+    cp tools/extract_boot_files/$ramdisk_file BOOT-EXTRACTED/extract-ramdisk.pl
+    cd BOOT-EXTRACTED
 
-      if [ "$res" == "0" ]
+    echo
+    echo Extracting kernel ...
+    ./extract-kernel.pl boot.img 2>/dev/null
+   
+    if [ ! -e zImage ]
+    then
+      echo "Error: No zImage found!"
+    else
+      test_z=`od -A n -j 1 -N 4 zImage | sed 's/ //g'`
+      if [ "$test_z" == "" ]
       then
-        kernel_file=extract-kernel.pl
-        ramdisk_file=extract-ramdisk.pl
-      else
-        exit 0
+        echo "Error: zImage is empty!"
       fi
+    fi
 
-      echo Making folder 'BOOT-EXTRACTED' ...
-      cd WORKING_*
-      mkdir ../BOOT-EXTRACTED
-      cp boot.img ../BOOT-EXTRACTED/
-      
+    echo Extracting ramdisk ... 
+    ./extract-ramdisk.pl boot.img 2>/dev/null
+
+    if [ ! -d boot.img-ramdisk ]
+    then
+      echo "Error: No ramdisk folder found!"
+    fi
+
+    rm boot.img
+    rm extract-*.pl
+    cd ..
+    echo
+
+  else
+
+    if [ -e boot/initrd.gz ] && [ -e boot/zImage ]
+    then
       cd ..
-      cp tools/extract_boot_files/$kernel_file BOOT-EXTRACTED/extract-kernel.pl
-      cp tools/extract_boot_files/$ramdisk_file BOOT-EXTRACTED/extract-ramdisk.pl
-      cd BOOT-EXTRACTED
-
-      echo
-      echo Extracting kernel ...
-      ./extract-kernel.pl boot.img 2>/dev/null
-     
-      if [ ! -e zImage ]
-      then
-        echo "Error: No zImage found!"
-      else
-        test_z=`od -A n -j 1 -N 4 zImage | sed 's/ //g'`
-        if [ "$test_z" == "" ]
-        then
-          echo "Error: zImage is empty!"
-        fi
-      fi
-
-      echo Extracting ramdisk ... 
-      ./extract-ramdisk.pl boot.img 2>/dev/null
-
-      if [ ! -d boot.img-ramdisk ]
-      then
-        echo "Error: No ramdisk folder found!"
-      fi
-
-      rm boot.img
-      rm extract-*.pl
-      cd ..
-      echo
+      scripts/ensure_nand_extracted $1
 
     else
+      echo "Error: boot.img not found!"
+      echo
+      cd ..
+      exit 0
+    fi
+  fi      
 
-      if [ -e boot/initrd.gz ] && [ -e boot/zImage ]
-      then
-        cd ..
-        scripts/ensure_nand_extracted $1
-
-      else
-        echo "Error: boot.img not found!"
-        echo
-        cd ..
-        exit 0
-      fi
-    fi      
-  
-  else
-    echo "Error: system folder not found under working folder!"
-    cd ..
-    exit 0
-  fi
 fi
 
