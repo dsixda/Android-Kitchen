@@ -179,6 +179,20 @@ then
   exit $?
 
 
+
+#
+# Check for certain Samsung factory images
+#
+elif [ -e system.rfs ]
+then
+
+  cd ..
+  echo "Found system.rfs"
+  scripts/rfs_files_to_working_folder no_create $2
+  exit $?
+
+
+
 #
 # Check for Samsung Galaxy S2 Nandroid backup
 #

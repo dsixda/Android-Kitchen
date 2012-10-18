@@ -35,7 +35,7 @@ The format for each ROM must be one of the following:
 
  Samsung - untested devices (e.g. Galaxy Mini):
  - system.rfs + optional csc.rfs/boot.img
- - TAR file containing the above
+ - TAR/ZIP file containing the above
 
  Huawei:
  - APP file from Huawei software update (e.g. UPDATE.APP)
