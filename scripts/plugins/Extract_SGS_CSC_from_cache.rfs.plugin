@@ -4,9 +4,9 @@ echo "Samsung Galaxy S CSC Extractor"
 echo "-------------------------------"
 echo
 echo "This script will extract the CSC (Customer Software Customization)"
-echo "from the cache.rfs of a stock Samsung Galaxy S firmware.  The CSC"
-echo "comes in a file called 'sec_csc.zip' which contains location and"
-echo "carrier-specific configurations and software."
+echo "from the cache.rfs/csc.rfs of a stock Samsung firmware.  The CSC"
+echo "comes in a file called 'sec_csc.zip' or 'csc.zip' which contains"
+echo "location and carrier-specific configurations and software."
 echo
 
 echo -n "Proceed (y/n)? (default: y): "
@@ -26,35 +26,44 @@ echo "Creating folder `pwd`/$csc_dir ..."
 mkdir $csc_dir
 
 echo
-echo "---> Place stock cache.rfs into the folder mentioned above <--"
+echo "---> Place stock cache.rfs or csc.rfs into the folder mentioned above <--"
 
 scripts/press_enter
 
-if [ -e $csc_dir/cache.rfs ]
+if [ -e $csc_dir/cache.rfs ] || [ -e $csc_dir/csc.rfs ]
 then
+
+  if [ -e $csc_dir/cache.rfs ] 
+  then
+    csc_file=cache.rfs
+    zip_file=sec_csc.zip
+  else
+    csc_file=csc.rfs
+    zip_file=csc.zip
+  fi
 
   if [ `uname | grep CYGWIN` ]
   then
-    scripts/show_magiciso $csc_dir cache.rfs
+    scripts/show_magiciso $csc_dir $csc_file
   else
-    scripts/extract_ext3_img $csc_dir cache.rfs
+    scripts/extract_ext3_img $csc_dir $csc_file
   fi
 
-  rm -f $csc_dir/cache.rfs 2>/dev/null
+  rm -f $csc_dir/$csc_file 2>/dev/null
   if [ "$?" == "1" ]
   then
     echo
-    echo "WARNING: cache.rfs is in use.  Remove file manually after application is closed."
+    echo "WARNING: $csc_file is in use.  Remove file manually after application is closed."
     echo
   fi
 
-  if [ ! -e $csc_dir/sec_csc.zip ]
+  if [ ! -e $csc_dir/$zip_file ]
   then
-    echo "WARNING: sec_csc.zip not found!"
+    echo "WARNING: $zip_file not found!"
     exit 1
   else
     echo
-    echo "Finished!  Your file is at $csc_dir/sec_csc.zip."
+    echo "Finished!  Your file is at $csc_dir/$zip_file."
     echo
     echo "You can unzip this file and copy the contents of the 'system'"
     echo "folder to your ROM's system folder."
@@ -63,7 +72,7 @@ then
   fi
 
 else
-  echo "Error: cache.rfs not found!"
+  echo "Error: CSC RFS file not found!"
   echo
   cd ..
   echo "Removing $csc_dir folder"
