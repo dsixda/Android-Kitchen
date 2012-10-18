@@ -39,6 +39,8 @@ then
   if [ -e $build_dir/$csc_img ]
   then
     mv $build_dir/$csc_img $build_dir/system
+  else
+    scripts/show_cache_warning $csc_img
   fi
 
   # Sometimes images have zero permissions set when extracted from TAR archive,
@@ -88,6 +90,8 @@ else
   if [ -e original_update/$csc_img ]
   then
     echo "Found original_update/$csc_img"
+  else
+    scripts/show_cache_warning original_update/$csc_img
   fi
 
 
