@@ -32,6 +32,7 @@ then
   cd ..
 
 else
+  echo "No working folder found!"
   exit 0
 fi
 
