@@ -73,22 +73,12 @@ then
 elif [ -e system.img ]
 then
 
-  if [ -e boot.img ]
-  then
-    echo "Found boot.img"
-  fi
-
   cd ..
   scripts/img_files_to_working_folder no_create $2
   exit $?
 
 elif [ -e system.img.ext4 ]
 then
-
-  if [ -e boot.img ]
-  then
-    echo "Found boot.img"
-  fi
 
   cd ..
   scripts/simg_ext4_files_to_working_folder no_create $2
