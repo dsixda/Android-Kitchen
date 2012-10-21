@@ -228,11 +228,11 @@ then
     echo " Your working folder will remain the same and continue to have the "
     echo " original update-script."
     echo 
-    echo -n " Add updater-script to ROM (y/n)? (default: n): "
+    echo -n " Add updater-script to ROM's ZIP file (y/n)? (default: y): "
     read convert_it
   fi
 
-  if [ "$convert_it" == "y" ]
+  if [ "$convert_it" != "n" ]
   then
 
     cd ..
