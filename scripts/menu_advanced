@@ -31,7 +31,7 @@ do
   echo " 15 - Unpack data.img"
   echo " 16 - Sign APK or ZIP file(s)" 
   echo " 17 - Convert update-script or updater-script"
-  echo " 18 - Miscellaneous options / Plugin scripts"
+  echo " 18 - Plugin scripts"
   echo
   echo " 99 - Build ROM from working folder"
   echo "  0 - BACK TO MAIN MENU"
