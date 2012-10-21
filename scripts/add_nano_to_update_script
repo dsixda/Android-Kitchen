@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright (c) 2011 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
@@ -37,8 +37,22 @@ then
     fi
 
     echo "Updating update-script with nano entries"
-    sed -i -e 's/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh\nset_perm 0 0 04755 SYSTEM:xbin\/nano\n/g' update-script
 
+    if [ `grep -c "set_perm_recursive.*SYSTEM:xbin[ ]*$" update-script` != 0 ]
+    then
+      sed -i -e 's/set_perm_recursive\(.*\)SYSTEM:xbin[ ]*$/set_perm_recursive\1SYSTEM:xbin\nset_perm 0 0 04755 SYSTEM:xbin\/nano\n/' update-script
+
+    elif [ `grep -c "init.goldfish.sh" update-script` != 0 ]
+    then
+      sed -i -e 's/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh\nset_perm 0 0 04755 SYSTEM:xbin\/nano\n/g' update-script
+
+    elif [ `grep -c "write_raw_image .*:boot.img BOOT:" update-script` != 0 ]
+    then
+      sed -i -e 's/write_raw_image \(.*:boot.img\) BOOT:/set_perm 0 0 04755 SYSTEM:xbin\/nano\nwrite_raw_image \1 BOOT:/' update-script
+    
+    else
+      echo "set_perm 0 0 04755 SYSTEM:xbin/nano" >> update-script
+    fi
 
     if [ "`grep -om 1 nano update-script`" != "nano" ]
     then

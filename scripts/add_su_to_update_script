@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright (c) 2011 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
@@ -23,20 +23,20 @@ then
   #
   # Do this to prevent conflicts with the update-script in ROMs that already have the binary
   #  
-  if [ -e ../../../../system/xbin/su ]
+  if [ -e ../../../../system/bin/su ]
   then
 
-    if [ "`find ../../../../system/bin -name su`" == "" ]
+    if [ "`find ../../../../system/xbin -name su`" == "" ]
     then
-      echo "Moving system/xbin/su to system/bin/su"
-      mkdir -p ../../../../system/bin
-      mv -f ../../../../system/xbin/su ../../../../system/bin/su
+      echo "Moving system/bin/su to system/xbin/su"
+      mkdir -p ../../../../system/xbin
+      mv -f ../../../../system/bin/su ../../../../system/xbin/su
     else
-      echo "/system/bin/su found, removing the one under /system/xbin/su"
-      rm -f ../../../../system/xbin/su
+      echo "/system/xbin/su found, removing the one under /system/bin/su"
+      rm -f ../../../../system/bin/su
     fi
 
-  elif [ "`find ../../../../system/bin -name su`" == "" ]
+  elif [ "`find ../../../../system/xbin -name su`" == "" ]
   then
     echo "Error: /system/xbin/su and /system/bin/su not found!"
     cd ../../../../..
@@ -46,19 +46,34 @@ then
 
   echo
   echo "Updating update-script with su entry and symbolic link"
-  sed -i -e 's/etc\/init.goldfish.sh/etc\/init.goldfish.sh\nset_perm 0 0 06755 SYSTEM:bin\/su\nsymlink \/system\/bin\/su SYSTEM:xbin\/su/g' update-script
 
-  if [ ! -d ../../../../system/xbin ]
+  if [ `grep -c "set_perm_recursive.*SYSTEM:xbin[ ]*$" update-script` != 0 ]
   then
-    echo "Creating /system/xbin folder"
-    mkdir -p ../../../../system/xbin
-    touch ../../../../system/xbin/placeholder
+    sed -i -e 's/set_perm_recursive\(.*\)SYSTEM:xbin[ ]*$/set_perm_recursive\1SYSTEM:xbin\nset_perm 0 0 06755 SYSTEM:xbin\/su\nsymlink \/system\/xbin\/su SYSTEM:bin\/su\n/' update-script
+  
+  elif [ `grep -c "init.goldfish.sh" update-script` != 0 ]
+  then
+    sed -i -e 's/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh\nset_perm 0 0 06755 SYSTEM:xbin\/su\nsymlink \/system\/xbin\/su SYSTEM:bin\/su/g' update-script
+
+  elif [ `grep -c "write_raw_image .*:boot.img BOOT:" update-script` != 0 ]
+  then
+    sed -i -e 's/write_raw_image \(.*:boot.img\) BOOT:/set_perm 0 0 06755 SYSTEM:xbin\/su\nsymlink \/system\/xbin\/su SYSTEM:bin\/su\nwrite_raw_image \1 BOOT:/' update-script
+  
+  else
+    echo "set_perm 0 0 06755 SYSTEM:xbin/su" >> update-script
+    echo "symlink /system/xbin/su SYSTEM:bin/su" >> update-script
   fi
 
-
-  if [ `grep -c "/bin/su " update-script` == 0 ]
+  if [ ! -d ../../../../system/bin ]
   then
-    echo "Error: Could no update update-script with su"
+    echo "Creating /system/bin folder"
+    mkdir -p ../../../../system/bin
+    touch ../../../../system/bin/placeholder
+  fi
+
+  if [ `grep -c "/xbin/su " update-script` == 0 ]
+  then
+    echo "Error: Could not update update-script with su"
   fi
 
 else

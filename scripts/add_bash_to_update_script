@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright (c) 2011 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
@@ -25,12 +25,12 @@ then
   #
   # Do this to prevent conflicts with the update-script in ROMs that already have the binary
   #
-  if [ -e system/xbin/bash ]
+  if [ -e system/bin/bash ]
   then
-    if [ "`find system/bin -name bash`" == "" ]
+    if [ "`find system/xbin -name bash`" == "" ]
     then
-      echo "Copying system/xbin/bash to system/bin/bash"
-      cp -f system/xbin/bash system/bin/bash
+      echo "Copying system/bin/bash to system/xbin/bash"
+      cp -f system/bin/bash system/xbin/bash
     fi
   fi
 
@@ -38,9 +38,24 @@ then
 
   cd META-INF/com/google/android
 
-  sed -i -e 's/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh\nset_perm 0 0 04755 SYSTEM:bin\/bash\nsymlink \/system\/bin\/bash SYSTEM:bin\/sh/g' update-script
+  if [ `grep -c "set_perm_recursive.*SYSTEM:xbin[ ]*$" update-script` != 0 ]
+  then
+    sed -i -e 's/set_perm_recursive\(.*\)SYSTEM:xbin[ ]*$/set_perm_recursive\1SYSTEM:xbin\nset_perm 0 0 04755 SYSTEM:xbin\/bash\nsymlink \/system\/xbin\/bash SYSTEM:bin\/sh\n/' update-script
 
-  grep_bash=`grep -c bin/bash update-script` 
+  elif [ `grep -c "init.goldfish.sh" update-script` != 0 ]
+  then
+    sed -i -e 's/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh\nset_perm 0 0 04755 SYSTEM:xbin\/bash\nsymlink \/system\/xbin\/bash SYSTEM:bin\/sh/g' update-script
+
+  elif [ `grep -c "write_raw_image .*:boot.img BOOT:" update-script` != 0 ]
+  then
+    sed -i -e 's/write_raw_image \(.*:boot.img\) BOOT:/set_perm 0 0 04755 SYSTEM:xbin\/bash\nsymlink \/system\/xbin\/bash SYSTEM:bin\/sh\nwrite_raw_image \1 BOOT:/' update-script
+  
+  else
+    echo "set_perm 0 0 04755 SYSTEM:xbin/bash" >> update-script
+    echo "symlink /system/xbin/bash SYSTEM:bin/sh" >> update-script
+  fi
+
+  grep_bash=`grep -c xbin/bash update-script` 
   cd ../../../..
 
   if [ $grep_bash != 2 ]

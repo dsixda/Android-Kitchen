@@ -133,13 +133,23 @@ then
   rm -fv $super_path
 fi
 
-if [ "$enterVersion" == "s" ] || [ "$enterVersion" == "c" ] 
+
+
+if [ -d xbin ]
 then
-  cp -fv ../../tools/su_files/$folder/app/Superuser.apk app
-  cp -fv ../../tools/su_files/$folder/bin/su bin
+  echo Found /system/xbin
 else
+  echo Creating /system/xbin
+  mkdir xbin
+fi
+
+if [ "$enterVersion" == "d" ] || [ "$enterVersion" == "f" ] 
+then
   cp -fv ../../tools/su_files/chainsdd/Superuser.apk app
-  cp -fv ../../tools/su_files/chainsdd/$folder/su bin
+  cp -fv ../../tools/su_files/chainsdd/$folder/su xbin
+else
+  cp -fv ../../tools/su_files/$folder/app/Superuser.apk app
+  cp -fv ../../tools/su_files/$folder/bin/su xbin
 fi
 
 cd ../..

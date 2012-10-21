@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright (c) 2011 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
@@ -46,8 +46,25 @@ then
 
     echo
     echo "Updating update-script with sysro and sysrw entries"
-    perl -pi -e 's/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh\nset_perm 0 0 04755 SYSTEM:xbin\/sysrw\nset_perm 0 0 04755 SYSTEM:xbin\/sysro\n/g' update-script
+
+
+    if [ `grep -c "set_perm_recursive.*SYSTEM:xbin[ ]*$" update-script` != 0 ]
+    then
+      sed -i -e 's/set_perm_recursive\(.*\)SYSTEM:xbin[ ]*$/set_perm_recursive\1SYSTEM:xbin\nset_perm 0 0 04755 SYSTEM:xbin\/sysrw\nset_perm 0 0 04755 SYSTEM:xbin\/sysro\n/' update-script
+
+    elif [ `grep -c "init.goldfish.sh" update-script` != 0 ]
+    then
+      perl -pi -e 's/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh\nset_perm 0 0 04755 SYSTEM:xbin\/sysrw\nset_perm 0 0 04755 SYSTEM:xbin\/sysro\n/g' update-script
  
+    elif [ `grep -c "write_raw_image .*:boot.img BOOT:" update-script` != 0 ]
+    then
+      sed -i -e 's/write_raw_image \(.*:boot.img\) BOOT:/set_perm 0 0 04755 SYSTEM:xbin\/sysrw\nset_perm 0 0 04755 SYSTEM:xbin\/sysro\nwrite_raw_image \1 BOOT:/' update-script
+    
+    else
+      echo "set_perm 0 0 04755 SYSTEM:xbin/sysrw" >> update-script
+      echo "set_perm 0 0 04755 SYSTEM:xbin/sysro" >> update-script
+    fi
+    
     if [ "`grep -om 1 sysro update-script`" != "sysro" ] || [ "`grep -om 1 sysrw update-script`" != "sysrw" ]
     then
       echo "Error: Unable to update update-script with sysro/sysrw"
