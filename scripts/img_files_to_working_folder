@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright (c) 2011 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
@@ -33,7 +33,6 @@ else
 
   current_dir=`pwd`
   dest_dir=$current_dir/original_update
-  scripts/check_no_bootimg $dest_dir
 
   #
   # Check for system.img/boot.img/lib.img in original_update  
@@ -44,10 +43,6 @@ else
     if [ -e original_update/boot.img ]
     then
       echo "Found original_update/boot.img"
-    else
-      echo "Error: No original_update/boot.img found"
-      echo
-      exit 1
     fi
 
     if [ -e original_update/lib.img ]
@@ -80,8 +75,12 @@ else
   mkdir $build_dir
   mkdir $build_dir/system
 
-  echo "Copying boot.img ..."
-  cp original_update/boot.img $build_dir
+  if [ -e original_update/boot.img ]
+  then
+    echo "Copying boot.img ..."
+    cp original_update/boot.img $build_dir
+  fi
+
   echo "Copying system.img ..."
   cp original_update/system.img $build_dir/system
 
