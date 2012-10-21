@@ -89,18 +89,11 @@ echo "Which version of the Superuser package do you want"
 echo "to install?"
 echo
 
-echo " c - Chainfire's SuperSU         (New tool)"
-
-if [ "`grep -c ro.build.version.release=1 build.prop`" != "0" ]
-then
-  echo " d - ChainsDD's Cupcake/Donut    (Android 1.x)" 
-else
-  echo " f - ChainsDD's version          (Android 2.x+)" 
-fi
-
-echo " s - Old and simple version      (All Android)"
+echo " c - Chainfire's SuperSU"
+echo " d - ChainsDD's version " 
+echo " v - Original version (very old)"
 echo
-echo " x - Cancel rooting              (default)"
+echo " x - Cancel rooting (default)"
 echo
 
 echo -n "? "
@@ -112,11 +105,13 @@ then
   folder=chainfire
 elif [ "$enterVersion" == "d" ]
 then
-  folder=cupcake-donut
-elif [ "$enterVersion" == "f" ]
-then
-  folder=current
-elif [ "$enterVersion" == "s" ]
+  if [ "`grep -c ro.build.version.release=1 build.prop`" != "0" ]
+  then
+    folder=cupcake-donut
+  else
+    folder=current
+  fi
+elif [ "$enterVersion" == "v" ]
 then
   folder=old
 else
@@ -143,7 +138,7 @@ else
   mkdir xbin
 fi
 
-if [ "$enterVersion" == "d" ] || [ "$enterVersion" == "f" ] 
+if [ "$enterVersion" == "d" ]
 then
   cp -fv ../../tools/su_files/chainsdd/Superuser.apk app
   cp -fv ../../tools/su_files/chainsdd/$folder/su xbin
