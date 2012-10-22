@@ -8,6 +8,11 @@
 #
 ############################################################################
 
+#
+# This script has three optional parameters:
+#
+# $1 = 'override' - add the busybox info to the update-script no matter what
+#
 
 cd WORKING_*
 cd META-INF/com/google/android
@@ -17,17 +22,17 @@ echo
 if [ -e update-script ]
 then
 
-  if [ "`grep -c \"symlink busybox\" update-script`" != "0" ]
+  if [ "`grep -c \"symlink busybox\" update-script`" != "0" ] && [ "$1" != "override" ]
   then
     echo "update-script already has BusyBox content"
 
   else
 
-    if [ "`grep -m 1 \"busybox ln\" ../../../../*`" != "" ] || [ "`grep -m 1 \"busybox --install\" ../../../../*`" != "" ] 
+    if [[ "$1" != "override" ]] && [[ "`grep -m 1 \"busybox ln\" ../../../../*`" != "" || "`grep -m 1 \"busybox --install\" ../../../../*`" != "" ]] 
     then
       echo "A script containing BusyBox symlinks was detected"
       echo "No changes to update-script required"
-    
+
     else
 
       echo "Adding installbusybox to working folder"

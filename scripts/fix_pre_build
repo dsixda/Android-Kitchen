@@ -21,10 +21,9 @@ then
 
 elif [ ! -e META-INF/com/google/android/update-script ] && [ ! -e META-INF/com/google/android/updater-script ]
 then
-  echo "Warning: update-script/updater-script not found"
-  echo
   cd ..
-  exit 0
+  scripts/check_no_update_script
+  cd WORKING_*
 
 elif [ -e META-INF/com/google/android/updater-script ]
 then
