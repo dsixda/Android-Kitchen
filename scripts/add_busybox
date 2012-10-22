@@ -91,38 +91,36 @@ echo
 if [ -d system/xbin ]
 then
   echo Found /system/xbin
+
+  if [ -e system/xbin/busybox ] 
+  then
+
+    echo
+    echo "Working folder already has /system/xbin/busybox"
+
+    if [ "$1" == "show_help" ]
+    then
+      echo -n "Replace with BusyBox $version (y/n)? (default: y): "
+      read replace_bb
+      echo
+    else
+      replace_bb=n
+    fi
+
+    if [ "$replace_bb" == "n" ]
+    then
+      cd ..
+      exit 0
+    fi
+
+    echo "Replacing /system/xbin/busybox"
+  fi
 else
   echo Creating /system/xbin
   mkdir system/xbin
 fi
 
-echo
-
-if [ -e system/xbin/busybox ] 
-then
-
-  echo "Working folder already has /system/xbin/busybox"
-
-  if [ "$1" == "show_help" ]
-  then
-    echo -n "Replace with BusyBox $version (y/n)? (default: y): "
-    read replace_bb
-    echo
-  else
-    replace_bb=n
-  fi
-
-  if [ "$replace_bb" == "n" ]
-  then
-    cd ..
-    exit 0
-  fi
-
-  echo "Replacing /system/xbin/busybox"
-else
-  echo "Adding /system/xbin/busybox"
-fi
-
+echo "Adding /system/xbin/busybox"
 cp -f ../tools/busybox_files/busybox system/xbin/
 cd ..
 
