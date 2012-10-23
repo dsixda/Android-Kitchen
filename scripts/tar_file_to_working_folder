@@ -45,7 +45,7 @@ echo "Creating working folder $build_dir ..."
 mkdir $build_dir
 
 echo
-echo "Extracting ROM ..."
+echo "Extracting ROM from TAR file ..."
 
 tar xvf original_update/$update_file -C $build_dir -x factoryfs.img cache.img modem.bin \
       zImage factoryfs.rfs cache.rfs PDA.tar.md5 CSC.tar.md5 PHONE.tar.md5 PDA.tar CSC.tar \

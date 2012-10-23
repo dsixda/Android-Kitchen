@@ -45,7 +45,7 @@ echo "Creating working folder $build_dir ..."
 mkdir $build_dir
 
 echo
-echo "Extracting ROM ..."
+echo "Extracting ROM from ZIP file ..."
 unzip -q original_update/$update_file -d $build_dir -x bootloader.img recovery.img recovery_signed.img userdata.img radio.img rcdata.img splash1.nb0 splash2.nb0 android-info.txt 2>/dev/null
 
 if [ "$?" == "9" ]
