@@ -48,7 +48,7 @@ else
     echo "Found an updater-script but not an update-script. For"
     echo "compatibility with the kitchen scripts, only update-"
     echo "scripts are used in the kitchen (see the kitchen's FAQ"
-    echo "at xda-developers.com for a detailed explanation.)"
+    echo "at xda-developers.com for a detailed explanation)."
     echo
     echo "The kitchen will attempt to convert your updater-script"
     echo "into an update-script file using the old (or similar)"
