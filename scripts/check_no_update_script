@@ -47,21 +47,26 @@ else
     echo
     echo "Found an updater-script but not an update-script. For"
     echo "compatibility with the kitchen scripts, only update-"
-    echo "scripts are used in the kitchen. (See the kitchen's FAQ"
+    echo "scripts are used in the kitchen (see the kitchen's FAQ"
     echo "at xda-developers.com for a detailed explanation.)"
+    echo
+    echo "The kitchen will attempt to convert your updater-script"
+    echo "into an update-script file using the old (or similar)"
+    echo "syntax of an update-script, which makes it easier for"
+    echo "the kitchen to make changes for different devices. When"
+    echo "the ROM is built, it will be converted back."
+    echo 
+    echo "WARNING:"
+    echo "If you are using a custom ROM (ZIP) that was made"
+    echo "without the kitchen, then the conversion may not be"
+    echo "100%. The kitchen will make a backup of this file"
+    echo "as META-INF/com/google/android/updater-script.orig."
     echo
     echo "Choose an option number:"
     echo 
-    echo "  1 = Convert it to update-script (recommended)"
-    echo "  2 = Do nothing, keep the updater-script"
+    echo "  1 = Convert it to update-script (Amend format)"
+    echo "  2 = Do nothing, keep updater-script (Edify format)"
     echo
-    echo "- Option #1 will do a conversion of the updater-script"
-    echo "  (Edify) into an update-script (Amend). NOTE: It can"
-    echo "  be changed back to Edify format when ROM is built."
-    echo
-    echo "- Option #2 should only be used if you wish not to use"
-    echo "  any of the options in the kitchen other than to"
-    echo "  build the ROM or to convert to update-script later."
     echo
     echo -n "? (default=1) "
 
@@ -72,7 +77,10 @@ else
       scripts/fix_update_script
     else
       echo
-      echo "WARNING: The kitchen may have problems without an update-script"
+      echo "NOTE: You can build or de-odex your ROM, but most other"
+      echo "options will not work.  You can choose to convert your"
+      echo "updater-script later from the Advanced Options menu."
+      echo
       exit 1
     fi
 
