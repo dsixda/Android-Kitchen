@@ -12,7 +12,7 @@ sys_mnt=\/dev\/block\/mmcblk0p33
 cache_mnt=\/dev\/block\/mmcblk0p34
 boot_mnt=\/dev\/block\/mmcblk0p21
 data_mnt=\/dev\/block\/mmcblk0p35
-sdcard_mnt=\/dev\/block\/???
+sdcard_mnt=???
 
 fix_boot=yes
 
