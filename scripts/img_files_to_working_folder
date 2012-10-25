@@ -342,6 +342,8 @@ fi
 # Wi-fi fix - required for some Huawei devices
 scripts/fix_huawei_wifi
 
+# Sony Xperia 2011-12 devices - bloatware
+scripts/remove_xperia_bloat
 
 if [ "$2" != "kernel_only" ] && [ "$2" != "name_given" ]
 then
