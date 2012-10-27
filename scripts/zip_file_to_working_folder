@@ -46,7 +46,7 @@ mkdir $build_dir
 
 echo
 echo "Extracting ROM from ZIP file ..."
-unzip -q original_update/$update_file -d $build_dir -x bootloader.img recovery.img recovery_signed.img userdata.img radio.img rcdata.img splash1.nb0 splash2.nb0 android-info.txt 2>/dev/null
+unzip -qo original_update/$update_file -d $build_dir -x bootloader.img recovery.img recovery_signed.img userdata.img radio.img rcdata.img splash1.nb0 splash2.nb0 android-info.txt 2>/dev/null
 
 if [ "$?" == "9" ]
 then
