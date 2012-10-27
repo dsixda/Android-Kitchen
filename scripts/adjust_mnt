@@ -24,13 +24,15 @@ then
   fi
 
 
-  # First check for Samsung Galaxy S/S2
+  # First check for Samsung Galaxy S
   scripts/check_galaxy_s
   is_gs=$?
 
   if [ "$is_gs" == "1" ]
   then
     device_name="GT-I9000"
+
+  # Check for GS2 Exynos
   else
     scripts/check_galaxy_s2
     is_gs2=$? 
@@ -39,6 +41,7 @@ then
     then
       device_name="GT-I9100"
     
+    # Check for GS2 Qualcomm
     else
       scripts/check_galaxy_s2x
       is_gs2x=$?
@@ -48,44 +51,69 @@ then
         device_name="GT-I9100X"
       else
 
-        scripts/check_galaxy_s3_common
-        is_gs3_common=$?
+        # Check for GS3 Exynos
         scripts/check_galaxy_s3_exynos
         is_gs3_exynos=$?
 
-        scripts/check_galaxy_s3_t999
-        is_gs3_t999=$? 
-        scripts/check_galaxy_s3_i747
-        is_gs3_i747=$?
-        scripts/check_galaxy_s3_i9300
-        is_gs3_i9300=$?
-        scripts/check_galaxy_s3_l710
-        is_gs3_l710=$?
-        scripts/check_galaxy_s3_i535
-        is_gs3_i535=$?
-        scripts/check_galaxy_s3_i9305
-        is_gs3_i9305=$?
+        if [ "$is_gs3_exynos" == "1" ] 
+        then
 
-        if [ "$is_gs3_t999" == "1" ]
-        then
-          device_name="SGH-T999"
-        elif [ "$is_gs3_i747" == "1" ]
-        then  
-          device_name="SGH-I747"
-        elif [ "$is_gs3_i9300" == "1" ]
-        then
-          device_name="GT-I9300"
-        elif [ "$is_gs3_l710" == "1" ]
-        then
-          device_name="SPH-L710"
-        elif [ "$is_gs3_i535" == "1" ]
-        then
-          device_name="SCH-I535"
-        elif [ "$is_gs3_i9305" == "1" ]
-        then
-          device_name="GT-I9305"          
+          scripts/check_galaxy_s3_i9300
+          is_gs3_i9300=$?
+          scripts/check_galaxy_s3_i9305
+          is_gs3_i9305=$?
+          scripts/check_galaxy_s3_korean
+          is_gs3_korean=$?
+
+          if [ "$is_gs3_i9300" == "1" ]
+          then
+            device_name="GT-I9300"
+          elif [ "$is_gs3_i9305" == "1" ]
+          then
+            device_name="GT-I9305"          
+          elif [ "$is_gs3_korean" == "1" ]
+          then
+            device_name="GT-I9300" 
+          fi
+
+          is_gs3_common=1
+
         else
-          device_name=`scripts/get_device_name`
+
+          scripts/check_galaxy_s3_common
+          is_gs3_common=$?
+
+          # Check for GS3 non-Exynos
+          if [ "$is_gs3_common" == "1" ]
+          then
+
+            scripts/check_galaxy_s3_t999
+            is_gs3_t999=$? 
+            scripts/check_galaxy_s3_i747
+            is_gs3_i747=$?
+            scripts/check_galaxy_s3_l710
+            is_gs3_l710=$?
+            scripts/check_galaxy_s3_i535
+            is_gs3_i535=$?
+
+            if [ "$is_gs3_t999" == "1" ]
+            then
+              device_name="SGH-T999"
+            elif [ "$is_gs3_i747" == "1" ]
+            then  
+              device_name="SGH-I747"
+            elif [ "$is_gs3_l710" == "1" ]
+            then
+              device_name="SPH-L710"
+            elif [ "$is_gs3_i535" == "1" ]
+            then
+              device_name="SCH-I535"
+            fi
+
+          # None of the above
+          else
+            device_name=`scripts/get_device_name`
+          fi
         fi
       fi
     fi

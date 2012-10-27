@@ -9,14 +9,9 @@
 ############################################################################
 
 
-scripts/check_galaxy_s3_i9300
-i9300=$?
-scripts/check_galaxy_s3_i9305
-i9305=$?
-scripts/check_galaxy_s3_korean
-korean=$?
+model=`scripts/get_build_prop_val ro.product.model`
 
-if [ "$i9300" == "1" ] || [ "$i9305" == "1" ] || [ "$korean" == "1" ]
+if [ -e "tools/samsung_files/sgs3_korean_variants/$model" ]
 then
   exit 1
 else
