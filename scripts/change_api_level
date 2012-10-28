@@ -46,7 +46,7 @@ echo
 
 if [ "$do_change" != "y" ]
 then
-  echo "Ok, nothing will be changed"
+  echo "OK, nothing will be changed"
 else 
 
   echo -n "Please enter the new level number (currently: $api_level): "

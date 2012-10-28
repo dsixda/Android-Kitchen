@@ -65,7 +65,7 @@ echo
 
 if [ "$do_rename" == "n" ]
 then
-  echo "Ok, nothing will be changed"
+  echo "OK, nothing will be changed"
 
 else 
 
