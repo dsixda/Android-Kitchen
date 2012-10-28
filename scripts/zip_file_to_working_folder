@@ -46,9 +46,76 @@ mkdir $build_dir
 
 echo
 echo "Extracting ROM from ZIP file ..."
-unzip -qo original_update/$update_file -d $build_dir -x bootloader.img recovery.img recovery_signed.img userdata.img radio.img rcdata.img splash1.nb0 splash2.nb0 android-info.txt 2>/dev/null
 
-if [ "$?" == "9" ]
+if [ `uname | grep CYGWIN` ]
+then
+
+  #
+  # Instead of 'unzip -qo' (the 'o' would force overwrite), show the user a prompt if a duplicate filename is encountered;
+  # e.g. In a case where we have /system/lib/libdivxdrm.so and /system/lib/libDivxDrm.so, it would ask to overwrite/rename
+  # or ignore one of them.  This way, the user won't be unaware of the duplicate file name.
+  #
+  # To show the prompt in the unzip command, disable the output to /dev/null. To prevent displaying warnings about excluded  
+  # files (because /dev/null is not used anymore) put them in the 'rm' command instead of in unzip's '-x' arguments.
+  #
+  # This is not a faster method than "unzip -q ... -x ... 2>/dev/null", but it prevents the kitchen from hanging at unzip.
+  #
+  # Also, this is just a workaround, it doesn't fix the duplicate file name issue. You have two options to fix the issue:
+  #
+  # 1) Use an operating system that uses case-sensitive file names (Linux or OS X)
+  # 2) In the Windows registry, set HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel\obcaseinsensitive to 0 and
+  #    reboot... but do this at your own risk.
+  #
+  unzip -q original_update/$update_file -d $build_dir 2>&1 | tee unzip.log
+  unzip_result=$?
+  
+  rm -f bootloader.img recovery.img recovery_signed.img userdata.img radio.img rcdata.img splash1.nb0 splash2.nb0 android-info.txt 
+
+  replace_count=`grep -c replace unzip.log`
+  rm -f unzip.log
+
+  if [ $replace_count -gt 0 ]
+  then
+    echo
+    echo
+    echo "WARNING"
+    echo "-------"
+    echo "One of the folders in your ZIP archive contains two files with the SAME NAME that differ"
+    echo "by upper and lower case, which is the reason you saw the prompt above.  Because Windows"
+    echo "is case-insensitive, it treats both files as a SINGLE file rather than two distinct"
+    echo "files!"
+    echo
+    echo "You can choose to ignore this issue, or quit. There are two ways to resolve this:"
+    echo 
+    echo "1) Use an operating system that treats file names as case-sensitive (Linux or OS X), OR"
+    echo "2) In the Windows registry, set: "
+    echo "   HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel\obcaseinsensitive to 0"
+    echo "   and reboot. However, this affects all of Windows - do this at your own risk!"
+    echo 
+    echo
+    echo -n "Do you wish to ignore this issue (y/n)? (default: n): "
+    read do_ignore
+
+    if [ "$do_ignore" != "y" ]
+    then
+      echo
+      echo "OK, aborting"
+      cd ..
+      exit 1
+    else
+      echo
+      echo "OK, ignoring it, but your new ROM may have stability issues!"
+    fi
+  fi
+
+else
+  unzip -q original_update/$update_file -d $build_dir -x bootloader.img recovery.img recovery_signed.img userdata.img radio.img rcdata.img splash1.nb0 splash2.nb0 android-info.txt 2>/dev/null
+
+  unzip_result=$?
+
+fi
+
+if [ "$unzip_result" == "9" ]
 then
   echo
   echo "Error: Cannot extract ROM!"
