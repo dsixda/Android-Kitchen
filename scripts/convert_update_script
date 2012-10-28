@@ -377,6 +377,17 @@ sed -i \
 
 
 #
+# sleep
+#
+echo "- sleep ..."
+
+sed -i \
+  -e 's/sleep \(.*\)/sleep(\1);/g' \
+  updater-script
+
+
+
+#
 # delete / delete_recursive
 #
 echo "- delete/delete_recursive ..."
