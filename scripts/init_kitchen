@@ -25,6 +25,7 @@ rm -f scripts/.DS_Store
 rm -f tools/.DS_Store
 rm -f original_update/.DS_Store
 rm -f .DS_Store
+rm -f unzip.log
 
 bin_list=( mkbootfs mkbootfs.exe mkbootimg mkbootimg.exe rsa.o sha.o )
 
