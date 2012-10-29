@@ -120,7 +120,7 @@ then
   fi    
 
   echo
-  echo "Device name in kitchen = $device_name"
+  echo "Device name in kitchen, or variant of: $device_name"
 
   change_mnt=`scripts/get_edify_def_val $device_name change_mnt`
   change_mnt_dell=`scripts/get_edify_def_val $device_name change_mnt_dell`
