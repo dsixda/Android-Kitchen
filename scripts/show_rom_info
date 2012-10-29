@@ -43,13 +43,12 @@ fi
 
 scripts/check_galaxy_s_and_s2
 is_galaxy_ss2=$?
-scripts/check_galaxy_s2x
-is_galaxy_s2x=$?
-scripts/check_galaxy_s3_common
-is_galaxy_s3_common=$?
+scripts/check_galaxies
+is_galaxies=$?
 scripts/check_galaxy_s3_exynos
 is_galaxy_s3_exynos=$?
-
+scripts/check_gnote2_common
+is_gnote2_common=$
 
 if [ "$is_galaxy_ss2" == "1" ]
 then
@@ -305,7 +304,7 @@ cd WORKING_*
 
 show_csc=no
 
-if [ -e system/CSCVersion.txt ] || [ "$is_galaxy_ss2" == "1" ] || [ "$is_galaxy_s2x" == "1" ] || [ "$device_name" == "GT-I9001" ] || [ "$is_galaxy_s3_common" == "1" ]
+if [ -e system/CSCVersion.txt ] || [ "$device_name" == "GT-I9001" ] || [ "$is_galaxies" == "1" ]
 then
 
   show_csc=yes
@@ -483,7 +482,7 @@ echo " /system/app is deodexed        : $deodex_app_status"
 if [ "$is_galaxy_ss2" == "1" ] || [ "$is_galaxy_s3_exynos" == "1" ]
 then
   echo " modem.bin found                : $modem_status"
-elif [ "$is_galaxy_s2x" != "1" ]
+elif [ "$is_galaxies" != "1" ]
 then
   echo " radio.img found                : $radio_status"
 fi

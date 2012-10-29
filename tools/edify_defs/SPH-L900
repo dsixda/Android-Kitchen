@@ -1,0 +1,18 @@
+
+# Sprint Samsung Galaxy Note II SPH-L900
+
+change_mnt=yes
+
+param1=ext4
+param2=EMMC
+
+param1_sdcard=vfat
+param2_sdcard=MTD
+
+sys_mnt=\/dev\/block\/mmcblk0p13
+cache_mnt=\/dev\/block\/mmcblk0p12
+boot_mnt=\/dev\/block\/mmcblk0p8
+data_mnt=\/dev\/block\/mmcblk0p17
+sdcard_mnt=???
+
+fix_boot=yes

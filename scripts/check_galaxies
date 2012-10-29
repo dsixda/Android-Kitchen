@@ -1,0 +1,32 @@
+############################################################################
+#
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
+#
+# Android Kitchen is 100% free.  This script file is intended for personal
+# and/or educational use only.  It may not be duplicated for monetary
+# benefit or any other purpose without the permission of the developer.
+#
+############################################################################
+
+
+scripts/check_galaxy_s
+sgs=$?
+
+scripts/check_galaxy_s2
+sgs2=$?
+
+scripts/check_galaxy_s2x
+sgs2x=$
+
+scripts/check_galaxy_s3_common
+sgs3=$?
+
+scripts/check_gnote2_common
+sgnote2=$?
+
+if [ "$sgs" == "1" ] || [ "$sgs2" == "1" ] || [ "$sgs2x" == "1" ] || [ "$sgs3" == "1" ] || [ "$sgnote2" == "1" ]
+then
+  exit 1
+else
+  exit 0
+fi

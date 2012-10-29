@@ -47,14 +47,10 @@ else
 
   cd $base_dir
   device_name=`scripts/get_device_name`
-  scripts/check_galaxy_s_and_s2
-  sgss2=$?
-  scripts/check_galaxy_s2x
-  sgs2x=$?
-  scripts/check_galaxy_s3_common
-  sgs3_common=$? 
+  scripts/check_galaxies
+  galaxy=$?
 
-  if [ -e tools/edify_defs/$device_name ] || [ "$sgss2" == "1" ] || [ "$sgs2x" == "1" ] || [ "$sgs3_common" == "1" ] 
+  if [ -e tools/edify_defs/$device_name ] || [ "$galaxy" == "1" ] 
   then
 
     if [ "$1" == "" ]
