@@ -1,0 +1,19 @@
+
+# Samsung Galaxy Ace 2 GT-I8160L
+
+change_mnt=yes
+
+param1=ext4
+param2=EMMC
+
+param1_sdcard=vfat
+param2_sdcard=MTD
+
+sys_mnt=\/dev\/block\/mmcblk0p3
+cache_mnt=\/dev\/block\/mmcblk0p4
+boot_mnt=\/dev\/block\/mmcblk0p15
+data_mnt=\/dev\/block\/mmcblk0p5
+sdcard_mnt=\/dev\/block\/mmcblk0p8
+
+fix_boot=yes
+
