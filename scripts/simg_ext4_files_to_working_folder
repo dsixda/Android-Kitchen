@@ -131,7 +131,7 @@ sys_bytes=`od -A n -h -j 0 -N 6 $src_dir/system.img.ext4 | sed 's/ //g'`
 if [ -e $src_dir/cache.img.ext4 ]
 then
   echo "Analyzing cache.img.ext4 ..."
-  cache_bytes=`od -A n -h -j 0 -N 6 $src_dir/system.img.ext4 | sed 's/ //g'`
+  cache_bytes=`od -A n -h -j 0 -N 6 $src_dir/cache.img.ext4 | sed 's/ //g'`
 else
   cache_bytes="000000000000"
 fi
