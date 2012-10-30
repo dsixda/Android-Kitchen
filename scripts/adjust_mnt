@@ -110,14 +110,14 @@ then
               device_name="SCH-I535"
             fi
 
-	  else
+	        else
 
-	    scripts/check_gnote2_common
-	    is_gnote2_common=$?
+	          scripts/check_gnote2_common
+	          is_gnote2_common=$?
 
-	    # Check for Galaxy Note 2
-	    if [ "$is_gnote2_common" == "1" ]
- 	    then
+	          # Check for Galaxy Note 2
+	          if [ "$is_gnote2_common" == "1" ]
+ 	          then
 
               scripts/check_gnote2_t889
               is_gnote2_t889=$? 
@@ -138,9 +138,9 @@ then
               fi
 
             # None of the above
-	    else
+	          else
               device_name=`scripts/get_device_name`
-	    fi
+	          fi
           fi
         fi
       fi
@@ -515,7 +515,7 @@ then
      
         fi
 
-      elif [ "$is_gs3_exynos" == "1" ]
+      elif [ "$is_gs3_exynos" == "1" ] || [ "$is_gnote2_common" == "1" ]
       then
 
         #################################

@@ -1,5 +1,5 @@
 
-# Samsung Galaxy Note II GT-N7100
+# International Samsung Galaxy Note II GT-N7100
 
 change_mnt=yes
 
@@ -12,7 +12,9 @@ param2_sdcard=MTD
 sys_mnt=\/dev\/block\/mmcblk0p13
 cache_mnt=\/dev\/block\/mmcblk0p12
 boot_mnt=\/dev\/block\/mmcblk0p8
-data_mnt=???
-sdcard_mnt=???
+data_mnt=\/dev\/block\/mmcblk0p16
+sdcard_mnt=\/dev\/block\/mmcblk1p1
+
+modem_mnt=\/dev\/block\/mmcblk0p10
 
 fix_boot=yes
