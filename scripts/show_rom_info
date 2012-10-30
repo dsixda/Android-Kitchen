@@ -48,7 +48,7 @@ is_galaxies=$?
 scripts/check_galaxy_s3_exynos
 is_galaxy_s3_exynos=$?
 scripts/check_gnote2_common
-is_gnote2_common=$
+is_gnote2_common=$?
 
 if [ "$is_galaxy_ss2" == "1" ]
 then
@@ -126,7 +126,7 @@ cd WORKING_*
 if [ "`find . -name su`" == "" ] 
 then
   su_status=NO
-elif [ "`find . -iname Superuser.apk`" == "" ]
+elif [ "`find . -iname Superuser.apk`" == "" ] && [ "`find . -iname SuperSU.apk`" == "" ]
 then
   su_status=NO
 else
@@ -323,7 +323,7 @@ cd ..
 
 
 
-if [ "$is_galaxy_ss2" == "1" ] || [ "$is_galaxy_s3_exynos" == "1" ]
+if [ "$is_galaxy_ss2" == "1" ] || [ "$is_galaxy_s3_exynos" == "1" ] || [ "$is_gnote2_common" == "1" ]
 then
 
   #
@@ -462,7 +462,7 @@ then
   echo " CSC version                    : $csc_version"
 fi
 
-echo " Rooted (Superuser.apk + su)    : $su_status"
+echo " Rooted (Superuser app + su)    : $su_status"
 echo " Rooted (unsecured boot.img)    : $unsecure_status"                                         
 echo " BusyBox installed              : $bb_status"
 echo " BusyBox run-parts support      : $runparts_status"
@@ -479,7 +479,7 @@ echo " Bash shell support             : $bash_status"
 echo " /system/framework is deodexed  : $deodex_fr_status"
 echo " /system/app is deodexed        : $deodex_app_status"
 
-if [ "$is_galaxy_ss2" == "1" ] || [ "$is_galaxy_s3_exynos" == "1" ]
+if [ "$is_galaxy_ss2" == "1" ] || [ "$is_galaxy_s3_exynos" == "1" ] || [ "$is_gnote2_common" == "1" ]
 then
   echo " modem.bin found                : $modem_status"
 elif [ "$is_galaxies" != "1" ]
