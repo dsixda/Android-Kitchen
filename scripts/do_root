@@ -31,7 +31,7 @@ echo "--------------------------------------------"
 echo 
 echo "The following will be done for root:"
 echo
-echo "- Add Superuser.apk and su"
+echo "- Add Superuser app and su binary"
 echo "- Add necessary lines to the update-script"
 
 if [ "$sgs" == "0" ]
@@ -64,11 +64,15 @@ fi
 
 su_path=`find . -name su`
 super_path=`find . -iname Superuser.apk`
+if [ "$super_path" == "" ]
+then
+  super_path=`find . -iname SuperSU.apk`
+fi
 overwrite=0
 
 if [ "$su_path" != "" ] && [ "$super_path" != "" ] 
 then
-  echo "The files 'su' and Superuser.apk already exist"
+  echo "The files $su_path and $super_path exist"
   echo -n "Overwrite (y/n)? (default: n): "
   read do_su
 
@@ -123,7 +127,7 @@ fi
 if [ "$overwrite" == "1" ]
 then
   echo
-  echo "Overwriting old 'su' and Superuser.apk ..."
+  echo "Overwriting old 'su' binary and Superuser app ..."
   rm -fv $su_path
   rm -fv $super_path
 fi
