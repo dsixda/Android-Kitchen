@@ -515,7 +515,7 @@ then
      
         fi
 
-      elif [ "$is_gs3_exynos" == "1" ]
+      elif [ "$is_gs3_exynos" == "1" ] || [ "$is_gnote2_common" == "1" ]
       then
 
         #################################
