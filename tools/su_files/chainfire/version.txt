@@ -1,1 +1,1 @@
-SuperSU v0.96
+SuperSU v0.97
