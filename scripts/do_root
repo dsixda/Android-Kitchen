@@ -72,7 +72,7 @@ overwrite=0
 
 if [ "$su_path" != "" ] && [ "$super_path" != "" ] 
 then
-  echo "The files $su_path and $super_path exist"
+  echo "The /system folder contains $su_path and $super_path"
   echo -n "Overwrite (y/n)? (default: n): "
   read do_su
 
