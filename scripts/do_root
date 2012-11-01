@@ -64,9 +64,15 @@ fi
 
 su_path=`find . -name su`
 super_path=`find . -iname Superuser.apk`
+
+super_su_exists=0
 if [ "$super_path" == "" ]
 then
   super_path=`find . -iname SuperSU.apk`
+  if [ "$super_path" != "" ]
+  then
+    super_su_exists=1
+  fi
 fi
 overwrite=0
 
@@ -149,6 +155,11 @@ then
 else
   cp -fv ../../tools/su_files/$folder/app/Superuser.apk app
   cp -fv ../../tools/su_files/$folder/bin/su xbin
+fi
+
+if [ "$super_su_exists" == "1" ] && [ "$enterVersion" == "c" ]
+then
+  mv -fv app/Superuser.apk app/SuperSU.apk
 fi
 
 cd ../..
