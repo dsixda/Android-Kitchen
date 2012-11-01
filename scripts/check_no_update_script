@@ -94,7 +94,15 @@ else
     cd ..
     scripts/fix_update_script
     scripts/fix_update_script_with_features
-    scripts/add_busybox_to_update_script override
+
+    cd WORKING_*
+    set bb=`find system -name busybox`
+    cd ..
+    if [ "$bb" != "" ]
+    then
+      scripts/add_busybox_to_update_script override
+    fi
+
     echo
   fi
 fi
