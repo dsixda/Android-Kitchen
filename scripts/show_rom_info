@@ -36,20 +36,18 @@ else
   exit 0
 fi
 
+echo
+echo -n "Please wait "
 
 #
 # Check if Samsung Galaxy S/S2
 #
 
+echo -n "."
 scripts/check_galaxy_s_and_s2
 is_galaxy_ss2=$?
-scripts/check_galaxies
-is_galaxies=$?
-scripts/check_galaxy_s3_exynos
-is_galaxy_s3_exynos=$?
-scripts/check_gnote2_common
-is_gnote2_common=$?
 
+echo -n "."
 if [ "$is_galaxy_ss2" == "1" ]
 then
   scripts/extract_initramfs
@@ -67,6 +65,16 @@ fi
 clear
 echo
 echo -n "Please wait "
+
+echo -n "."
+scripts/check_galaxies
+is_galaxies=$?
+echo -n "."
+scripts/check_galaxy_s3_exynos
+is_galaxy_s3_exynos=$?
+echo -n "."
+scripts/check_gnote2_common
+is_gnote2_common=$?
 
 
 #
