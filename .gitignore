@@ -8,3 +8,5 @@ OUTPUT_ZIP
 BOOT-EXTRACTED
 WORKING*
 temp
+bootimg_*
+todo.txt
