@@ -767,6 +767,28 @@ cd META-INF/com/google/android
 sed -i -e '/^$/d' updater-script
 
 
+test_mnt=`grep "^mount(" updater-script`
+test_mnt2=`grep "sbin/mount\", \"" updater-script`
+
+if [ "$test_mnt" != "" ] || [ "$test_mnt2" != "" ]
+then
+  echo 
+  echo
+  echo "Please ensure these device mount statements are correct:"
+  echo "--------------------------------------------------------------------------"  
+
+  if [ "$test_mnt" != "" ]
+  then
+    grep "^mount(" updater-script
+  fi
+
+  if [ "$test_mnt2" != "" ]
+  then 
+    grep "sbin/mount\", \"" updater-script
+  fi
+
+  echo "--------------------------------------------------------------------------"
+fi
 
 
 if [ -e updater-script ]
