@@ -18,8 +18,8 @@ then
   echo
   echo "Ensure you run this file from the SAME folder as where it was"
   echo "installed, otherwise the kitchen will have problems running the"
-  echo "scripts.  Start the kitchen with the ./menu command, NOT with"
-  echo "any other command or method!"
+  echo "scripts.  After you 'cd' to the correct folder, start the kitchen"
+  echo "with the ./menu command, NOT with any other command or method!"
   exit 0
 fi
 
