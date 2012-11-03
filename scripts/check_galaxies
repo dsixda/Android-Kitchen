@@ -8,23 +8,7 @@
 #
 ############################################################################
 
-
-scripts/check_galaxy_s
-sgs=$?
-
-scripts/check_galaxy_s2
-sgs2=$?
-
-scripts/check_galaxy_s2x
-sgs2x=$
-
-scripts/check_galaxy_s3_common
-sgs3=$?
-
-scripts/check_gnote2_common
-sgnote2=$?
-
-if [ "$sgs" == "1" ] || [ "$sgs2" == "1" ] || [ "$sgs2x" == "1" ] || [ "$sgs3" == "1" ] || [ "$sgnote2" == "1" ]
+if [ "`scripts/get_samsung_variant`" != "" ]
 then
   exit 1
 else

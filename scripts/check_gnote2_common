@@ -8,17 +8,23 @@
 #
 ############################################################################
 
+my_model=`scripts/get_product_model`
 
-scripts/check_gnote2_l900
-l900=$?
-scripts/check_gnote2_n7100
-n7100=$?
-scripts/check_gnote2_t889
-t889=$?
+cd tools/samsung_files/model_variants/galaxy_note2
 
-if [ "$l900" == "1" ] || [ "$n7100" == "1" ] || [ "$t889" == "1" ]
-then
-  exit 1
-else
-  exit 0
-fi
+for variant_name in `ls`
+do     
+   for model_name in `ls $variant_name` 
+   do
+      if [ "$model_name" == "$my_model" ]		
+      then
+        cd ../..
+        exit 1
+      fi
+   done
+done
+
+cd ../../../..
+
+exit 0
+

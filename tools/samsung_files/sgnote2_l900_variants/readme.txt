@@ -1,1 +1,0 @@
-Use ro.product.model

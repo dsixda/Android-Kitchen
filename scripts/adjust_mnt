@@ -24,131 +24,61 @@ then
   fi
 
 
-  # First check for Samsung Galaxy S
-  scripts/check_galaxy_s
-  is_gs=$?
+  #
+  # Find device name for lookup in edify_defs folder
+  #
+  device_name=`scripts/get_samsung_variant`
 
-  if [ "$is_gs" == "1" ]
+  if [ "$device_name" == "" ]
   then
-    device_name="GT-I9000"
+    device_name=`scripts/get_device_name`
 
-  # Check for GS2 Exynos
   else
-    scripts/check_galaxy_s2
-    is_gs2=$? 
 
-    if [ "$is_gs2" == "1" ]
+    #
+    # Check Galaxy platform type
+    #
+
+    scripts/check_galaxy_s
+    is_gs=$?
+
+    if [ "$is_gs" != "1" ]
     then
-      device_name="GT-I9100"
-    
-    # Check for GS2 Qualcomm
-    else
-      scripts/check_galaxy_s2x
-      is_gs2x=$?
+      scripts/check_galaxy_s2
+      is_gs2=$? 
 
-      if [ "$is_gs2x" == "1" ]
+      if [ "$is_gs2" != "1" ]
       then
-        device_name="GT-I9100X"
-      else
+        scripts/check_galaxy_s2x
+        is_gs2x=$?
 
-        # Check for GS3 Exynos
-        scripts/check_galaxy_s3_exynos
-        is_gs3_exynos=$?
-
-        if [ "$is_gs3_exynos" == "1" ] 
+        if [ "$is_gs2x" != "1" ]
         then
+          scripts/check_galaxy_s3_exynos
+          is_gs3_exynos=$?
 
-          scripts/check_galaxy_s3_i9300
-          is_gs3_i9300=$?
-          scripts/check_galaxy_s3_i9305
-          is_gs3_i9305=$?
-          scripts/check_galaxy_s3_korean
-          is_gs3_korean=$?
-
-          if [ "$is_gs3_i9300" == "1" ]
+          if [ "$is_gs3_exynos" == "1" ] 
           then
-            device_name="GT-I9300"
-          elif [ "$is_gs3_i9305" == "1" ]
-          then
-            device_name="GT-I9305"          
-          elif [ "$is_gs3_korean" == "1" ]
-          then
-            device_name="GT-I9300" 
-          fi
+            is_gs3_common=1
 
-          is_gs3_common=1
+          else
+            scripts/check_galaxy_s3_common
+            is_gs3_common=$?
 
-        else
-
-          scripts/check_galaxy_s3_common
-          is_gs3_common=$?
-
-          # Check for GS3 non-Exynos
-          if [ "$is_gs3_common" == "1" ]
-          then
-
-            scripts/check_galaxy_s3_t999
-            is_gs3_t999=$? 
-            scripts/check_galaxy_s3_i747
-            is_gs3_i747=$?
-            scripts/check_galaxy_s3_l710
-            is_gs3_l710=$?
-            scripts/check_galaxy_s3_i535
-            is_gs3_i535=$?
-
-            if [ "$is_gs3_t999" == "1" ]
+            if [ "$is_gs3_common" != "1" ]
             then
-              device_name="SGH-T999"
-            elif [ "$is_gs3_i747" == "1" ]
-            then  
-              device_name="SGH-I747"
-            elif [ "$is_gs3_l710" == "1" ]
-            then
-              device_name="SPH-L710"
-            elif [ "$is_gs3_i535" == "1" ]
-            then
-              device_name="SCH-I535"
+              scripts/check_gnote2_common
+              is_gnote2_common=$?
             fi
-
-	        else
-
-	          scripts/check_gnote2_common
-	          is_gnote2_common=$?
-
-	          # Check for Galaxy Note 2
-	          if [ "$is_gnote2_common" == "1" ]
- 	          then
-
-              scripts/check_gnote2_t889
-              is_gnote2_t889=$? 
-              scripts/check_gnote2_l900
-              is_gnote2_l900=$?
-              scripts/check_gnote2_n7100
-              is_gnote2_n7100=$?
-
-              if [ "$is_gnote2_t889" == "1" ]
-              then
-                device_name="SGH-T889"
-              elif [ "$is_gnote2_l900" == "1" ]
-              then  
-                device_name="SPH-L900"
-              elif [ "$is_gnote2_n7100" == "1" ]
-              then
-                device_name="GT-N7100"
-              fi
-
-            # None of the above
-	          else
-              device_name=`scripts/get_device_name`
-	          fi
           fi
         fi
       fi
-    fi
-  fi    
+    fi    
+  fi
 
   echo
   echo "Device name in kitchen, or variant of: $device_name"
+
 
   change_mnt=`scripts/get_edify_def_val $device_name change_mnt`
   change_mnt_dell=`scripts/get_edify_def_val $device_name change_mnt_dell`
@@ -518,9 +448,9 @@ then
       elif [ "$is_gs3_exynos" == "1" ] || [ "$is_gnote2_common" == "1" ]
       then
 
-        #################################
-        # Samsung Galaxy S3 International
-        #################################
+        ##########################################
+        # Samsung Galaxy S3 International / Note 2
+        ##########################################
 
         if [ `grep -c flash_modem updater-script` -gt 0 ]
         then

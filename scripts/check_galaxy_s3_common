@@ -8,21 +8,22 @@
 #
 ############################################################################
 
+my_model=`scripts/get_product_model`
 
-scripts/check_galaxy_s3_t999
-t999=$?
-scripts/check_galaxy_s3_i747
-i747=$?
-scripts/check_galaxy_s3_l710
-l710=$?
-scripts/check_galaxy_s3_i535
-i535=$?
-scripts/check_galaxy_s3_exynos
-exynos=$?
+cd tools/samsung_files/model_variants/galaxy_s3
 
-if [ "$t999" == "1" ] || [ "$i747" == "1" ] || [ "$l710" == "1" ] || [ "$i535" == "1" ] || [ "$exynos" == "1" ]
-then
-  exit 1
-else
-  exit 0
-fi
+for variant_name in `ls`
+do     
+   for model_name in `ls $variant_name` 
+   do
+      if [ "$model_name" == "$my_model" ]		
+      then
+        cd ../..
+        exit 1
+      fi
+   done
+done
+
+cd ../../../..
+
+exit 0

@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright (c) 2011 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
@@ -8,10 +8,9 @@
 #
 ############################################################################
 
+model=`scripts/get_build_prop_val ro.product.model`
 
-device=`scripts/get_build_prop_val ro.product.device`
-
-if [ -e tools/samsung_files/sgs2_variants/$device ]
+if [ -e "tools/samsung_files/model_variants/galaxy_s2/GT-I9100/$model" ]
 then
   exit 1
 else
