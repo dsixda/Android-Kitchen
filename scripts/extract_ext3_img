@@ -212,6 +212,15 @@ then
   cd $base_dir
   cd $img_dir
 
+  # Check for CSC plugin script
+  if [ "`echo $img_dir | grep csc_`" != "" ] && [ "`echo $img_dir | grep WORKING_`" == "" ]
+  then
+    mkdir system
+    mv $img_file system
+    cd system
+    csc_plugin=1
+  fi
+
   echo
   echo "Ready to extract files from $img_file"
   mv $img_file ../$img_file
@@ -266,8 +275,15 @@ then
     hdiutil detach $mydisk
   fi
 
-  mv $img_file $img_dir/$img_file
-  cd system
+  # Check again for CSC plugin
+  if [ "$csc_plugin" == "1" ]
+  then
+    mv system/*.zip .
+    rm -rf system
+  else
+    mv $img_file $img_dir/$img_file
+    cd system
+  fi
 
   if [ "$listing" != "" ]
   then
