@@ -60,7 +60,10 @@ find . -name sh.exe.stackdump -type f -delete
 #
 # Clean up temp files left behind by interrupted Amend/Edify conversion scripts
 #
-find META-INF/com/google/android/ -name 'sed*' -type f -delete
+if [ -d META-INF/com/google/android ]
+then
+  find META-INF/com/google/android/ -name 'sed*' -type f -delete
+fi
 
 
 #
