@@ -164,7 +164,7 @@ fi
 
 cd ../..
 
-
+echo
 scripts/add_su_to_update_script
 
 if [ "$sgs" == "0" ]
