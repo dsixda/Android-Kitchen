@@ -1,0 +1,20 @@
+
+# International Samsung Galaxy S3 GT-I9300
+
+change_mnt=yes
+
+param1=ext4
+param2=EMMC
+
+param1_sdcard=vfat
+param2_sdcard=MTD
+
+sys_mnt=\/dev\/block\/mmcblk0p9
+cache_mnt=\/dev\/block\/mmcblk0p8
+boot_mnt=\/dev\/block\/mmcblk0p5
+data_mnt=\/dev\/block\/mmcblk0p12
+sdcard_mnt=???
+
+modem_mnt=\/dev\/block\/mmcblk0p7
+
+fix_boot2=yes
