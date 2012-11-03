@@ -8,17 +8,22 @@
 #
 ############################################################################
 
+model=`scripts/get_build_prop_val ro.product.model`
 
-scripts/check_galaxy_s3_i9300
-i9300=$?
-scripts/check_galaxy_s3_i9305
-i9305=$?
-scripts/check_galaxy_s3_korean
-korean=$?
-
-if [ "$i9300" == "1" ] || [ "$i9305" == "1" ] || [ "$korean" == "1" ]
+if [ -e "tools/samsung_files/model_variants/galaxy_s3/GT-I9300/$model" ]
 then
   exit 1
-else
-  exit 0
 fi
+
+if [ -e "tools/samsung_files/model_variants/galaxy_s3/GT-I9305/$model" ]
+then
+  exit 1
+fi
+
+if [ -e "tools/samsung_files/model_variants/galaxy_s3/GT-I9300Korean/$model" ]
+then
+  exit 1
+fi
+
+
+exit 0
