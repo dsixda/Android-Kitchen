@@ -96,7 +96,7 @@ else
     scripts/fix_update_script_with_features
 
     cd WORKING_*
-    set bb=`find system -name busybox`
+    bb=`find system -name busybox`
     cd ..
     if [ "$bb" != "" ]
     then
