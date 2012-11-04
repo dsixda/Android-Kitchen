@@ -15,16 +15,13 @@ cd tools/samsung_files/model_variants
 for device_dir in `ls`
 do
   for variant_name in `ls $device_dir`
-  do     
-     for model_name in `ls $device_dir/$variant_name` 
-     do
-        if [ "$model_name" == "$my_model" ]		
-        then
-          echo $variant_name
-          cd ../../..
-          exit 0
-        fi
-     done
+  do 
+    if [ -e "$device_dir/$variant_name/$my_model" ]
+    then
+      echo $variant_name
+      cd ../../..
+      exit 0
+    fi
   done
 done
 
