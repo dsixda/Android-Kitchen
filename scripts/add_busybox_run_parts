@@ -66,19 +66,37 @@ then
   exit 0
 fi
 
+
+
+#
+# Create the folder
+#
+
+if [ ! -d system/etc/init.d ]
+then
+  echo 
+  echo "WARNING: You have not yet created the folder /system/etc/init.d"
+  echo
+  echo "Creating /system/etc/init.d folder ..."
+  mkdir -p system/etc/init.d
+  touch system/etc/init.d/placeholder
+fi
+
+
 cd ..
 
 
 scripts/check_galaxy_s_and_s2
 is_gs=$?
 
-device=`scripts/get_build_prop_val ro.product.device`
 
 #
 # Samsung Galaxy S2 or equivalent
 #
 if [ "$is_gs" == "1" ]
 then
+
+  device=`scripts/get_build_prop_val ro.product.device`
 
   cd WORKING_*
   test_initd=`grep -c "set_perm.*SYSTEM:etc/init.d" META-INF/com/google/android/update-script`
@@ -236,10 +254,4 @@ else
 
 fi
 
-cd WORKING_*
-if [ ! -d system/etc/init.d ]
-then
-  echo 
-  echo "WARNING: You have not yet created the folder system/etc/init.d"
-fi
-cd ..
+
