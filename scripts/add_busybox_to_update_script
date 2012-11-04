@@ -14,6 +14,18 @@
 # $1 = 'override' - add the busybox info to the update-script no matter what
 #
 
+#
+# Don't add 'installbusybox' script if going to convert to updater-script when 
+# buiding ROM -- use the installation command directly.
+#
+# The installation command uses 'run_program' and a set of arguments, which 
+# would only work with an updater-script.  On the other hand, the update-
+# script uses the 'installbusybox' script, which is executed by run_program 
+# but requires no arguments.
+#
+scripts/update_script_should_convert_back
+convert_to_edify=$?
+
 cd WORKING_*
 cd META-INF/com/google/android
 
@@ -30,10 +42,21 @@ then
 
     if [[ "$1" != "override" ]] && [[ "`grep -m 1 \"busybox ln\" ../../../../*`" != "" || "`grep -m 1 \"busybox --install\" ../../../../*`" != "" ]] 
     then
+
       echo "A script containing BusyBox symlinks was detected"
       echo "No changes to update-script required"
 
-    else
+    elif [ "$1" != "override" ] && [ "`grep -c \"busybox --install -s\" update-script`" != "" ]
+    then
+
+      echo "The update-script contains a reference to a BusyBox install command"
+      echo "No changes to update-script required"
+
+    #
+    # We're not sure yet if this update-script will be converted to updater-script when building
+    #
+    elif [ "$convert_to_edify" == "0" ]
+    then
 
       echo "Adding installbusybox to working folder"
       cp ../../../../../tools/busybox_files/installbusybox ../../../../
@@ -68,6 +91,45 @@ then
           sed -i -e 's/set_perm 0 1000 0755 SYSTEM:xbin\/busybox/set_perm 0 1000 0755 SYSTEM:xbin\/busybox\nsymlink \/system\/xbin\/busybox SYSTEM:bin\/busybox/g' update-script
         fi
       fi
+
+
+    #
+    # The update-script will be converted to updater-script when built
+    #
+    elif [ "$convert_to_edify" == "1" ]
+    then
+
+      echo "Adding BusyBox install command to update-script"
+
+      if [ `grep -c "set_perm_recursive.*SYSTEM:xbin[ ]*$" update-script` != 0 ]
+      then
+        sed -i -e 's/set_perm_recursive\(.*\)SYSTEM:xbin[ ]*$/set_perm_recursive\1SYSTEM:xbin\nset_perm 0 1000 0755 SYSTEM:xbin\/busybox\nrun_program PACKAGE:system\/xbin\/busybox --install -s SYSTEM:xbin\n/' update-script
+
+      elif [ `grep -c "init.goldfish.sh" update-script` != 0 ]
+      then
+        sed -i -e 's/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh/set_perm 0 2000 0550 SYSTEM:etc\/init.goldfish.sh\nset_perm 0 1000 0755 SYSTEM:xbin\/busybox\nrun_program PACKAGE:system\/xbin\/busybox --install -s SYSTEM:xbin\n/g' update-script
+
+      elif [ `grep -c "write_raw_image .*:boot.img BOOT:" update-script` != 0 ]
+      then
+        sed -i -e 's/write_raw_image \(.*:boot.img\) BOOT:/set_perm 0 1000 0755 SYSTEM:xbin\/busybox\nrun_program PACKAGE:system\/xbin\/busybox --install -s SYSTEM:xbin\nwrite_raw_image \1 BOOT:/' update-script
+      
+      else
+        echo "set_perm 0 1000 0755 SYSTEM:xbin/busybox" >> update-script      
+        echo "run_program PACKAGE:system\/xbin\/busybox --install -s SYSTEM:xbin" >> update-script
+      fi
+
+      if [ `grep -c "busybox --install -s" update-script` == 0 ]
+      then
+        echo "Error: BusyBox not added to update-script!"
+      else
+
+        if [ ! -e ../../../../system/bin/busybox ]
+        then
+          echo "Adding symlink to /system/bin/busybox"
+          sed -i -e 's/set_perm 0 1000 0755 SYSTEM:xbin\/busybox/set_perm 0 1000 0755 SYSTEM:xbin\/busybox\nsymlink \/system\/xbin\/busybox SYSTEM:bin\/busybox/g' update-script
+        fi
+      fi
+
     fi
   fi
 
