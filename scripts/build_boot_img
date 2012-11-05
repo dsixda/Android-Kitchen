@@ -120,10 +120,28 @@ fi
 
 
 #
+# Check for MT65xx
+#
+
+cd WORKING_*
+working_folder=`pwd`
+cd ..
+dec_offset=`scripts/get_boot_img_page_size $working_folder`
+scripts/check_mt65xx_bootimg $working_folder $dec_offset 1>/dev/null
+mt65xx=$?
+
+
+
+#
 # Compile mkboot*
 #
 
-mkbootimg_src=mkbootimg.c
+if [ "$mt65xx" == "1" ]
+then
+  mkbootimg_src=mkbootimg_mt65xx.c
+else
+  mkbootimg_src=mkbootimg.c
+fi
 mkbootimg_out=mkbootimg
 
 if [ `uname | grep CYGWIN` ]

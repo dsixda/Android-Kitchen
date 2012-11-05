@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright (c) 2011 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
@@ -9,12 +9,14 @@
 ############################################################################
 
 #
-# This script has one mandatory parameter:
+# This script has two mandatory parameters:
 #
-# $1 = kernel offset (in decimal format)
+# $1 = kernel offset (in decimal format) - this parameter is mandatory
+# $2 = type of device (current options: mt65xx) - this parameter is optional
 #
 
 dec_offset=$1
+type=$2
 
 if [ "$dec_offset" == "" ]
 then
@@ -39,6 +41,8 @@ then
   sed -i -e ''$pgsz_line_num's/.*/    unsigned pagesize = '$dec_offset';/' tools/mkboot/mkbootimg.c
 fi
 
+
+# Kernel offset in boot.img
 str=`sed '23q;d' tools/extract_boot_files/extract-kernel.pl`
 if [ "$str" != "\$pageSize = $dec_offset;" ]
 then
@@ -46,12 +50,45 @@ then
   sed -i -e '23s/.*/$pageSize = '$dec_offset';/' tools/extract_boot_files/extract-kernel.pl
 fi
 
+
+# Chop kernel header
+if [ "$type" == "mt65xx" ]
+then
+  new_str="\$kernel = substr(\$kernel, 512);"
+else
+  new_str=""
+fi
+str=`sed '25q;d' tools/extract_boot_files/extract-kernel.pl`
+if [ "$str" != "$new_str" ]
+then
+  echo "Modifying extract-kernel.pl, line 25"
+  sed -i -e '25s/.*/'"$new_str"'/' tools/extract_boot_files/extract-kernel.pl  
+fi
+
+
+# Ramdisk offset in boot.img
 str=`sed '23q;d' tools/extract_boot_files/extract-ramdisk.pl`
 if [ "$str" != "\$pageSize = $dec_offset;" ]
 then
   echo "Setting offset=$dec_offset in extract-ramdisk.pl, line 23"
   sed -i -e '23s/.*/$pageSize = '$dec_offset';/' tools/extract_boot_files/extract-ramdisk.pl
 fi
+
+
+# Chop ramdisk header
+if [ "$type" == "mt65xx" ]
+then
+  new_str="\$ram1 = substr(\$ram1, 512);"
+else
+  new_str=""
+fi
+str=`sed '31q;d' tools/extract_boot_files/extract-ramdisk.pl`
+if [ "$str" != "$new_str" ]
+then
+  echo "Modifying extract-ramdisk.pl, line 31"
+  sed -i -e '31s/.*/'"$new_str"'/' tools/extract_boot_files/extract-ramdisk.pl  
+fi
+
 
 exit 0
 
