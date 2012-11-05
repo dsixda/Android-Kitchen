@@ -22,10 +22,12 @@ base_dir=`pwd`
 
 # Check for MT65XX
 cd $working_folder
-if [ "`od -A n -h -j $dec_offset -N 14 boot.img | sed 's/ //g'`" \
-    == "1688588819dc0024454b4e524c45" ]
+
+# Location of "KERNEL" string
+str_offset=$(($dec_offset+8))
+if [ "`od -A n -h -j $str_offset -N 6 boot.img | sed 's/ //g'`" \
+    == "454b4e524c45" ]
 then
-  #dec_offset=$(($dec_offset+512))
   echo "MT65xx kernel header detected"
   cd $base_dir
   exit 1
