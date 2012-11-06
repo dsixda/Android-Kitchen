@@ -174,37 +174,9 @@ fi
 
 cd WORKING_*
 
-#
-# Create update.zip
-#
-echo
-echo Making update.zip ...
-
-if [ "$cmd_line" == "dsixda Null" ]
-then
-  zip -r -y -q update * -x *.cvs* *.git* *.svn* \
-      *updater-script.orig* *update-binary.orig* *update-script.orig* \
-      boot.img 
-else
-  zip -r -y -q update * -x *.cvs* *.git* *.svn* \
-      *updater-script.orig* *update-binary.orig* *update-script.orig* 
-fi      
-
-echo
-
-if [ -e update.zip ]
-then
-  echo update.zip created 
-  echo
-else
-  echo "Error: update.zip not created!"
-  cd ..
-  exit 0
-fi
-
 
 #
-# Convert update-script (Amend) to updater-script (Edify) in the ZIP file only
+# Convert update-script (Amend) to updater-script (Edify) for the ZIP file only
 #
 
 if [ "$extreme" == "no" ] && [ -e META-INF/com/google/android/update-script ]
@@ -218,6 +190,8 @@ then
   if [ "$auto_convert" == "1" ] || [ "$express" == "yes" ]
   then 
     convert_it=y
+    want_file=updater-script
+
   else
     echo
     echo "--------------------------------------------------------------------------"
@@ -231,16 +205,27 @@ then
     echo " Your working folder will remain the same and continue to have the "
     echo " original update-script."
     echo 
-    echo -n " Add updater-script to ROM's ZIP file (y/n)? (default: y): "
+    echo -n " Use updater-script in ROM's ZIP file (y/n)? (default: y): "
     read convert_it
   fi
+
 
   if [ "$convert_it" != "n" ]
   then
 
+    # Remove installbusybox (it's compatible with updater-script, but
+    # Edify syntax also supports run_program with multiple args)
+    if [ -e installbusybox ] 
+    then
+      cd ..
+      scripts/add_busybox_to_update_script
+      cd WORKING_*
+    fi
+
     cd ..
     scripts/convert_update_script for_zip $express
 
+    # updater-script has been produced
     if [ "$?" != "1" ]
     then
 
@@ -252,9 +237,8 @@ then
       else
         echo "Proceed with the change (y/n)?"
         echo 
-        echo "  y = Proceed; updater-script and update-binary will be moved to the ZIP"
-        echo "      file; update-script in ZIP file will be removed but will remain in"
-        echo "      working folder."
+        echo "  y = Proceed; updater-script and update-binary will be used in the ZIP"
+        echo "      file; update-script will remain in working folder."
         echo "  n = Cancel; updater-script and update-binary will be deleted and not"
         echo "      used."
         echo
@@ -271,25 +255,22 @@ then
         if [ -e META-INF/com/google/android/updater-script ]
         then
           ../scripts/convert_to_unix META-INF/com/google/android/updater-script 
-          zip update.zip META-INF/com/google/android/updater-script META-INF/com/google/android/update-binary
-          zip -d update.zip META-INF/com/google/android/update-script
+          want_file=updater-script
         else
           echo "updater-script not found, keeping update-script"
+          want_file=update-script
         fi
 
       else
         echo
-        echo "Cancelling"
+        echo "Cancelling - we'll use the update-script in ZIP file"
+        want_file=update-script
       fi
 
-      rm -f META-INF/com/google/android/updater-script
-      rm -f META-INF/com/google/android/update-binary
 
       if [ "$auto_convert" == "1" ] && [ "$proceed_change" == "n" ]
       then
-        echo "The update-script is not suitable for flashing your ROM."
-        echo "Removing update.zip ..."
-        rm -f update.zip
+        echo "You cannot flash a ROM for this device unless it has an updater-script."
         echo
         cd ..
         exit 0
@@ -298,33 +279,102 @@ then
     else
       echo "Keeping update-script"
       cd WORKING_*
+      want_file=update-script
     fi
 
   else
     echo
     echo
     echo "Keeping update-script"
+    want_file=update-script
   fi
 
   echo
 
 else
 
-  #
-  # For Extreme mode
-  #
+  echo
 
   if [ -e META-INF/com/google/android/update-script ]
   then
     echo "update-script (Amend) found"
+    want_file=update-script
   fi
   
   if [ -e META-INF/com/google/android/updater-script ]
   then
     echo "updater-script (Edify) found"
+    want_file=updater-script
   fi
 
   echo
+fi
+
+
+
+
+
+
+if [ "$want_file" == "updater-script" ]
+then
+  script_not_want=*update-script*
+  binary_not_want=""
+else
+
+  # Remove any run_program references to busybox with multiple args
+  # and replace with the installbusybox script. This is compatible
+  # with update-script.
+  if [ -e system/xbin/busybox ]
+  then
+    cd ..
+    scripts/add_busybox_to_update_script amend
+    cd WORKING_*
+  fi
+
+  script_not_want=*updater-script*
+  binary_not_want=*update-binary*
+fi
+
+if [ "$cmd_line" == "dsixda Null" ]
+then
+  boot_not_want=boot.img
+else
+  boot_not_want=""
+fi
+
+
+#
+# Create update.zip
+#
+echo
+echo Making update.zip ...
+
+zip -r -y -q update * -x *.cvs* *.git* *.svn* \
+    *updater-script.orig* *update-binary.orig* *update-script.orig* \
+    $script_not_want $binary_not_want $boot_not_want
+
+
+echo
+
+# Remove updater-script from working folder if update-script already exists
+cd META-INF/com/google/android
+if [ -e update-script ]
+then
+  rm -f updater-script
+  rm -f update-binary
+fi
+
+cd ../../../..
+
+
+if [ -e update.zip ]
+then
+  echo update.zip created 
+  echo
+else
+  echo "Error: update.zip not created!"
+  cd ..
+  exit 0
 fi
 
 

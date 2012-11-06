@@ -9,22 +9,30 @@
 ############################################################################
 
 #
-# This script has three optional parameters:
+# This script has one optional parameter:
 #
 # $1 = 'override' - add the busybox info to the update-script no matter what
+#    = 'amend'    - use the installbusybox file, which is supported by update-script
+#                   - use this only when ROM is being built with update-script
 #
 
 #
 # Don't add 'installbusybox' script if going to convert to updater-script when 
-# buiding ROM -- use the installation command directly.
+# buiding ROM; it's too much clutter -- use the installation command directly.
 #
 # The installation command uses 'run_program' and a set of arguments, which 
 # would only work with an updater-script.  On the other hand, the update-
 # script uses the 'installbusybox' script, which is executed by run_program 
 # but requires no arguments.
 #
-scripts/update_script_should_convert_back 1>/dev/null
-convert_to_edify=$?
+
+
+if [ "$1" == "amend" ]
+then
+  convert_to_edify=0
+else
+  convert_to_edify=1
+fi
 
 cd WORKING_*
 cd META-INF/com/google/android
@@ -34,27 +42,36 @@ echo
 if [ -e update-script ]
 then
 
-  if [ "$1" != "override" ] && [ "`grep -c \"symlink busybox\" update-script`" != "0" ]
-  then
-    echo "update-script already has BusyBox content"
-
-  elif [[ "$1" != "override" ]] && [[ "`grep -m 1 \"busybox ln\" ../../../../*`" != "" || "`grep -m 1 \"busybox --install\" ../../../../*`" != "" ]] 
+  if [ "$convert_to_edify" == "0" ]
   then
 
-    echo "A script containing BusyBox symlinks was detected"
-    echo "No changes to update-script required"
+    # Exit if all busybox symlinks already exist in update-script, or a
+    # busybox installer script exists in base dir of working folder
+    if [ "`grep -c \"symlink busybox\" update-script`" != "0" ] || \
+      [ "`grep -m 1 \"busybox ln\" ../../../../*`" != "" ] || \
+      [ "`grep -m 1 \"busybox --install\" ../../../../*`" != "" ] 
+    then
+      cd ../../../../..
+      exit 0
+    fi
+ 
+    #
+    # Remove existing busybox references in update-script
+    #
+    search_run=`grep -c "run_program.*xbin/busybox --install" update-script`
+    search_perm=`grep -c "set_perm.*xbin/busybox" update-script`
+    search_symlinks=`grep -c "symlink.*xbin/busybox " update-script` 
 
-  elif [ "$1" != "override" ] && [ "`grep -c \"busybox --install -s\" update-script`" != "0" ]
-  then
+    if [ $search_run -gt 0 ] || [ $search_perm -gt 0 ] || [ $search_symlinks -gt 0 ]
+    then
+      echo "Removing existing references to /system/xbin/busybox in update-script"
+      sed -i \
+        -e '/set_perm.*xbin\/busybox/d' \
+        -e '/symlink.*xbin\/busybox/d' \
+        -e '/run_program.*xbin\/busybox --install/d' \
+      update-script 
+    fi
 
-    echo "The update-script contains a reference to a BusyBox install command"
-    echo "No changes to update-script required"
-
-  #
-  # We're not sure yet if this update-script will be converted to updater-script when building
-  #
-  elif [ "$convert_to_edify" == "0" ]
-  then
 
     echo "Adding installbusybox to working folder"
     cp ../../../../../tools/busybox_files/installbusybox ../../../../
@@ -91,11 +108,41 @@ then
     fi
 
 
-  #
+  ######################################################################
   # The update-script will be converted to updater-script when built
-  #
+  ######################################################################
   elif [ "$convert_to_edify" == "1" ]
   then
+
+    # Remove the installbusybox script with just a single call in the updater-script (which
+    # is not compatible with update-scripts)
+    if [ -e ../../../../installbusybox ]
+    then
+      echo "Removing existing references to BusyBox and installbusybox in update-script"
+      sed -i \
+        -e '/set_perm.*bin\/busybox/d' \
+        -e '/symlink.*bin\/busybox/d' \
+        -e '/run_program.*installbusybox/d' \
+      update-script 
+
+      if [ -e ../../../../installbusybox ]
+      then
+        echo "Removing installbusybox"
+        rm -f ../../../../installbusybox
+      fi
+
+      echo
+
+    elif [ "$1" != "override" ] && [ "`grep -c \"symlink busybox\" update-script`" != "0" ]
+    then
+      echo "update-script already has BusyBox content"
+
+    elif [[ "$1" != "override" ]] && [[ "`grep -m 1 \"busybox ln\" ../../../../*`" != "" || "`grep -m 1 \"busybox --install\" ../../../../*`" != "" ]] 
+    then
+
+      echo "A script containing BusyBox symlinks was detected"
+      echo "No changes to update-script required"
+    fi
 
     echo "Adding BusyBox install command to update-script"
 
