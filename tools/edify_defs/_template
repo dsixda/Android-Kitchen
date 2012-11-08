@@ -26,11 +26,11 @@ change_mnt_dell=no
 # e.g. sys_mnt=\/dev\/block\/mcblk0p25
 #
 # If unknown, set to: ???
-sys_mnt=
-cache_mnt=
-boot_mnt=
-data_mnt=
-sdcard_mnt=
+sys_mnt=???
+cache_mnt=???
+boot_mnt=???
+data_mnt=???
+sdcard_mnt=???
 
 # Set this mount point for the modem.bin in Samsung devices like the Galaxy S2
 modem_mnt=
