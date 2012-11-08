@@ -110,6 +110,7 @@ then
               system/customize/resource/SPC_animation_final.mp3 \
               system/etc/PowerOn.ogg \
               system/etc/PowerOn.wav \
+              system/media/bootaudio.mp3 \
               system/media/audio/ui/PowerOn.ogg \
               system/media/audio/ui/PowerOff.ogg \
               system/media/audio/ui/PowerOff.wav \
