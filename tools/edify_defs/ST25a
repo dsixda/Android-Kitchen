@@ -1,0 +1,18 @@
+
+# Sony Xperia ST25a
+
+change_mnt=yes
+
+param1=ext4
+param2=EMMC
+
+param1_sdcard=vfat
+param2_sdcard=MTD
+
+sys_mnt=\/dev\/block\/mmcblk0p10
+cache_mnt=\/dev\/block\/mmcblk0p12
+boot_mnt=\/dev\/block\/mmcblk0p9
+data_mnt=\/dev\/block\/mmcblk0p11
+sdcard_mnt=\/dev\/block\/mmcblk0p14
+
+
