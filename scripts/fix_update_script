@@ -273,7 +273,11 @@ then
     perl -pi -e 's/set_perm 0 0 0644 SYSTEM:vendor\/etc\/gps.xml//g' META-INF/com/google/android/update-script    
   fi
 
-
+  if [ ! -d system/etc/bluez ]
+  then
+    perl -pi -e 's/set_perm_recursive 1002 1002 0755 0440 SYSTEM:etc\/bluez//g' META-INF/com/google/android/update-script
+    perl -pi -e 's/set_perm 0 0 0755 SYSTEM:etc\/bluez//g' META-INF/com/google/android/update-script
+  fi
 
   if [ ! -d system/xbin ]
   then
