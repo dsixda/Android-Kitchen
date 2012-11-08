@@ -1,0 +1,18 @@
+
+# Sony Xperia LT29i
+
+change_mnt=yes
+
+param1=ext4
+param2=EMMC
+
+param1_sdcard=vfat
+param2_sdcard=MTD
+
+sys_mnt=\/dev\/block\/mmcblk0p12
+cache_mnt=\/dev\/block\/mmcblk0p13
+boot_mnt=\/dev\/block\/mmcblk0p4
+data_mnt=\/dev\/block\/mmcblk0p14
+sdcard_mnt=\/dev\/block\/mmcblk0p15
+
+
