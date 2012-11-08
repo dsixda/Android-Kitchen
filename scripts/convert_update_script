@@ -49,8 +49,8 @@ then
   echo 
   echo "This option will also be given when you build your ROM, so it is"
   echo "not necessary to convert your update-script now.  The kitchen is NOT"
-  echo "compatible with updater-scripts, so only the 'Build ROM' option "
-  echo "should be used afterwards if you have an updater-script."
+  echo "compatible with updater-scripts, so only a few options can be used "
+  echo "afterwards if you have an updater-script."
   echo
   echo "Ensure you have an update-script under META-INF/com/google/android"
   echo "of your working folder."
