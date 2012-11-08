@@ -31,7 +31,7 @@ my($ram1) = substr($bootimg, $ram1Addr, $ram1Size);
 
 if (substr($ram1, 0, 2) ne "\x1F\x8B")
 {
-	die "The boot image does not appear to be a valid gzip file";
+	die "The boot image does not appear to contain a valid gzip file";
 }
 
 open (RAM1FILE, ">$ARGV[0]-ramdisk.cpio.gz");
