@@ -33,7 +33,12 @@ then
   then
     device_name=`scripts/get_device_name`
 
+    scripts/check_mt65xx_bootimg
+    is_mt65xx_bootimg=$?
+
   else
+
+    is_mt65xx_bootimg=0
 
     #
     # Check Galaxy platform type
@@ -385,6 +390,17 @@ then
         updater-script
       fi
 
+
+      #
+      # MT65XX EMCC-based devices use "bootimg" rather than boot
+      #        
+
+      if [ "$is_mt65xx_bootimg" == "1" ]
+      then
+        sed -i \
+          -e 's/boot.img\", \"boot\"),/boot.img\", \"bootimg\"),/g' \
+        updater-script
+      fi
 
 
       ###############################

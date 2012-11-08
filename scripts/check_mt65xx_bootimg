@@ -9,19 +9,40 @@
 ############################################################################
 
 #
-# This script has two mandatory parameters
+# This script has two parameters
 #
-# $1 = folder of boot.img
-# $2 = offset in boot.img to kernel (in decimal)
+# $1 = folder of boot.img (optional)
+# $2 = offset in boot.img to kernel (in decimal) (optional)
+#       - can only be specified if $1 also specified
 #
 
 working_folder=$1
 dec_offset=$2
 
+if [ "$working_folder" == "" ]
+then
+  cd WORKING_*
+  working_folder=`pwd`
+  cd ..
+
+  if [ "$dec_offset" == "" ]
+  then
+    dec_offset=`scripts/get_boot_img_page_size $working_folder`
+  fi  
+fi
+
+
 base_dir=`pwd`
 
 # Check for MT65XX
 cd $working_folder
+
+if [ ! -e boot.img ]
+then
+  cd $base_dir
+  echo "Error: boot.img not found"
+  exit 0
+fi
 
 # Location of "KERNEL" string
 str_offset=$(($dec_offset+8))

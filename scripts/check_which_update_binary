@@ -38,11 +38,25 @@ else
   cd ../../../../..
   scripts/check_galaxy_s2
   sgs2=$?
-  scripts/check_galaxy_s2x
-  sgs2x=$?
-  scripts/check_galaxy_s3_common
-  sgs3_common=$?
 
+  if [ "$sgs2" != "1" ]
+  then
+    scripts/check_galaxy_s2x
+    sgs2x=$?
+    
+    if [ "$sgs2x" != "1" ]
+    then
+      scripts/check_galaxy_s3_common
+      sgs3_common=$?
+
+      if [ "$sgs3_common" != "1" ]
+      then
+        scripts/check_mt65xx_bootimg
+        mt65xx=$?
+      fi
+    fi
+  fi
+  
   device_name=`scripts/get_device_name`
 
   cd $update_dir
@@ -78,8 +92,12 @@ else
       # e.g. mount("yaffs2", "MTD", "userdata", "/data");
       #
 
-      cp -vf ../../../../../tools/update_files/emmc-update-binary update-binary
-
+      if [ "$mt65xx" == "1" ]
+      then
+        cp -vf ../../../../../tools/update_files/emmc-mt65xx-update-binary update-binary
+      else
+        cp -vf ../../../../../tools/update_files/emmc-update-binary update-binary
+      fi
    
     else
 
