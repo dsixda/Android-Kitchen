@@ -9,10 +9,10 @@ param2=EMMC
 param1_sdcard=vfat
 
 sys_mnt=\/dev\/block\/mmcblk0p25
-cache_mnt=\/dev\/block\/???
+cache_mnt=???
 boot_mnt=\/dev\/block\/mmcblk0p22
 data_mnt=\/dev\/block\/mmcblk0p26
-sdcard_mnt=\/dev\/block\/???
+sdcard_mnt=???
 
 fix_boot=yes
 
