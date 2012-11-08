@@ -10,7 +10,7 @@
 
 device=`scripts/get_variant_or_device_name`
 
-if [ ! -e "tools/edify_defs/$device" ]
+if [ ! -e "tools/edify_defs/$device" ] && [ "$device" != "UNKNOWN" ]
 then
 
   cd WORKING_*
@@ -28,7 +28,10 @@ then
     echo "The kitchen will now try to create a very basic definition file based"
     echo "on the mount points specified in your updater-script ..."
 
-    echo "change_mnt=yes" >> ../tools/edify_defs/$device
+    file_path=../tools/edify_defs/$device
+
+    echo "change_mnt=yes" >> $file_path
+    echo >> $file_path
 
     mnt_name_list=( system cache data sdcard )
     var_name_list=( sys_mnt cache_mnt data_mnt sdcard_mnt )
@@ -42,9 +45,15 @@ then
       if [ "`echo $item | grep -c \"mount(\\\"ext\"`" != 0 ] && [ $found_param1 == 0 ]
       then
         param1=`echo $item | sed -e 's/mount(\"\(.*\)\",/\1/g'`
-        echo "param1=$param1" >> ../tools/edify_defs/$device
-        echo "param2=EMMC" >> ../tools/edify_defs/$device
+        echo >> $file_path
+        echo "param1=$param1" >> $file_path 
+        echo "param2=EMMC" >> $file_path 
+        echo >> $file_path
         found_param1=1
+
+        echo "param1_sdcard=vfat" >> $file_path
+        echo "param2_sdcard=MTD" >> $file_path
+        echo >> $file_path
 
       # Look for /dev/block/mmcblock etc.
       elif [ "`echo $item | grep -c block`" != 0 ]
@@ -67,7 +76,7 @@ then
             if [ "`echo $item | grep $mnt`" != "" ]
             then
               var=${var_name_list[$i]}
-              echo "$var=$block_id" >> ../tools/edify_defs/$device
+              echo "$var=$block_id" >> $file_path 
               got_block_id=0
             fi                  
           done
@@ -79,8 +88,14 @@ then
     # Default ext type
     if [ $found_param1 == 0 ]
     then
-      echo "param1=ext4" >> ../tools/edify_defs/$device
-      echo "param2=EMMC" >> ../tools/edify_defs/$device
+      echo >> $file_path
+      echo "param1=ext4" >> $file_path
+      echo "param2=EMMC" >> $file_path 
+      echo >> $file_path
+
+      echo "param1_sdcard=vfat" >> $file_path
+      echo "param2_sdcard=MTD" >> $file_path
+      echo >> $file_path      
     fi
 
 
@@ -95,18 +110,27 @@ then
       
       if [ "`echo $boot_mnt | grep block`" != "" ]
       then
-        echo "boot_mnt=$boot_mnt" >> ../tools/edify_defs/$device
-        echo "fix_boot2=yes" >> ../tools/edify_defs/$device
+        echo "boot_mnt=$boot_mnt" >> $file_path
+        echo "fix_boot2=yes" >> $file_path 
       fi
     fi
 
+    for (( i = 0 ; i < ${#var_name_list[@]} ; i++ ))
+    do
+      var=${var_name_list[$i]}
+      if [ "`grep $var $file_path`" == "" ]
+      then
+        echo "$var=???" >> $file_path
+      fi
+    done
 
     echo
     echo "tools/edify_defs/$device:"
+    echo "-------------------------------------------------"
     echo
-    cat ../tools/edify_defs/$device
+    cat $file_path
     echo
-    echo Done.
+    echo "-------------------------------------------------"
     echo
     echo
   fi
