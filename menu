@@ -16,10 +16,10 @@ version=0.214
 if [ ! -e menu ]
 then
   echo
-  echo "Ensure you run this file from the SAME folder as where it was"
-  echo "installed, otherwise the kitchen will have problems running the"
-  echo "scripts.  After you 'cd' to the correct folder, start the kitchen"
-  echo "with the ./menu command, NOT with any other command or method!"
+  echo "确保您是在本工具的安装目录运行本工具，"
+  echo "否则本工具可能无法正常运行。"
+  echo "当进入本工具的安装目录时，"
+  echo "运行./menu命令启动本工具，不要尝试使用其他命令或方法!"
   exit 0
 fi
 
@@ -30,7 +30,7 @@ for check_dir in ${dir_list[@]}
 do
   if [ ! -e $check_dir ]
   then
-    echo "Error: Folder '$check_dir' not found"
+    echo "错误: 再找到目录： '$check_dir' "
     error_found=1
   fi
 done
@@ -38,7 +38,7 @@ done
 if [ $error_found == 1 ]
 then
   echo
-  echo "Ensure you have installed the folders for the kitchen correctly."
+  echo "请确保本工具安装在了正确的目录下."
   exit 0
 fi
 
@@ -67,29 +67,29 @@ do
 
   echo 
   echo "============================================================"
-  echo " Android Kitchen $version - by dsixda (xda-developers.com)"
+  echo "     ROM定制工具 $version - c;dsixda p;Untitled Xperia Team "
   echo "============================================================"
   echo 
-  echo "> MAIN MENU"
+  echo "> 主菜单"
   echo
-  echo "  1 - Set up working folder from ROM"
-  echo "  2 - Add root permissions"
-  echo "  3 - Add BusyBox"
-  echo "  4 - Disable boot screen sounds"
-  echo "  5 - Zipalign all *.apk files to optimize RAM usage"
-  echo "  6 - Change wipe status of ROM"
-  echo "  7 - Change name of ROM"
-  echo "  8 - Show working folder information"
+  echo "  1 - 从ROM创建工作目录"
+  echo "  2 - 添加Root权限"
+  echo "  3 - 添加BusyBox"
+  echo "  4 - 禁用开机铃声"
+  echo "  5 - 对所有apk执行Zipalign操作，优化RAM使用"
+  echo "  6 - 更改ROM的清除状态"
+  echo "  7 - 修改ROM显示名称"
+  echo "  8 - 显示工作目录信息"
   echo 
-  echo "  0 - ADVANCED OPTIONS"
-  echo " 00 - LEGACY OPTIONS (old and rarely used)"
-  echo " 99 - Build ROM from working folder"
+  echo "  0 - 高级选项"
+  echo " 00 - 老版本功能(很少使用到)"
+  echo " 99 - 从工作目录创建刷机包"
   echo
-  echo "  u - Kitchen Info/Update/Donate"
-  echo "  x - Exit"
+  echo "  u - 关于/升级/捐赠"
+  echo "  x - 退出本工具"
   echo
   echo 
-  echo -n "Enter option: "
+  echo -n "请输入您的选择: "
   read opt
 
   if [ "$opt" != "x" ] && [ "$opt" != "u" ] && [ "$opt" != "1" ]
@@ -112,8 +112,8 @@ do
       00) scripts/menu_legacy $version; continue;;
       99) scripts/build_rom;;
       u) scripts/about $version; continue;;
-      x) scripts/init_kitchen; clear; echo; echo "Goodbye."; echo; exit 1;;
-      *) echo "Invalid option"; continue;;
+      x) scripts/init_kitchen; clear; echo; echo "感谢您的使用，再会～"; echo; exit 1;;
+      *) echo "该选项不可用"; continue;;
     esac
   fi
 
