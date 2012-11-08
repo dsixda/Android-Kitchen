@@ -1,0 +1,116 @@
+############################################################################
+#
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
+#
+# Android Kitchen is 100% free.  This script file is intended for personal
+# and/or educational use only.  It may not be duplicated for monetary
+# benefit or any other purpose without the permission of the developer.
+#
+############################################################################
+
+device=`scripts/get_variant_or_device_name`
+
+if [ ! -e "tools/edify_defs/$device" ]
+then
+
+  cd WORKING_*
+
+  out=(`grep ^mount META-INF/com/google/android/updater-script | grep block`)
+  if [ "$out" == "" ]
+  then
+    out=(`grep "^run_program(\"/sbin/mount\"" META-INF/com/google/android/updater-script | grep block`)
+  fi
+
+  if [ "$out" != "" ]
+  then
+    echo "WARNING! Device '$device' is not defined under tools/edify_defs"
+    echo
+    echo "The kitchen will now try to create a very basic definition file based"
+    echo "on the mount points specified in your updater-script ..."
+
+    echo "change_mnt=yes" >> ../tools/edify_defs/$device
+
+    mnt_name_list=( system cache data sdcard )
+    var_name_list=( sys_mnt cache_mnt data_mnt sdcard_mnt )
+    got_block_id=0
+    found_param1=0
+
+    for item in ${out[@]}
+    do
+      
+      # Look for ext3/ext4 etc.
+      if [ "`echo $item | grep -c \"mount(\\\"ext\"`" != 0 ] && [ $found_param1 == 0 ]
+      then
+        param1=`echo $item | sed -e 's/mount(\"\(.*\)\",/\1/g'`
+        echo "param1=$param1" >> ../tools/edify_defs/$device
+        echo "param2=EMMC" >> ../tools/edify_defs/$device
+        found_param1=1
+
+      # Look for /dev/block/mmcblock etc.
+      elif [ "`echo $item | grep -c block`" != 0 ]
+      then
+        got_block_id=1
+        slash=\\\\
+        block_id=`echo $item | sed -e 's/\"//g' -e 's/,//g' -e 's/\(\/\)/'$slash'\1/g'`
+
+
+      elif [ $got_block_id==1 ]
+      then
+
+        # Look for mount name
+        if [ "`echo $item | grep -c /`" == "1" ]
+        then
+          for (( i = 0 ; i < ${#mnt_name_list[@]} ; i++ ))
+          do
+            mnt=${mnt_name_list[$i]}
+            
+            if [ "`echo $item | grep $mnt`" != "" ]
+            then
+              var=${var_name_list[$i]}
+              echo "$var=$block_id" >> ../tools/edify_defs/$device
+              got_block_id=0
+            fi                  
+          done
+        fi            
+      fi
+
+    done
+
+    # Default ext type
+    if [ $found_param1 == 0 ]
+    then
+      echo "param1=ext4" >> ../tools/edify_defs/$device
+      echo "param2=EMMC" >> ../tools/edify_defs/$device
+    fi
+
+
+    # Look for boot image mount - for the boot_mnt and fix_boot2 parameters
+    boot_out=(`grep write_raw_image META-INF/com/google/android/updater-script \
+        | grep boot.img | grep block`)
+ 
+    if [ "$boot_out" != "" ]
+    then
+      slash=\\\\
+      boot_mnt=`echo ${boot_out[1]} | sed -e 's/\"\(.*\)\"),/\1/g' -e 's/\(\/\)/'$slash'\1/g'`
+      
+      if [ "`echo $boot_mnt | grep block`" != "" ]
+      then
+        echo "boot_mnt=$boot_mnt" >> ../tools/edify_defs/$device
+        echo "fix_boot2=yes" >> ../tools/edify_defs/$device
+      fi
+    fi
+
+
+    echo
+    echo "tools/edify_defs/$device:"
+    echo
+    cat ../tools/edify_defs/$device
+    echo
+    echo Done.
+    echo
+    echo
+  fi
+
+  cd ..
+fi
+

@@ -1,0 +1,18 @@
+############################################################################
+#
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
+#
+# Android Kitchen is 100% free.  This script file is intended for personal
+# and/or educational use only.  It may not be duplicated for monetary
+# benefit or any other purpose without the permission of the developer.
+#
+############################################################################
+
+device_name=`scripts/get_samsung_variant`
+
+if [ "$device_name" == "" ]
+then
+  device_name=`scripts/get_device_name`
+fi
+
+echo $device_name
