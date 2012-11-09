@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright (c) 2011 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
@@ -49,12 +49,44 @@ then
   changed=1
 fi
 
-if [ "`grep -om 1 persist.service.adb.enable=0 default.prop`" == "persist.service.adb.enable=0" ]
+
+# Enable ADB in ICS and newer
+usb_config=`grep ^persist.sys.usb.config default.prop`
+
+if [ "$usb_config" != "" ]
 then
-  echo "Set: persist.service.adb.enable=1"
-  perl -pi -e 's/persist.service.adb.enable=0/persist.service.adb.enable=1/g' default.prop
-  changed=1
+
+  if [ "`echo $usb_config | grep ,adb`" == "" ]
+  then
+    sed -i -e 's/^\(persist.sys.usb.config=.*\)[ ]*$/\1,adb/g' default.prop
+    echo "Set: `grep persist.sys.usb.config default.prop`"    
+    changed=1
+  fi
+
+# Enable ADB in versions older than ICS
+else
+
+  adb_enable=`grep persist.service.adb.enable default.prop`
+
+  if [ "$adb_enable" != "" ]
+  then
+
+    if [ "`grep -om 1 persist.service.adb.enable=0 default.prop`" == "persist.service.adb.enable=0" ]
+    then
+      echo "Set: persist.service.adb.enable=1"
+      perl -pi -e 's/persist.service.adb.enable=0/persist.service.adb.enable=1/g' default.prop
+      changed=1
+    fi 
+
+  else
+    echo "Add: persist.service.adb.enable=1"
+    echo "persist.service.adb.enable=1" >> default.prop
+    changed=1
+  fi
 fi
+
+
+
 
 if [ $changed == 1 ]
 then
