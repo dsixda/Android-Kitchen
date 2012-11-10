@@ -49,6 +49,7 @@ str_offset=$(($dec_offset+8))
 if [ "`od -A n -h -j $str_offset -N 6 boot.img | sed 's/ //g'`" \
     == "454b4e524c45" ]
 then
+  echo
   echo "MT65xx kernel header detected"
   cd $base_dir
   exit 1

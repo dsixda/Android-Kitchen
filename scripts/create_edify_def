@@ -23,10 +23,14 @@ then
 
   if [ "$out" != "" ]
   then
+    echo
+    echo "======================================================================"
+    echo
     echo "WARNING! Device '$device' is not defined under tools/edify_defs"
     echo
     echo "The kitchen will now try to create a very basic definition file based"
-    echo "on the mount points specified in your updater-script ..."
+    echo "on the mount points specified in your updater-script; however, it may"
+    echo "not be 100% accurate ..."
 
     file_path=../tools/edify_defs/$device
 
