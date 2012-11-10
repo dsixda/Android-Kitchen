@@ -10,6 +10,7 @@
 
 
 cd WORKING_*
+working_folder=`pwd`
 cd META-INF/com/google/android
 update_dir=`pwd`
 
@@ -49,7 +50,7 @@ else
       scripts/check_galaxy_s3_common
       sgs3_common=$?
 
-      if [ "$sgs3_common" != "1" ]
+      if [ "$sgs3_common" != "1" ] && [ -e $working_folder/boot.img ]
       then
         scripts/check_mt65xx_bootimg
         mt65xx=$?

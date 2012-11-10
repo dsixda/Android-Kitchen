@@ -24,6 +24,11 @@ then
   fi
 
 
+  cd WORKING_*
+  working_folder=`pwd`
+  cd ..
+
+
   #
   # Find device name for lookup in edify_defs folder
   #
@@ -33,8 +38,11 @@ then
   then
     device_name=`scripts/get_device_name`
 
-    scripts/check_mt65xx_bootimg
-    is_mt65xx_bootimg=$?
+    if [ -e $working_folder/boot.img ]
+    then
+      scripts/check_mt65xx_bootimg
+      is_mt65xx_bootimg=$?
+    fi      
 
   else
 
