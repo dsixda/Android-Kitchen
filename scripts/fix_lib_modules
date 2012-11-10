@@ -25,10 +25,15 @@ then
     link=${symlinks[$i]}
     src=${source_files[$i]}
 
-    rm -f $link
-    echo "$src -> $link"
+    if [ "`echo $src | grep /`" == "" ]
+    then
 
-    sed -i -e 's/\(set_perm_recursive 0 0 0755 0644 SYSTEM:[ ]*$\)/symlink \/system\/lib\/modules\/'$src' SYSTEM:lib\/modules\/'$link'\n\1/g' ../../../META-INF/com/google/android/update-script
+      rm -f $link
+      echo "$src -> $link"
+
+      sed -i -e 's/\(set_perm_recursive 0 0 0755 0644 SYSTEM:[ ]*$\)/symlink \/system\/lib\/modules\/'$src' SYSTEM:lib\/modules\/'$link'\n\1/g' ../../../META-INF/com/google/android/update-script
+    fi
+
   done
 
 
