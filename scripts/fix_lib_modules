@@ -1,0 +1,50 @@
+############################################################################
+#
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
+#
+# Android Kitchen is 100% free.  This script file is intended for personal
+# and/or educational use only.  It may not be duplicated for monetary
+# benefit or any other purpose without the permission of the developer.
+#
+############################################################################
+
+cd WORKING_*
+
+if [ -d system/lib/modules ]
+then
+  cd system/lib/modules
+
+  echo
+  echo "Looking for symlinks under /system/lib/modules ..."
+
+  symlinks=( `find . -type l -exec ls -l {} \; | sed 's/.* .\/\([^ ]*\).*/\1/g'` )
+  source_files=( `find . -type l -exec ls -l {} \; | sed 's/.*-> //g'` )
+
+  for (( i=0 ; i < ${#symlinks[@]} ; i++ ))
+  do
+    link=${symlinks[$i]}
+    src=${source_files[$i]}
+
+    rm -f $link
+    cp -v $src $link
+  done
+
+
+  # For MT6577
+  if [ `uname | grep CYGWIN` ]
+  then
+    if [ -e wlan_mt6620.ko ] && [ ! -e wlan.ko ]
+    then
+      cp -v wlan_mt6620.ko wlan.ko
+    fi
+
+    if [ -e p2p_mt6620.ko ] && [ ! -e p2p.ko ]
+    then
+      cp -v p2p_mt6620.ko p2p.ko
+    fi
+  fi
+
+  cd ../../..
+fi
+
+cd ..

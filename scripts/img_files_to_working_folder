@@ -342,6 +342,10 @@ fi
 # Wi-fi fix - required for some Huawei devices
 scripts/fix_huawei_wifi
 
+# Symlink check
+scripts/fix_lib_modules
+
+
 # Sony Xperia 2011-12 devices - bloatware
 scripts/remove_xperia_bloat
 
