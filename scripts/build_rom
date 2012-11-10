@@ -265,6 +265,9 @@ then
         echo
         echo "Cancelling - we'll use the update-script in ZIP file"
         want_file=update-script
+        rm -fv META-INF/com/google/android/updater-script
+        rm -fv META-INF/com/google/android/update-binary
+        echo
       fi
 
 
