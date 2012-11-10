@@ -26,25 +26,39 @@ then
     src=${source_files[$i]}
 
     rm -f $link
-    cp -v $src $link
+    echo "$src -> $link"
+
+    sed -i -e 's/\(set_perm_recursive 0 0 0755 0644 SYSTEM:[ ]*$\)/symlink \/system\/lib\/modules\/'$src' SYSTEM:lib\/modules\/'$link'\n\1/g' ../../../META-INF/com/google/android/update-script
   done
 
 
   # For MT6577
   if [ `uname | grep CYGWIN` ]
   then
-    if [ -e wlan_mt6620.ko ] && [ ! -e wlan.ko ]
-    then
-      cp -v wlan_mt6620.ko wlan.ko
-    fi
 
-    if [ -e p2p_mt6620.ko ] && [ ! -e p2p.ko ]
-    then
-      cp -v p2p_mt6620.ko p2p.ko
-    fi
+    symlinks=( wlan.ko p2p.ko )
+    source_files=( wlan_mt6620.ko p2p_mt6620.ko )
+
+    for (( i=0; i < ${#symlinks[@]} ; i++ ))
+    do
+
+      link=${symlinks[$i]}
+      src=${source_files[$i]}
+
+      if [ -e $src ] && [ ! -e $link ]
+      then
+
+        echo "$src -> $link"
+
+        sed -i -e 's/\(set_perm_recursive 0 0 0755 0644 SYSTEM:[ ]*$\)/symlink \/system\/lib\/modules\/'$src' SYSTEM:lib\/modules\/'$link'\n\1/g' ../../../META-INF/com/google/android/update-script
+      fi
+
+    done
+
   fi
 
   cd ../../..
+  echo
 fi
 
 cd ..
