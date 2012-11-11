@@ -15,7 +15,6 @@ then
   cd system/lib/modules
 
   echo
-  echo "Looking for symlinks under /system/lib/modules ..."
 
   symlinks=( `find . -type l -exec ls -l {} \; | sed 's/.* .\/\([^ ]*\).*/\1/g'` )
   source_files=( `find . -type l -exec ls -l {} \; | sed 's/.*-> //g'` )
@@ -29,7 +28,7 @@ then
     then
 
       rm -f $link
-      echo "$src -> $link"
+      echo "Symlinking /system/lib/modules/$src -> $link"
 
       sed -i -e 's/\(set_perm_recursive 0 0 0755 0644 SYSTEM:[ ]*$\)/symlink \/system\/lib\/modules\/'$src' SYSTEM:lib\/modules\/'$link'\n\1/g' ../../../META-INF/com/google/android/update-script
     fi
@@ -53,7 +52,7 @@ then
       if [ -e $src ] && [ ! -e $link ]
       then
 
-        echo "$src -> $link"
+        echo "Symlinking /system/lib/modules/$src -> $link"
 
         sed -i -e 's/\(set_perm_recursive 0 0 0755 0644 SYSTEM:[ ]*$\)/symlink \/system\/lib\/modules\/'$src' SYSTEM:lib\/modules\/'$link'\n\1/g' ../../../META-INF/com/google/android/update-script
       fi
