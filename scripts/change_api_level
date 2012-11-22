@@ -26,6 +26,7 @@ echo
 echo "Each API level corresponds to at least one Android OS version."
 echo
 echo "e.g."
+echo "      Android 4.2         = API Level 17"
 echo "      Android 4.1-4.1.1   = API Level 16"
 echo "      Android 4.0.3-4.0.4 = API Level 15"
 echo "      Android 4.0-4.0.2   = API Level 14"
@@ -33,8 +34,8 @@ echo "      Android 3.2         = API Level 13"
 echo "      Android 3.1.x       = API Level 12"
 echo "      Android 3.0.x       = API Level 11"
 echo "      Android 2.3.3+      = API Level 10"
-echo "      Android 2.3-2.3.2   = API Level 9"
-echo "      Android 2.2.x       = API Level 8"
+echo
+echo "NOTE: The above is not the full list."
 echo
 echo "The complete set of mappings is found at:"
 echo "http://developer.android.com/guide/appendix/api-levels.html"
