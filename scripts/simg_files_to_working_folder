@@ -258,7 +258,7 @@ else
   if [ $num_odex_app -gt $num_apk_app ]
   then
     echo
-    echo "The /system/app folder is missing some APK (and possible ODEX) files."
+    echo "The /system/app folder is missing some APK (and maybe some ODEX) files."
     echo "These are probably found in hidden.img"
 
     use_hidden=1
