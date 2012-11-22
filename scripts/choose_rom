@@ -93,7 +93,7 @@ else
 
       elif [ "$filename" == "factoryfs.img" ]
       then
-        filename="factoryfs.img, cache.img and zImage"
+        filename="factoryfs.img, hidden.img, cache.img and zImage"
 
       elif [ "$filename" == "PDA.tar.md5" ]
       then

@@ -132,6 +132,26 @@ fi
 
 
 #
+# Check for hidden.img symlinks (Galaxy S2)
+#
+
+cd WORKING_*
+
+if [ -d preload/symlink/system/app ] 
+then
+  
+  cd ..
+  echo
+  echo "/preload/symlink/system/app found under working folder"
+  scripts/add_preload_symlinks_to_update_script
+
+else
+  cd ..
+fi
+
+
+
+#
 # Check for /data/local 
 #
 

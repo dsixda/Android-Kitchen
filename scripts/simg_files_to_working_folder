@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright (c) 2011 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
@@ -43,11 +43,16 @@ then
 else
 
   #
-  # Check for factoryfs.img, cache.img and zImage in original_update  
+  # Check for factoryfs.img, hidden.img, cache.img and zImage in original_update  
   #
   if [ -e original_update/factoryfs.img ]
   then
     echo "Found original_update/factoryfs.img"
+    
+    if [ -e original_update/hidden.img ]
+    then
+      echo "Found original_update/hidden.img"
+    fi
 
     if [ -e original_update/cache.img ]
     then
@@ -55,17 +60,10 @@ else
     else
       scripts/show_cache_warning original_update/cache.img
     fi
+
   else
-
-    if [ -e original_update/cache.img ]
-    then
-      echo "Found original_update/cache.img"
-      echo "Error: No original_update/factoryfs.img found"
-    else
-      echo
-      echo "Error: No ROMs found under original_update folder!"
-    fi
-
+    echo
+    echo "Error: No factoryfs.img found under original_update folder!"
     exit 1
   fi
 
@@ -74,6 +72,7 @@ else
     echo "Found original_update/zImage"
     scripts/show_rooted_kernel_msg
   else
+    echo
     echo "Warning: No original_update/zImage found"
   fi
 
@@ -115,8 +114,10 @@ fi
 if [ "$1" == "no_create" ]
 then
   src_dir=$build_dir/system
+  hidden_dir=$build_dir
 else
   src_dir=original_update
+  hidden_dir=$src_dir
 fi
 
 system_dir=$build_dir/system
@@ -215,6 +216,154 @@ cd ..
 echo
 echo "The file ext4_factoryfs.img has been fully unpacked into:"
 echo "  $system_dir"
+
+
+
+base_dir=`pwd`
+
+
+######################################################################
+# Check for symlinks to /preload/symlink/system/app under /system/app
+######################################################################
+
+cd $system_dir/app
+
+# First check for *.apk with symlink to preload/symlink/system/app
+# and delete them (this works for Linux / OS X)
+
+preload_apps=( `find . -type l -exec ls -l {} \; | grep /preload/symlink/system/app | sed 's/.* \/preload\/symlink\/system\/app\/\(.*\)/\1/g'` )
+
+if [ "$preload_apps" != "" ]
+then
+
+  echo 
+  echo -n "Under /system/app, removing symlinks to apps in /preload/symlink/system/app "
+  for apk in ${preload_apps[@]} 
+  do
+    echo -n "."
+    rm -f $apk  
+  done
+
+  use_hidden=1
+
+else
+  # Check if the number of odex files outnumbers number of apks (this works for Cygwin)
+  num_odex_app=`find . | grep -c "\.odex$"`
+  num_apk_app=`find . | grep -c "\.apk$"`
+
+  if [ $num_odex_app -gt $num_apk_app ]
+  then
+    echo
+    echo "The /system/app folder is missing some APK files."
+    echo "These are probably found in hidden.img"
+
+    use_hidden=1
+  fi
+fi
+
+cd $base_dir
+
+if [ "$use_hidden" == "1" ]
+then
+  
+  echo
+  echo "These are probably found in hidden.img"
+
+  if [ ! -e $hidden_dir/hidden.img ]
+  then
+    echo
+    echo "--> Place hidden.img under the '$hidden_dir' folder <--"
+    echo "    (You can also ignore this step)"
+    echo
+    
+    scripts/press_enter
+
+    if [ ! -e $hidden_dir/hidden.img ]
+    then
+      echo "Skipping hidden.img"
+    fi
+  fi
+
+
+  #
+  # hidden.img unpacking
+  #
+
+  if [ -e $hidden_dir/hidden.img ]
+  then
+
+    working_dir=$system_dir/..
+    hidden_dir2=$working_dir/hidden
+    mkdir $hidden_dir2
+    cd $hidden_dir2
+    hidden_dir2=`pwd`
+    cd $base_dir
+
+    echo
+    echo "Converting hidden.img into a format for unpacking ..."
+    tools/samsung_files/simg2img_files/simg2img $hidden_dir/hidden.img \
+      $hidden_dir2/ext4_hidden.img
+
+    if [ ! -e $hidden_dir2/ext4_hidden.img ]
+    then
+      echo "Unable to convert hidden.img!"
+      exit 1
+    fi
+
+    if [ "$hidden_dir" != "original_update" ]
+    then
+      rm -f $hidden_dir/hidden.img
+    fi
+
+    #
+    # Extract files from ext4_hidden.img
+    #
+
+    if [ `uname | grep CYGWIN` ]
+    then
+      scripts/show_ext2explore $hidden_dir2 ext4_hidden.img
+    else
+      scripts/extract_ext3_img $hidden_dir2 ext4_hidden.img
+    fi
+
+    rm -f $hidden_dir2/ext4_hidden.img 2>/dev/null
+    if [ "$?" == "1" ]
+    then
+      echo
+      echo "WARNING: ext4_hidden.img is in use.  Remove file manually after application is closed."
+      echo
+    fi
+
+    echo
+
+    if [ -d $hidden_dir2/symlink/system/app ] && [ `find $hidden_dir2/symlink/system/app | grep -c "\.apk$"` -gt 0 ]
+    then
+      echo "Good, found some system apps under hidden.img"
+      mkdir -p $working_dir/preload/symlink/system
+      mv $hidden_dir2/symlink/system/app $working_dir/preload/symlink/system/ 
+    else
+      echo "Warning: No system apps found in hidden.img"
+    fi
+
+    echo
+    echo
+
+    rm -rf $hidden_dir2
+  fi
+
+elif [ -e $hidden_dir/hidden.img ]
+then
+  echo
+  echo "Ignoring hidden.img"
+
+  if [ "$hidden_dir" != "original_update" ]
+  then
+    rm -f $hidden_dir/hidden.img
+  fi
+fi
+
+
+cd $base_dir
 
 
 if [ -e $src_dir/cache.img ]

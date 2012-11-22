@@ -423,6 +423,15 @@ sed -i \
   -e 's/\"SYSTEM:\([^\"]*\)\"/SYSTEM:\1/g' \
   -e 's/symlink SYSTEM:/symlink \/system\//g' \
   \
+  -e 's/\/preload\//PRELOAD:/g' \
+  -e 's/ \/preload/ PRELOAD:/g' \
+  -e 's/"\/preload"/PRELOAD:/g' \
+  -e 's/\"preload\"/PRELOAD:/g' \
+  -e 's/\"PRELOAD:\"/PRELOAD:/g' \
+  -e 's/\" PRELOAD/ PRELOAD/g' \
+  -e 's/\"PRELOAD:\([^\"]*\)\"/PRELOAD:\1/g' \
+  -e 's/symlink PRELOAD:/symlink \/preload\//g' \
+  \
   -e 's/\/tmp\//TMP:/g' \
   -e 's/ \/tmp/ TMP:/g' \
   -e 's/"\/tmp"/TMP:/g' \
@@ -487,6 +496,7 @@ temp.log
 sed -i \
   -e 's/MTD //g' \
   -e 's/ system\// SYSTEM:/g' \
+  -e 's/ preload\// PRELOAD:/g' \
   -e 's/ tmp\// TMP:/g' \
   -e 's/ data\// DATA:/g' \
   -e 's/ sdcard\// SDCARD:/g' \
@@ -494,6 +504,7 @@ sed -i \
   -e 's/ sdext\// SDEXT:/g' \
   -e 's/ boot\// BOOT:/g' \
   -e 's/\(symlink [^ ]*\)SYSTEM:/\1\/system\//g' \
+  -e 's/\(symlink [^ ]*\)PRELOAD:/\1\/preload\//g' \
   -e 's/\(symlink [^ ]*\)DATA:/\1\/data\//g' \
   -e 's/\(symlink [^ ]*\)CACHE:/\1\/cache\//g' \
   -e 's/\(symlink [^ ]*\)TMP:/\1\/tmp\//g' \
@@ -501,6 +512,7 @@ sed -i \
   -e 's/\(symlink [^ ]*\)SDEXT:/\1\/sdext\//g' \
   -e 's/\(symlink [^ ]*\)BOOT:/\1\/boot\//g' \
   -e 's/\(set_perm.*\/.*\)SYSTEM:/\1\/system\//g' \
+  -e 's/\(set_perm.*\/.*\)PRELOAD:/\1\/preload\//g' \
   -e 's/\(set_perm.*\/.*\)DATA:/\1\/data\//g' \
   -e 's/\(set_perm.*\/.*\)CACHE:/\1\/cache\//g' \
   -e 's/\(set_perm.*\/.*\)TMP:/\1\/tmp\//g' \
@@ -508,6 +520,7 @@ sed -i \
   -e 's/\(set_perm.*\/.*\)SDEXT:/\1\/sdext\//g' \
   -e 's/\(set_perm.*\/.*\)BOOT:/\1\/boot\//g' \
   -e 's/\(package_extract_file\) SYSTEM:/\1 system\//g' \
+  -e 's/\(package_extract_file\) PRELOAD:/\1 preload\//g' \
   -e 's/\(package_extract_file\) DATA:/\1 data\//g' \
   -e 's/\(package_extract_file\) CACHE:/\1 cache\//g' \
   -e 's/\(package_extract_file\) TMP:/\1 tmp\//g' \

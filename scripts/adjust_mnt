@@ -115,6 +115,7 @@ then
     sdcard_mnt=`scripts/get_edify_def_val $device_name sdcard_mnt`
     webtop_mnt=`scripts/get_edify_def_val $device_name webtop_mnt`
     modem_mnt=`scripts/get_edify_def_val $device_name modem_mnt`
+    preload_mnt=`scripts/get_edify_def_val $device_name preload_mnt`
   fi
 
   cd WORKING_*
@@ -150,22 +151,26 @@ then
     then
       sed -i \
         -e 's/format("MTD", "system")/format("'"$param1"'", "'"$param2"'", "'"$sys_mnt"'")/g' \
+        -e 's/format("MTD", "preload")/format("'"$param1"'", "'"$param2"'", "'"$preload_mnt"'")/g' \
         -e 's/format("MTD", "cache")/format("'"$param1_cache"'", "'"$param2_cache"'", "'"$cache_mnt"'")/g' \
         -e 's/format("MTD", "boot")/format("'"$param1"'", "'"$param2"'", "'"$boot_mnt"'")/g' \
         -e 's/format("MTD", "userdata")/format("'"$param1"'", "'"$param2"'", "'"$data_mnt"'")/g' \
         \
         -e 's/format("'"$param1"'", "MTD", "system")/format("'"$param1"'", "'"$sys_mnt"'")/g' \
+        -e 's/format("'"$param1"'", "MTD", "preload")/format("'"$param1"'", "'"$preload_mnt"'")/g' \
         -e 's/format("'"$param1_cache"'", "MTD", "cache")/format("'"$param1_cache"'", "'"$cache_mnt"'")/g' \
         -e 's/format("'"$param1"'", "MTD", "boot")/format("'"$param1"'", "'"$boot_mnt"'")/g' \
         -e 's/format("'"$param1"'", "MTD", "userdata")/format("'"$param1"'", "'"$data_mnt"'")/g' \
         \
         -e 's/mount("MTD", "system"/mount("'"$param1"'", "'"$param2"'", "'"$sys_mnt"'"/g' \
+        -e 's/mount("MTD", "preload"/mount("'"$param1"'", "'"$param2"'", "'"$preload_mnt"'"/g' \
         -e 's/mount("MTD", "cache"/mount("'"$param1_cache"'", "'"$param2_cache"'", "'"$cache_mnt"'"/g' \
         -e 's/mount("MTD", "boot"/mount("'"$param1"'", "'"$param2"'", "'"$boot_mnt"'"/g' \
         -e 's/mount("MTD", "userdata"/mount("'"$param1"'", "'"$param2"'", "'"$data_mnt"'"/g' \
         -e 's/mount("MTD", "sdcard"/mount("'"$param1_sdcard"'", "'"$param2_sdcard"'", "'"$sdcard_mnt"'"/g' \
         \
         -e 's/mount("'"$param1"'", "MTD", "system"/mount("'"$param1"'", "'"$sys_mnt"'"/g' \
+        -e 's/mount("'"$param1"'", "MTD", "preload"/mount("'"$param1"'", "'"$preload_mnt"'"/g' \
         -e 's/mount("'"$param1_cache"'", "MTD", "cache"/mount("'"$param1_cache"'", "'"$cache_mnt"'"/g' \
         -e 's/mount("'"$param1"'", "MTD", "boot"/mount("'"$param1"'", "'"$boot_mnt"'"/g' \
         -e 's/mount("'"$param1"'", "MTD", "userdata"/mount("'"$param1"'", "'"$data_mnt"'"/g' \
@@ -494,11 +499,13 @@ then
       sed -i \
         -e 's/format '"$param1"' '"$param2"' '"$sys_mnt"' 0/format SYSTEM:/g' \
         -e 's/format '"$param1"' '"$param2"' '"$sys_mnt"'/format SYSTEM:/g' \
+        -e 's/format '"$param1"' '"$param2"' '"$preload_mnt"'/format PRELOAD:/g' \
         -e 's/format '"$param1_cache"' '"$param2_cache"' '"$cache_mnt"'/format CACHE:/g' \
         -e 's/format '"$param1"' '"$param2"' '"$boot_mnt"'/format BOOT:/g' \
         -e 's/format '"$param1"' '"$param2"' '"$data_mnt"'/format DATA:/g' \
         \
         -e 's/format '"$param1"' '"$sys_mnt"'/format '"$param1"' SYSTEM:/g' \
+        -e 's/format '"$param1"' '"$preload_mnt"'/format '"$param1"' PRELOAD:/g' \
         -e 's/format '"$param1_cache"' '"$cache_mnt"'/format '"$param1_cache"' CACHE:/g' \
         -e 's/format '"$param1"' '"$boot_mnt"'/format '"$param1"' BOOT:/g' \
         -e 's/format '"$param1"' '"$data_mnt"'/format '"$param1"' DATA:/g' \
@@ -524,6 +531,7 @@ then
       then
         sed -i \
           -e 's/format .* '"$sys_mnt"'/format SYSTEM:/g' \
+          -e 's/format .* '"$preload_mnt"'/format PRELOAD:/g' \
           -e 's/format .* '"$cache_mnt"'/format CACHE:/g' \
           -e 's/format .* '"$boot_mnt"'/format BOOT:/g' \
           -e 's/format .* '"$data_mnt"'/format DATA:/g' \

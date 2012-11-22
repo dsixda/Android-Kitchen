@@ -22,7 +22,7 @@ The format for each ROM must be one of the following:
  - TAR/ZIP file containing the above
  
  Samsung Galaxy SII:
- - factoryfs.img + optional cache.img/zImage  
+ - factoryfs.img + optional hidden.img/cache.img/zImage  
  - system.img.ext4 + optional cache.img.ext4/boot.img
  - TAR/ZIP file containing the above
  - system.ext4.tar + optional boot.img (Nandroid backup)

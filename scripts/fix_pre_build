@@ -430,6 +430,24 @@ then
     cp ../tools/check_data_app .
   else
     echo "check_data_app already exists"
+    echo
+  fi
+fi
+
+
+
+#
+# Check for /preload app symlinks (Galaxy S2 hidden.img)
+#
+
+if [ -d preload/symlink/system/app ]
+then
+  if [ ! -e create_preload_symlinks ]
+  then
+    echo "Adding create_preload_symlinks to working folder"
+    cp ../tools/samsung_files/create_preload_symlinks .
+  else
+    echo "create_preload_symlinks already exists"
   fi
 fi
 

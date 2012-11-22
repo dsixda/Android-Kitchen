@@ -14,6 +14,7 @@ cache_mnt=\/dev\/block\/mmcblk0p7
 boot_mnt=\/dev\/block\/mmcblk0p5
 data_mnt=\/dev\/block\/mmcblk0p10
 sdcard_mnt=\/dev\/block\/mmcblk0p11
+preload_mnt=\/dev\/block\/mmcblk0p12
 
 modem_mnt=\/dev\/block\/mmcblk0p8
 

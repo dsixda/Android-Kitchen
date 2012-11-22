@@ -1,0 +1,15 @@
+#!/system/bin/mksh
+
+mount -o remount rw /system
+cd /preload/symlink/system/app
+
+# Can't create array with /bin/sh, hence we use mksh
+apks=( `ls | grep .apk` )
+
+for item in ${apks[@]}
+do
+  # Remove any existing symlinks
+  rm -rf /system/app/$item
+
+  ln -s /preload/symlink/system/app/$item /system/app/$item 
+done

@@ -191,9 +191,16 @@ elif [ -e factoryfs.img ]
 then
   echo Found factoryfs.img
 
+  if [ -e hidden.img ]
+  then
+    echo "Found hidden.img"
+  else
+    echo "No hidden.img found"
+  fi
+
   if [ -e cache.img ]
   then
-    echo Found cache.img
+    echo "Found cache.img"
   else
     echo "Warning: No cache.img found"
   fi
