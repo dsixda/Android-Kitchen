@@ -8,8 +8,5 @@ apks=( `ls | grep .apk` )
 
 for item in ${apks[@]}
 do
-  # Remove any existing symlinks
-  rm -rf /system/app/$item
-
   ln -s /preload/symlink/system/app/$item /system/app/$item 
 done
