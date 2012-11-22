@@ -4,9 +4,11 @@ mount -o remount rw /system
 cd /preload/symlink/system/app
 
 # Can't create array with /bin/sh, hence we use mksh
-apks=( `ls | grep .apk` )
+apk_list=( `ls | grep .apk` )
+odex_list=( `ls | grep .odex` )
+items=${apk_list[*]}" "${odex_list[*]}
 
-for item in ${apks[@]}
+for item in ${items[@]}
 do
   ln -s /preload/symlink/system/app/$item /system/app/$item 
 done

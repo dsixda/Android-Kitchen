@@ -228,33 +228,37 @@ base_dir=`pwd`
 
 cd $system_dir/app
 
-# First check for *.apk with symlink to preload/symlink/system/app
+# First check for *.apk and *.odex with symlink to preload/symlink/system/app
 # and delete them (this works for Linux / OS X)
 
-preload_apps=( `find . -type l -exec ls -l {} \; | grep /preload/symlink/system/app | sed 's/.* \/preload\/symlink\/system\/app\/\(.*\)/\1/g'` )
+preload_links=( `find . -type l -exec ls -l {} \; | grep /preload/symlink/system/app | sed 's/.* \/preload\/symlink\/system\/app\/\(.*\)/\1/g'` )
 
-if [ "$preload_apps" != "" ]
+if [ "$preload_links" != "" ]
 then
 
+  num_preload_links=${#preload_links[@]}
+
   echo 
-  echo -n "Under /system/app, removing symlinks to apps in /preload/symlink/system/app "
-  for apk in ${preload_apps[@]} 
+  echo -n "Under /system/app, removing <<$num_preload_links>> symlinks to APK and ODEX files in /preload/symlink/system/app "
+  for item in ${preload_links[@]} 
   do
     echo -n "."
-    rm -f $apk  
+    rm -f $item  
   done
 
   use_hidden=1
 
 else
+
   # Check if the number of odex files outnumbers number of apks (this works for Cygwin)
+
   num_odex_app=`find . | grep -c "\.odex$"`
   num_apk_app=`find . | grep -c "\.apk$"`
 
   if [ $num_odex_app -gt $num_apk_app ]
   then
     echo
-    echo "The /system/app folder is missing some APK files."
+    echo "The /system/app folder is missing some APK (and possible ODEX) files."
     echo "These are probably found in hidden.img"
 
     use_hidden=1
@@ -336,13 +340,37 @@ then
 
     echo
 
-    if [ -d $hidden_dir2/symlink/system/app ] && [ `find $hidden_dir2/symlink/system/app | grep -c "\.apk$"` -gt 0 ]
+    #
+    # Check if preload files are found in hidden.img
+    #
+    if [ -d $hidden_dir2/symlink/system/app ] 
     then
-      echo "Good, found some system apps under hidden.img"
-      mkdir -p $working_dir/preload/symlink/system
-      mv $hidden_dir2/symlink/system/app $working_dir/preload/symlink/system/ 
+      num_preload_apk=`find $hidden_dir2/symlink/system/app | grep -c "\.apk$"`
+      num_preload_odex=`find $hidden_dir2/symlink/system/app | grep -c "\.odex$"`
+
+      num_preload_total=$(($num_preload_apk + $num_preload_odex))
+
+      if [ $num_preload_total -gt 0 ]
+      then
+        echo "Found <<$num_preload_total>> APK and ODEX files under hidden.img"
+        mkdir -p $working_dir/preload/symlink/system
+        mv $hidden_dir2/symlink/system/app $working_dir/preload/symlink/system/ 
+
+        if [ "$num_preload_links" != "" ]
+        then
+         if [ $num_preload_links != $num_preload_total ]
+         then
+          echo "Warning: This number does not equal the number of symlinks found under /system/app earlier!"
+         else
+          echo "This number matches the number of symlinks found under /system/app earlier"
+         fi
+        fi
+
+      else
+        echo "Warning: No APK/ODEX files found in hidden.img"
+      fi
     else
-      echo "Warning: No system apps found in hidden.img"
+      echo "Warning: No /preload/symlink/system/app folder found in hidden.img"
     fi
 
     echo
