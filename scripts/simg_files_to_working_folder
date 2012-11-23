@@ -259,7 +259,6 @@ else
   then
     echo
     echo "The /system/app folder is missing some APK (and maybe some ODEX) files."
-    echo "These are probably found in hidden.img"
 
     use_hidden=1
   fi
@@ -358,19 +357,58 @@ then
 
         if [ "$num_preload_links" != "" ]
         then
-         if [ $num_preload_links != $num_preload_total ]
-         then
-          echo "Warning: This number does not equal the number of symlinks found under /system/app earlier!"
-         else
-          echo "This number matches the number of symlinks found under /system/app earlier"
-         fi
+          if [ $num_preload_links != $num_preload_total ]
+          then
+            echo "Warning: This number does not equal the number of symlinks found under /system/app earlier!"
+          else
+            echo "This number matches the number of symlinks found under /system/app earlier"
+          fi
         fi
 
+
+        #
+        # Closing comments about /preload stuff
+        #
+
+        device_name=`scripts/get_samsung_variant`
+
+        if [ "$device_name" == "" ]
+        then
+          echo
+          echo "WARNING: Device name has not been defined under /tools/edify_defs!"
+          echo
+        else
+          preload_mnt=`scripts/get_edify_def_val $device_name preload_mnt`
+
+          if [ "$preload_mnt" != "UNKNOWN" ]
+          then
+            echo
+            preload_mnt=`echo $preload_mnt | sed -e 's/\\\\//g'`
+
+            echo "Mount point for /preload has already been defined for this device"
+            echo "as $preload_mnt under /tools/edify_defs/$device_name. Good."
+          else
+            echo
+            echo "Warning: No /preload mount point ('preload_mnt') was defined under"
+            echo "tools/edify_defs/$device_name! Please ensure this is specified before"
+            echo "proceeding to next stage (press Enter when done or if you want to"
+            echo "skip this step)."
+            echo
+            scripts/press_enter
+          fi
+        fi
+
+        echo 
+        echo "NOTE: If you wish to de-odex this ROM, you will need to manually copy"
+        echo "the APK and ODEX files from the /preload folder to /system/app, and"
+        echo "then move these de-odexed APKs back to the original folder when done!"
+        echo
+
       else
-        echo "Warning: No APK/ODEX files found in hidden.img"
+        echo "Warning: No APK/ODEX files found in hidden.img!"
       fi
     else
-      echo "Warning: No /preload/symlink/system/app folder found in hidden.img"
+      echo "Warning: No /preload/symlink/system/app folder found in hidden.img!"
     fi
 
     echo
@@ -389,6 +427,8 @@ then
     rm -f $hidden_dir/hidden.img
   fi
 fi
+
+
 
 
 cd $base_dir
