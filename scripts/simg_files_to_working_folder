@@ -385,8 +385,9 @@ then
             echo
             preload_mnt=`echo $preload_mnt | sed -e 's/\\\\//g'`
 
-            echo "Mount point for /preload has already been defined for this device"
-            echo "as $preload_mnt under /tools/edify_defs/$device_name. Good."
+            echo "The mount point for /preload has already been defined for this"
+            echo "device as $preload_mnt under /tools/edify_defs/$device_name. "
+            echo "Good."
           else
             echo
             echo "Warning: No /preload mount point ('preload_mnt') was defined under"

@@ -3,7 +3,7 @@
 mount -o remount rw /system
 cd /preload/symlink/system/app
 
-# Can't create array with /bin/sh, hence we use mksh
+# Can't create array with /sbin/sh, hence we use mksh
 apk_list=( `ls | grep .apk` )
 odex_list=( `ls | grep .odex` )
 items=${apk_list[*]}" "${odex_list[*]}
