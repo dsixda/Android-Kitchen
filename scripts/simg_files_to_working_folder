@@ -402,7 +402,7 @@ then
         echo 
         echo "NOTE: If you wish to de-odex this ROM, you will need to manually copy"
         echo "the APK and ODEX files from the /preload folder to /system/app, and"
-        echo "then move these de-odexed APKs back to the original folder when done!"
+        echo "then move the de-odexed APKs back to the original folder when done!"
         echo
 
       else
