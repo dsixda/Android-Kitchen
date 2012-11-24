@@ -366,6 +366,13 @@ then
 fi
 
 
+#
+# Prima WLAN
+#
+cd ..
+scripts/fix_prima_wifi
+cd WORKING_*
+
 
 #
 # Check for /system/bin/reboot in working folder, and then modify the update-script if required.

@@ -1,0 +1,15 @@
+
+# LG Nexus 4 (GSM/HSPA+)
+
+change_mnt=yes
+
+param1=ext4
+param2=EMMC
+
+sys_mnt=\/dev\/block\/mmcblk0p21
+cache_mnt=\/dev\/block\/mmcblk0p22
+boot_mnt=\/dev\/block\/mmcblk0p6
+data_mnt=\/dev\/block\/mmcblk0p23
+sdcard_mnt=???
+
+fix_boot=yes

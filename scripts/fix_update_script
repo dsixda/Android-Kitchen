@@ -222,10 +222,24 @@ then
   else
     perl -pi -e 's/set_perm_recursive 1002 1002 0755 0440 SYSTEM:etc\/bluetooth\n//g' META-INF/com/google/android/update-script
     perl -pi -e 's/set_perm 0 0 0755 SYSTEM:etc\/bluetooth\n//g' META-INF/com/google/android/update-script
-    perl -pi -e 's/set_perm 1000 1000 0640 SYSTEM:etc\/bluetooth\/auto_pairing.conf\n//g' META-INF/com/google/android/update-script
-    perl -pi -e 's/set_perm 3002 3002 0444 SYSTEM:etc\/bluetooth\/blacklist.conf\n//g' META-INF/com/google/android/update-script
-
   fi
+
+
+  if [ ! -e system/etc/bluetooth/auto_pairing.conf ]
+  then
+    perl -pi -e 's/set_perm 1000 1000 0640 SYSTEM:etc\/bluetooth\/auto_pairing.conf\n//g' META-INF/com/google/android/update-script
+  fi
+
+  if [ ! -e system/etc/bluetooth/blacklist.conf ]
+  then
+    perl -pi -e 's/set_perm 3002 3002 0444 SYSTEM:etc\/bluetooth\/blacklist.conf\n//g' META-INF/com/google/android/update-script
+  fi
+
+   if [ ! -e system/etc/bluetooth/auto_pair_devlist.conf ]
+  then
+    perl -pi -e 's/set_perm 1000 1000 0640 SYSTEM:etc\/bluetooth\/auto_pair_devlist.conf\n//g' META-INF/com/google/android/update-script
+  fi
+
 
   if [ ! -e system/bin/run-as ]
   then

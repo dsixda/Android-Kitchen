@@ -18,6 +18,7 @@ set_perm_recursive 1002 1002 0755 0440 SYSTEM:etc/bluetooth
 set_perm 0 0 0755 SYSTEM:etc/bluetooth
 set_perm 1000 1000 0640 SYSTEM:etc/bluetooth/auto_pairing.conf
 set_perm 3002 3002 0444 SYSTEM:etc/bluetooth/blacklist.conf
+set_perm 1000 1000 0640 SYSTEM:etc/bluetooth/auto_pair_devlist.conf
 set_perm_recursive 1002 1002 0755 0440 SYSTEM:etc/bluez
 set_perm 0 0 0755 SYSTEM:etc/bluez
 set_perm 1002 1002 0440 SYSTEM:etc/dbus.conf
