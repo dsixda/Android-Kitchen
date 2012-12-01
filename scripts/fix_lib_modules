@@ -40,24 +40,43 @@ then
   if [ `uname | grep CYGWIN` ]
   then
 
-    symlinks=( wlan.ko p2p.ko )
-    source_files=( wlan_mt6620.ko p2p_mt6620.ko )
-
-    for (( i=0; i < ${#symlinks[@]} ; i++ ))
-    do
-
-      link=${symlinks[$i]}
-      src=${source_files[$i]}
-
-      if [ -e $src ] && [ ! -e $link ]
+    # wlan.ko fix
+    if [ ! -e wlan.ko ]
+    then
+      if [ -e wlan_mt6620.ko ]
       then
-
-        echo "Symlinking /system/lib/modules/$src -> $link"
-
-        sed -i -e 's/\(set_perm_recursive 0 0 0755 0644 SYSTEM:[ ]*$\)/symlink \/system\/lib\/modules\/'$src' SYSTEM:lib\/modules\/'$link'\n\1/g' ../../../META-INF/com/google/android/update-script
+        wlan_src=wlan_mt6620.ko 
+      elif [ -e wlan_mt6628.ko ]
+      then
+        wlan_src=wlan_mt6628.ko
       fi
+    fi
 
-    done
+    if [ "$wlan_src" != "" ]
+    then
+        echo "Symlinking /system/lib/modules/$wlan_src -> wlan.ko"
+
+        sed -i -e 's/\(set_perm_recursive 0 0 0755 0644 SYSTEM:[ ]*$\)/symlink \/system\/lib\/modules\/'$wlan_src' SYSTEM:lib\/modules\/wlan.ko\n\1/g' ../../../META-INF/com/google/android/update-script
+    fi
+
+    # p2p.ko fix
+    if [ ! -e p2p.ko ]
+    then
+      if [ -e p2p_mt6620.ko ]
+      then
+        p2p_src=p2p_mt6620.ko 
+      elif [ -e p2p_mt6628.ko ]
+      then
+        p2p_src=p2p_mt6628.ko
+      fi
+    fi
+
+    if [ "$p2p_src" != "" ]
+    then
+        echo "Symlinking /system/lib/modules/$p2p_src -> p2p.ko"
+
+        sed -i -e 's/\(set_perm_recursive 0 0 0755 0644 SYSTEM:[ ]*$\)/symlink \/system\/lib\/modules\/'$p2p_src' SYSTEM:lib\/modules\/p2p.ko\n\1/g' ../../../META-INF/com/google/android/update-script
+    fi
 
   fi
 
