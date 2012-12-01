@@ -8,6 +8,7 @@ param1_sdcard=vfat
 param2_sdcard=MTD
 
 sys_mnt=\/dev\/block\/mmcblk0p3
-cache_mnt=???
-data_mnt=???
-sdcard_mnt=???
+cache_mnt=\/dev\/block\/mmcblk0p4
+data_mnt=\/dev\/block\/mmcblk0p5
+sdcard_mnt=\/dev\/block\/mmcblk0p6
+
