@@ -401,9 +401,11 @@ then
 
         echo 
         echo "NOTE: If you wish to de-odex this ROM, you will need to manually copy"
-        echo "the APK and ODEX files from the /preload folder to /system/app, and"
-        echo "then move the de-odexed APKs back to the original folder when done!"
+        echo "the APK and ODEX files from the /preload apps folder to /system/app"
+        echo "before you de-odex."
         echo
+
+        scripts/press_enter
 
       else
         echo "Warning: No APK/ODEX files found in hidden.img!"
