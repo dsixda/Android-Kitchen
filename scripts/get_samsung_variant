@@ -9,6 +9,7 @@
 ############################################################################
 
 my_model=`scripts/get_product_model`
+my_model2=`echo $my_model | sed -e 's/SAMSUNG-\(.*\)/\1/g'`
 
 cd tools/samsung_files/model_variants
 
@@ -16,7 +17,8 @@ for device_dir in `ls`
 do
   for variant_name in `ls $device_dir`
   do 
-    if [ -e "$device_dir/$variant_name/$my_model" ]
+    if [ -e "$device_dir/$variant_name/$my_model" ] || \
+      [ -e "$device_dir/$variant_name/$my_model2" ] 
     then
       echo $variant_name
       cd ../../..
