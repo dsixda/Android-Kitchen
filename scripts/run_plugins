@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright (c) 2011 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
@@ -124,7 +124,7 @@ else
       continue
     fi
 
-    if [ refresh_names==1 ]
+    if [ $refresh_names == 1 ]
     then
       cd scripts/plugins
       grep_cmd=`find . | grep "\.plugin\$" | sed 's/.\///'`

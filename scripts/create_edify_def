@@ -67,7 +67,7 @@ then
         block_id=`echo $item | sed -e 's/\"//g' -e 's/,//g' -e 's/\(\/\)/'$slash'\1/g'`
 
 
-      elif [ $got_block_id==1 ]
+      elif [ $got_block_id == 1 ]
       then
 
         # Look for mount name
