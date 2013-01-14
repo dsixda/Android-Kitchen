@@ -14,3 +14,4 @@ boot_mnt=\/dev\/block\/mmcblk0p21
 data_mnt=\/dev\/block\/mmcblk0p35
 sdcard_mnt=\/dev\/block\/mmcblk0p36
 
+fix_boot3=yes

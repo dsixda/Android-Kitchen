@@ -1,0 +1,18 @@
+
+# HTC Droid DNA
+
+change_mnt=yes
+
+param1=ext4
+param2=EMMC
+
+param1_sdcard=vfat
+param2_sdcard=MTD
+
+sys_mnt=\/dev\/block\/mmcblk0p32
+cache_mnt=\/dev\/block\/mmcblk0p33
+boot_mnt=\/dev\/block\/mmcblk0p19
+data_mnt=\/dev\/block\/mmcblk0p34
+sdcard_mnt=\/dev\/block\/mmcblk0p35
+
+fix_boot3=yes
