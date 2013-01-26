@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2013 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
@@ -483,23 +483,28 @@ then
   echo
   echo "----> OUTPUT_ZIP/$final_file" 
   echo
-  echo
   echo "Copy this to your device and flash from custom recovery menu."
   echo
-
-  echo "Remember to do a data and/or cache wipe if necessary!"
+  echo "=========================================================================="
   echo
-  echo "If your ROM does not boot, please refer to the FAQ for troubleshooting."
+  echo "NOTE 1: Remember to do a factory reset or data/cache wipe if necessary!"
+  echo
+  echo "NOTE 2: Always refer to the Android Kitchen FAQ @ xda-developers.com for "
+  echo "common issues such as:"
+  echo
+  echo " - Errors during flashing (e.g. Status 0)"
+  echo " - Non-booting ROM after flashing ZIP file"
 
   if [ "$sign_update" == "no" ]
   then
     echo
-    echo "PLEASE NOTE: You will need to disable signature checks in the recovery"
+    echo "NOTE 3: You will need to disable signature checks in the recovery"
     echo "menu to flash this ROM!  If you wish to sign this ROM later, please use"
     echo "the Sign ZIP option in the Advanced menu of the kitchen."
   fi
 
   echo
+  echo "Good luck!"
 
 else 
 
