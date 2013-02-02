@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2013 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
@@ -400,9 +400,9 @@ then
         fi
 
         echo 
-        echo "NOTE: If you wish to de-odex this ROM, you will need to manually copy"
-        echo "the APK and ODEX files from the /preload apps folder to /system/app"
-        echo "before you de-odex."
+        echo "NOTE: If you wish to de-odex this ROM, you will need to move the APK"
+        echo "and ODEX files from the /preload apps folder to /system/app before you"
+        echo "de-odex them. The kitchen will automatically handle this."
         echo
 
         scripts/press_enter

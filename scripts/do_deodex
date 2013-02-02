@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2013 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
@@ -62,6 +62,7 @@ do
   fi
 
 
+
   num_odex=`find . | grep -c "\.odex$"`
 
   if [ "$num_odex" == "0" ]
@@ -72,6 +73,39 @@ do
     exit 0
 
   else
+
+
+    # Look for odex files in preload folder (e.g. in Galaxy S2 GT-I9100)
+    if [ -d preload/symlink/system/app ]
+    then
+
+      cd preload/symlink/system/app
+
+      if [ `find . | grep -c "\.odex$"` != "0" ]
+      then
+        echo "NOTE: ODEX files are detected in /preload folder."
+        echo  
+        echo "Move all *.apk and *.odex files in preload symlink folder to "
+        echo -n "/system/app (y/n)? (default: y): "
+        
+        read move_files
+        echo
+
+        if [ "$move_files" == "n" ]
+        then
+          echo "WARNING: Not moving!"
+        else
+          mv -fv *.apk ../../../../system/app/
+          mv -fv *.odex ../../../../system/app/
+          touch placeholder 
+        fi
+
+        echo
+      fi
+
+      cd ../../../..
+    fi
+
 
     num_odex_fr=`find system/framework | grep -c "\.odex$"`
     num_odex_app=`find system/app | grep -c "\.odex$"`
@@ -240,12 +274,13 @@ do
 
     if [ "$move_apps" == "n" ]
     then
-      echo "Not moving"
+      echo "WARNING: Not moving"
     else
       echo
       mv -fv system/app/*.apk preload/symlink/system/app/
 
       touch system/app/placeholder
+      rm -f preload/symlink/system/app/placeholder
 
       if [ -e preload/symlink/system/app/Superuser.apk ]
       then
