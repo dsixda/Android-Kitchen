@@ -30,7 +30,7 @@ then
 
 else
   cd $1
-  working_folder=`pwd`
+  working_folder=$1
 fi
 
 
