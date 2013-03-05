@@ -101,6 +101,27 @@ do
         fi
 
         echo
+      else
+        if [ `find . | grep -c "\.apk$"` != "0" ]
+        then
+          if [ `find ../../../../system/app | grep -c "\.odex$"` != "0" ]
+          then
+            echo -n "Move all *.apk in preload symlink folder to /system/app (y/n)? (default: y): "
+            
+            read move_files
+            echo
+
+            if [ "$move_files" == "n" ]
+            then
+              echo "WARNING: Not moving!"
+            else
+              mv -fv *.apk ../../../../system/app/
+              touch placeholder 
+            fi
+
+            echo
+          fi
+        fi
       fi
 
       cd ../../../..
@@ -252,6 +273,7 @@ do
   fi
 
   num_odex_app=`find system/app | grep -c "\.odex$"`
+  num_apk_app=`find system/app | grep -c "\.apk$"`
   num_odex_fr=`find system/framework | grep -c "\.odex$"`
 
   echo
@@ -266,7 +288,7 @@ do
   fi
 
   # For some Samsung Exynos Galaxy S2 / Note ROMs
-  if [ $num_odex_app == 0 ] && [ -d preload/symlink/system/app ]
+  if [ $num_odex_app == 0 ] && [ $num_apk_app != 0 ] && [ -d preload/symlink/system/app ]
   then
     echo
     echo -n "Move all *.apk to /preload/symlink/system/app (y/n)? (default: y): "
