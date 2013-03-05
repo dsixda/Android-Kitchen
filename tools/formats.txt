@@ -28,7 +28,7 @@ The format for each ROM must be one of the following:
  - system.ext4.tar + optional boot.img (Nandroid backup)
  
  Samsung Galaxy SIII / Galaxy Note II
- - system.img.ext4 + optional cache.img.ext4/boot.img
+ - system.img.ext4 + optional tomb.img.ext4/cache.img.ext4/boot.img
  - system.img + optional cache.img/boot.img/modem.bin
  - TAR/ZIP file containing the above
  - system.ext4.tar + optional boot.img (Nandroid backup)

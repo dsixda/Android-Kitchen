@@ -14,5 +14,6 @@ cache_mnt=\/dev\/block\/mmcblk0p26
 boot_mnt=\/dev\/block\/mmcblk0p8
 data_mnt=\/dev\/block\/mmcblk0p25
 sdcard_mnt=\/dev\/block\/mmcblk0p28
+preload_mnt=\/dev\/block\/mmcblk0p27
 
 fix_boot2=yes

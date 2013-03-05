@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2013 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
@@ -235,6 +235,12 @@ then
   then
     echo "Found boot.img"
     mv boot.img ../temp_img
+  fi
+
+  if [ -e tomb.img.ext4 ]
+  then
+    echo "Found tomb.img.ext4"
+    mv tomb.img.ext4 ../temp_img
   fi
 
   if [ -e cache.img.ext4 ]

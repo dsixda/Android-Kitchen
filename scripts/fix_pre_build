@@ -450,7 +450,7 @@ fi
 
 
 #
-# Check for /preload app symlinks (Galaxy S2 hidden.img)
+# Check for /preload app symlinks (Galaxy S2)
 #
 
 if [ -d preload/symlink/system/app ]
