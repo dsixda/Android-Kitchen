@@ -63,7 +63,23 @@ else
     echo "The /system/app folder is missing some APK (and maybe some ODEX) files."
 
     use_hidden=1
-  fi
+
+   elif [ `uname | grep CYGWIN` ]
+   then
+
+    # Check for versions higher than Gingerbread/ICS (this is a workaround for Cygwin)
+
+    cd $system_dir
+    if [ "`grep -c ro.build.version.release=2 build.prop`" == "0" ] && \
+        [ "`grep -c ro.build.version.release=4.0 build.prop`" == "0" ]
+    then
+      echo
+      echo "The /system/app folder is potentially missing some APK/ODEX files"
+
+      use_hidden=1
+    fi
+
+   fi
 fi
 
 cd $base_dir
