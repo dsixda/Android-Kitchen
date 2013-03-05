@@ -1,5 +1,10 @@
 #!/system/bin/mksh
 
+#
+# By dsixda
+# Originally created for Galaxy S2 and its variants
+#
+
 mount -o remount rw /system
 cd /preload/symlink/system/app
 
