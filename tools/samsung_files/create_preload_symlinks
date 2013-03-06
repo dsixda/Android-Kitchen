@@ -18,5 +18,3 @@ do
   ln -s /preload/symlink/system/app/$item /system/app/$item 
 done
 
-rm -f /system/app/placeholder
-

@@ -80,12 +80,13 @@ do
     then
 
       cd preload/symlink/system/app
+      apk_list=`ls *.apk`
 
       if [ `find . | grep -c "\.odex$"` != "0" ]
       then
-        echo "NOTE: ODEX files are detected in /preload folder."
+        echo "NOTE: APK/ODEX files are detected in /preload folder."
         echo  
-        echo "Move all *.apk and *.odex files in preload symlink folder to "
+        echo "Move all *.apk and *.odex files from preload symlink folder to "
         echo -n "/system/app (y/n)? (default: y): "
         
         read move_files
@@ -95,9 +96,9 @@ do
         then
           echo "WARNING: Not moving!"
         else
+          echo $apk_list > preload_apk_list
           mv -fv *.apk ../../../../system/app/
           mv -fv *.odex ../../../../system/app/
-          touch placeholder 
         fi
 
         echo
@@ -106,7 +107,10 @@ do
         then
           if [ `find ../../../../system/app | grep -c "\.odex$"` != "0" ]
           then
-            echo -n "Move all *.apk in preload symlink folder to /system/app (y/n)? (default: y): "
+            echo "NOTE: APK files are detected in /preload folder."
+            echo
+            echo "Move all *.apk from preload symlink folder to /system/app (y/n)?"
+            echo -n "(default: y): "
             
             read move_files
             echo
@@ -115,8 +119,8 @@ do
             then
               echo "WARNING: Not moving!"
             else
+              echo $apk_list > preload_apk_list
               mv -fv *.apk ../../../../system/app/
-              touch placeholder 
             fi
 
             echo
@@ -288,36 +292,18 @@ do
   fi
 
   # For some Samsung Exynos Galaxy S2 / Note ROMs
-  if [ $num_odex_app == 0 ] && [ $num_apk_app != 0 ] && [ -d preload/symlink/system/app ]
+  if [ $num_odex_app == 0 ] && [ $num_apk_app != 0 ] && [ -e preload/symlink/system/app/preload_apk_list ]
   then
     echo
-    echo -n "Move all *.apk to /preload/symlink/system/app (y/n)? (default: y): "
-    read move_apps
+    echo "Moving back all *.apk originally found in /preload/symlink/system/app ..."
+    echo
 
-    if [ "$move_apps" == "n" ]
-    then
-      echo "WARNING: Not moving"
-    else
-      echo
-      mv -fv system/app/*.apk preload/symlink/system/app/
+    for apk in `cat preload/symlink/system/app/preload_apk_list`
+    do
+      mv system/app/$apk preload/symlink/system/app/
+    done
 
-      touch system/app/placeholder
-      rm -f preload/symlink/system/app/placeholder
-
-      if [ -e preload/symlink/system/app/Superuser.apk ]
-      then
-        echo
-        echo "Keeping Superuser.apk under /system/app"
-        mv -f preload/symlink/system/app/Superuser.apk system/app/
-      fi
-
-      if [ -e preload/symlink/system/app/SuperSU.apk ]
-      then
-        echo
-        echo "Keeping SuperSU.apk under /system/app"
-        mv -f preload/symlink/system/app/SuperSU.apk system/app/
-      fi
-    fi
+    rm -f preload/symlink/system/app/preload_apk_list
 
     echo
   fi
