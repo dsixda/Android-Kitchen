@@ -63,192 +63,212 @@ do
 
 
 
-  num_odex=`find . | grep -c "\.odex$"`
+  #
+  # Look for odex files in preload folder (e.g. in Galaxy S2)
+  #
 
-  if [ "$num_odex" == "0" ]
+  if [ -d preload/symlink/system/app ]
   then
-    echo "No *.odex files found, no need to deodex!"
-    cd ..
-    scripts/press_enter
-    exit 0
 
-  else
+    cd preload/symlink/system/app
 
+    num_preload_odex=`find . | grep -c "\.odex$"`
+    num_preload_apk=`find . | grep -c "\.apk$"`
+    num_sysapp_odex=`find ../../../../system/app | grep -c "\.odex$"`
+    num_sysfr_odex=`find ../../../../system/framework | grep -c "\.odex$"`
 
-    # Look for odex files in preload folder (e.g. in Galaxy S2 GT-I9100)
-    if [ -d preload/symlink/system/app ]
+    # Case 1 - No odex files in preload or /system/app
+    if [ $num_preload_odex == 0 ] && [ $num_sysapp_odex == 0 ] 
+    then
+      echo "No ODEX files found in /preload/symlink/system/app or /system/app"
+      echo
+
+    # Case 2 - No apk/odex files in preload but odex files in /system/app
+    elif [ $num_preload_odex == 0 ] && [ $num_preload_apk == 0 ] 
     then
 
-      cd preload/symlink/system/app
-      apk_list=`ls *.apk`
-
-      if [ `find . | grep -c "\.odex$"` != "0" ]
+      if [ ! -e preload_apk_list ]
       then
-        echo "NOTE: APK/ODEX files are detected in /preload folder."
-        echo  
-        echo "Move all *.apk and *.odex files from preload symlink folder to "
-        echo -n "/system/app (y/n)? (default: y): "
-        
-        read move_files
+        echo "Warning: No APK/ODEX files found in /preload/symlink/system/app"
         echo
+      fi
 
-        if [ "$move_files" == "n" ]
+    # Case 3 - apk/odex files in preload
+    elif [ $num_preload_odex -gt 0 ] || [ $num_preload_apk -gt 0 ]
+    then
+
+      echo "NOTE: $num_preload_apk APK and $num_preload_odex ODEX files are detected in /preload folder."
+      echo
+      echo "Move files from preload symlink folder to /system/app (y/n)?"
+      echo -n "(default: y): "
+
+      read move_files
+      echo
+
+      if [ "$move_files" == "n" ]
+      then
+        echo "WARNING: Not moving!"
+      else
+
+        if [ $num_preload_apk -gt 0 ] 
         then
-          echo "WARNING: Not moving!"
-        else
+          apk_list=`ls *.apk`
           echo $apk_list > preload_apk_list
           mv -fv *.apk ../../../../system/app/
+        else
+          touch placeholder
+        fi
+
+        if [ $num_preload_odex -gt 0 ] 
+        then
           mv -fv *.odex ../../../../system/app/
         fi
 
-        echo
-      else
-        if [ `find . | grep -c "\.apk$"` != "0" ]
-        then
-          if [ `find ../../../../system/app | grep -c "\.odex$"` != "0" ]
-          then
-            echo "NOTE: APK files are detected in /preload folder."
-            echo
-            echo "Move all *.apk from preload symlink folder to /system/app (y/n)?"
-            echo -n "(default: y): "
-            
-            read move_files
-            echo
-
-            if [ "$move_files" == "n" ]
-            then
-              echo "WARNING: Not moving!"
-            else
-              echo $apk_list > preload_apk_list
-              mv -fv *.apk ../../../../system/app/
-            fi
-
-            echo
-          fi
-        fi
       fi
 
-      cd ../../../..
-    fi
-
-
-    num_odex_fr=`find system/framework | grep -c "\.odex$"`
-    num_odex_app=`find system/app | grep -c "\.odex$"`
-
-    echo "Found $num_odex_fr *.odex files in system/framework"
-    echo "Found $num_odex_app *.odex files in system/app"
-
-    if [ $num_odex_fr == 0 ] && [ $num_odex_app -gt 0 ]
-    then
       echo
-      echo "WARNING: You must deodex the app folder if you had already"
-      echo "deodexed the framework folder."
     fi
 
+    cd ../../../..
+  fi
+
+
+
+  num_odex_fr=`find system/framework | grep -c "\.odex$"`
+  num_odex_app=`find system/app | grep -c "\.odex$"`
+
+  echo "Found $num_odex_fr *.odex files in /system/framework"
+  echo "Found $num_odex_app *.odex files in /system/app"
+
+  if [ -e preload/symlink/system/app/preload_apk_list ]
+  then
+    echo
+    echo "NOTE: A set of APK files will be moved back to /preload folder"
+    echo "after de-odexing is completed."
+    echo 
+  fi
+
+
+  if [ $num_odex_fr == 0 ] && [ $num_odex_app == 0 ]
+  then
+    echo
+    echo "No need to de-odex!"
+    cd ..
+    scripts/press_enter
+    exit 0
+  fi
+
+  if [ $num_odex_fr == 0 ] && [ $num_odex_app -gt 0 ]
+  then
+    echo
+    echo "WARNING: You must deodex the app folder if you had already"
+    echo "deodexed the framework folder."
+    echo
+  fi
+
+
+  cd ..
+  scripts/convert_to_unix tools/deodex_files/api_level.txt    
+  api_level=`scripts/get_api_level`
+  cd WORKING_*
+
+
+  #
+  # Show menu choices
+  #
+
+  echo
+  echo "Enter a choice:"
+  echo
+
+  if [ $num_odex_app -gt 0 ] || [ $num_odex_fr -gt 0 ]
+  then
+    echo " bb  = Back up both folders (do first!)"
+  fi
+
+  echo "  v  = Set Android OS version (Current API level = $api_level)"
+  echo
+  echo "       IMPORTANT: Ensure you set the correct API level"
+  echo
+
+  if [ $num_odex_fr -gt 0 ]
+  then
+    echo "  f  = Deodex /system/framework"
+  fi
+  if [ $num_odex_app -gt 0 ]
+  then
+    echo "  a  = Deodex /system/app"
+  fi
+  if [ $num_odex_app -gt 0 ] && [ $num_odex_fr -gt 0 ]
+  then
+    echo "  b  = Deodex both folders (recommended)"
+  fi
+  echo "  s  = Deodex a single file"
+  echo "  x  = Exit"
+  echo
+  echo -n "? "
+
+  read enterChoice
+
+  list1=( app )
+  list2=( framework )
+  list3=( framework app )
+
+  if [ "$enterChoice" == "a" ]
+  then
+    dir_list=app
+  elif [ "$enterChoice" == "v" ]
+  then
+    cd ..
+    scripts/change_api_level
+    continue
+  elif [ "$enterChoice" == "f" ] 
+  then
+    dir_list=framework
+  elif [ "$enterChoice" == "b" ] 
+  then
+    dir_list="framework app"
+  elif [ "$enterChoice" == "s" ]
+  then
+    cd ..
+    scripts/choose_single_deodex
+    continue
+  elif [ "$enterChoice" == "bb" ]
+  then
+
+    #
+    # Backup
+    #
+
+    folder_list=( framework app )
+    date_str=`date '+%m%d%y_%H%M%S'`
+
+    for f in ${folder_list[@]}
+    do
+
+      backup_folder="old_`echo -n $f`_$date_str"
+      cd system/$f
+
+      echo
+      echo "Creating backup folder $backup_folder outside working folder ..."
+      mkdir ../../../$backup_folder
+      cp  * ../../../$backup_folder/
+      echo "Finished backup of $f folder."
+
+      cd ../..
+    done
 
     cd ..
-    scripts/convert_to_unix tools/deodex_files/api_level.txt    
-    api_level=`scripts/get_api_level`
-    cd WORKING_*
+    scripts/press_enter
+    continue
 
-
-    #
-    # Show menu choices
-    #
-
-    echo
-    echo "Enter a choice:"
-    echo
-
-    if [ $num_odex_app -gt 0 ] || [ $num_odex_fr -gt 0 ]
-    then
-      echo " bb  = Back up both folders (do first!)"
-    fi
-
-    echo "  v  = Set Android OS version (Current API level = $api_level)"
-    echo
-    echo "       IMPORTANT: Ensure you set the correct API level"
-    echo
-
-    if [ $num_odex_fr -gt 0 ]
-    then
-      echo "  f  = Deodex /system/framework"
-    fi
-    if [ $num_odex_app -gt 0 ]
-    then
-      echo "  a  = Deodex /system/app"
-    fi
-    if [ $num_odex_app -gt 0 ] && [ $num_odex_fr -gt 0 ]
-    then
-      echo "  b  = Deodex both folders (recommended)"
-    fi
-    echo "  s  = Deodex a single file"
-    echo "  x  = Exit"
-    echo
-    echo -n "? "
-
-    read enterChoice
-
-    list1=( app )
-    list2=( framework )
-    list3=( framework app )
-
-    if [ "$enterChoice" == "a" ]
-    then
-      dir_list=app
-    elif [ "$enterChoice" == "v" ]
-    then
-      cd ..
-      scripts/change_api_level
-      continue
-    elif [ "$enterChoice" == "f" ] 
-    then
-      dir_list=framework
-    elif [ "$enterChoice" == "b" ] 
-    then
-      dir_list="framework app"
-    elif [ "$enterChoice" == "s" ]
-    then
-      cd ..
-      scripts/choose_single_deodex
-      continue
-    elif [ "$enterChoice" == "bb" ]
-    then
-
-      #
-      # Backup
-      #
-
-      folder_list=( framework app )
-      date_str=`date '+%m%d%y_%H%M%S'`
-
-      for f in ${folder_list[@]}
-      do
-
-        backup_folder="old_`echo -n $f`_$date_str"
-        cd system/$f
-
-        echo
-        echo "Creating backup folder $backup_folder outside working folder ..."
-        mkdir ../../../$backup_folder
-        cp  * ../../../$backup_folder/
-        echo "Finished backup of $f folder."
-
-        cd ../..
-      done
-
-      cd ..
-      scripts/press_enter
-      continue
-
-    elif [ "$enterChoice" == "x" ]
-    then
-      cd ..
-      exit 0
-    else
-      cd ..
-      continue
-    fi
+  elif [ "$enterChoice" == "x" ]
+  then
+    cd ..
+    exit 0
+  else
+    cd ..
+    continue
   fi
 
 
