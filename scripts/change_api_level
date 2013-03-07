@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright (c) 2012 - dsixda (dislam@rocketmail.com)
+# Copyright (c) 2013 - dsixda (dislam@rocketmail.com)
 #
 # Android Kitchen is 100% free.  This script file is intended for personal
 # and/or educational use only.  It may not be duplicated for monetary
@@ -40,36 +40,31 @@ echo
 echo "The complete set of mappings is found at:"
 echo "http://developer.android.com/guide/appendix/api-levels.html"
 echo
-echo -n "Change the current API level (y/n)? (default: n): "
 
-read do_change
-echo
+echo -n "Please enter new level number, or 0 to cancel (currently: $api_level): "
+read set_level
 
-if [ "$do_change" != "y" ]
+if [ "`echo $set_level | sed 's/[0-9]*//'`" != "" ] || [ "$set_level" == "" ]
 then
-  echo "OK, nothing will be changed"
-else 
+  echo
+  echo "Warning: Invalid input - nothing will be changed"
 
-  echo -n "Please enter the new level number (currently: $api_level): "
-  read set_level
-  
-  if [ "`echo $set_level | sed 's/[0-9]*//'`" != "" ]
+elif [ "$set_level" == "0" ]
+then
+  echo
+  echo "OK, nothing will be changed"
+
+else    
+  echo $set_level > tools/deodex_files/api_level.txt
+  current_level=`scripts/get_api_level`
+
+  echo
+  echo "In api_level.txt, the API level is now set to: $current_level"
+
+  if [ "$current_level" != "$set_level" ]
   then
     echo
-    echo "Warning: Invalid input - nothing will be changed"
-  else    
-
-    echo $set_level > tools/deodex_files/api_level.txt
-    current_level=`scripts/get_api_level`
-
-    echo
-    echo "In api_level.txt, the API level is now set to: $current_level"
-
-    if [ "$current_level" != "$set_level" ]
-    then
-      echo
-      echo "Warning: Name is not the same as specified"
-    fi
+    echo "Warning: Name is not the same as specified"
   fi
 fi
 
