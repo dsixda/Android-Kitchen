@@ -99,7 +99,7 @@ do
 
       echo "NOTE: $num_preload_apk APK and $num_preload_odex ODEX files are detected in /preload folder."
       echo
-      echo "Move files from preload symlink folder to /system/app (y/n)?"
+      echo "Temporarily move files from preload symlink folder to /system/app (y/n)?"
       echo -n "(default: y): "
 
       read move_files
