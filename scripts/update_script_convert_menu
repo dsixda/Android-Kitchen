@@ -32,17 +32,21 @@ do
   echo "- An updater-script is in 'Edify' format"
   echo
 
+  default_choice=""
+  
   cd WORKING_*
   if [ -e META-INF/com/google/android/updater-script ]
   then
     echo "You currently have:"
     echo "META-INF/com/google/android/updater-script"
     echo
+    default_choice=1
   elif [ -e META-INF/com/google/android/update-script ]
   then
     echo "You currently have:"
     echo "META-INF/com/google/android/update-script"
     echo
+    default_choice=2
   else
     echo "You currently don't have either file in your"
     echo "working folder."
@@ -58,9 +62,26 @@ do
   echo "  2 = Convert update-script to updater-script (Edify)"
   echo "  0 = Exit"
   echo
-  echo -n "? "
+
+  if [ "$default_choice" == "" ]
+  then
+    echo -n "? "
+  else
+    echo -n "(default: $default_choice)? "
+  fi
 
   read enterNumber
+
+  if [ "$enterNumber" != "0" ] &&  [ "$enterNumber" != "1" ] &&  [ "$enterNumber" != "2" ] 
+  then
+    if [ "$default_choice" == "" ]
+    then
+      echo "Invalid option"
+      continue
+    else
+      enterNumber=$default_choice
+    fi
+  fi
 
   if [ "$enterNumber" == "1" ]
   then
@@ -71,9 +92,6 @@ do
   elif [ "$enterNumber" == "0" ]
   then
     exit 0
-  else 
-    echo "Invalid option"
-    continue
   fi
 
   scripts/press_enter
