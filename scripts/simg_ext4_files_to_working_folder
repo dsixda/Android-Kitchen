@@ -274,11 +274,13 @@ base_dir=`pwd`
 
 
 
+scripts/check_galaxy_s2x
 
-
-# Check for /preload
-scripts/check_preload_symlinks $base_dir $system_dir $hidden_dir tomb.img.ext4
-
+if [ "$?" == "1" ]
+then
+  # Check for /preload
+  scripts/check_preload_symlinks $base_dir $system_dir $hidden_dir tomb.img.ext4
+fi
 
 
 # Check for CSC
