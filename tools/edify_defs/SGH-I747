@@ -15,4 +15,4 @@ boot_mnt=\/dev\/block\/mmcblk0p7
 data_mnt=\/dev\/block\/mmcblk0p15
 sdcard_mnt=???
 
-fix_boot2=yes
+fix_boot=yes
