@@ -149,11 +149,13 @@ scripts/check_galaxy_s2x
 s2x=$?
 scripts/check_galaxy_s3_common
 s3_common=$?
+scripts/check_galaxy_s4_common
+s4_common=$?
 
 cd WORKING_*
 cd META-INF/com/google/android
 
-if [ "$ss2" == "1" ] || [ "$s2x" == "1" ] || [ "$s3_common" == "1" ]
+if [ "$ss2" == "1" ] || [ "$s2x" == "1" ] || [ "$s3_common" == "1" ] || [ "$s4_common" == "1" ]
 then
   sed -i -e 's/format /delete_recursive /g' updater-script
 fi

@@ -50,10 +50,16 @@ else
       scripts/check_galaxy_s3_common
       sgs3_common=$?
 
-      if [ "$sgs3_common" != "1" ] && [ -e $working_folder/boot.img ]
+      if [ "$sgs3_common" != "1" ]
       then
-        scripts/check_mt65xx_bootimg
-        mt65xx=$?
+        scripts/check_galaxy_s4_common
+        sgs4_common=$?
+
+        if [ "$sgs4_common" != "1" ] && [ -e $working_folder/boot.img ]
+        then
+          scripts/check_mt65xx_bootimg
+          mt65xx=$?
+        fi
       fi
     fi
   fi
@@ -70,7 +76,7 @@ else
     
     cp -vf ../../../../../tools/update_files/sgs2-update-binary update-binary
 
-  elif [ "$sgs3_common" == "1" ]
+  elif [ "$sgs3_common" == "1" ] || [ "$sgs4_common" == "1" ]
   then
 
     cp -vf ../../../../../tools/update_files/sgs3-update-binary update-binary

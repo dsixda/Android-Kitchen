@@ -315,10 +315,13 @@ then
   res2=$?
   scripts/check_gnote2_common
   res3=$?
+  scripts/check_galaxy_s4_common
+  res4=$?
 
   cd WORKING_*
 
-  if [[ "$res" == "1" || "$res2" == "1" || "$res3" == "1" ]] && [[ ! -e flash_image ]]
+  if [[ "$res" == "1" || "$res2" == "1" || "$res3" == "1" || "$res4" == "1" ]] && \
+      [[ ! -e flash_image ]]
   then
     echo "Adding flash_image to ROM ..."
     cp ../tools/samsung_files/flash_image .

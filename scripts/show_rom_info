@@ -83,6 +83,8 @@ is_galaxy_s3_exynos=$?
 echo -n "."
 scripts/check_gnote2_common
 is_gnote2_common=$?
+scripts/check_galaxy_s4_common
+is_galaxy_s4_common=$?
 
 
 #
@@ -339,7 +341,8 @@ cd ..
 
 
 
-if [ "$is_galaxy_ss2" == "1" ] || [ "$is_galaxy_s3_exynos" == "1" ] || [ "$is_gnote2_common" == "1" ]
+if [ "$is_galaxy_ss2" == "1" ] || [ "$is_galaxy_s3_exynos" == "1" ] || \
+     [ "$is_gnote2_common" == "1" ] || [ "$is_galaxy_s4_common" == "1" ]
 then
 
   #
@@ -495,7 +498,8 @@ echo " Bash shell support             : $bash_status"
 echo " /system/framework is deodexed  : $deodex_fr_status"
 echo " /system/app is deodexed        : $deodex_app_status"
 
-if [ "$is_galaxy_ss2" == "1" ] || [ "$is_galaxy_s3_exynos" == "1" ] || [ "$is_gnote2_common" == "1" ]
+if [ "$is_galaxy_ss2" == "1" ] || [ "$is_galaxy_s3_exynos" == "1" ] || \
+     [ "$is_gnote2_common" == "1" ] || [ "$is_galaxy_s4_common" == "1" ]
 then
   echo " modem.bin found                : $modem_status"
 elif [ "$is_galaxies" != "1" ]
