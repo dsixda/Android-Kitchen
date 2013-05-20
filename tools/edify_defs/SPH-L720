@@ -1,0 +1,21 @@
+
+# Sprint Samsung Galaxy S4 SPH-L720
+
+change_mnt=yes
+
+param1=ext4
+param2=EMMC
+
+param1_sdcard=vfat
+param2_sdcard=MTD
+
+sys_mnt=\/dev\/block\/mmcblk0p16
+cache_mnt=\/dev\/block\/mmcblk0p18
+boot_mnt=\/dev\/block\/mmcblk0p20
+data_mnt=\/dev\/block\/mmcblk0p29
+sdcard_mnt=\/dev\/block\/mmcblk1p1
+
+modem_mnt=\/dev\/block\/mmcblk0p2
+
+fix_boot2=yes
+
