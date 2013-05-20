@@ -1,0 +1,18 @@
+############################################################################
+#
+# Copyright (c) 2013 - dsixda (dislam@rocketmail.com)
+#
+# Android Kitchen is 100% free.  This script file is intended for personal
+# and/or educational use only.  It may not be duplicated for monetary
+# benefit or any other purpose without the permission of the developer.
+#
+############################################################################
+
+model=`scripts/get_build_prop_val ro.product.model`
+
+if [ -e "tools/samsung_files/model_variants/galaxy_s4/GT-I9500/$model" ]
+then
+  exit 1
+fi
+
+exit 0
