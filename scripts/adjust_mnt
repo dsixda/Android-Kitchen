@@ -627,7 +627,7 @@ then
     #
     # Galaxy S3 system partition fix
     #
-    if [ "$is_gs3_common" == "1" ] 
+    if [ "$is_gs3_common" == "1" ] || [ "$is_gs4_common" == "1" ] 
     then
       sed -i \
         -e 's/mount("'"$param1"'", "'"$param2"'", "'"$sys_mnt"'", "\/system");//g' \
