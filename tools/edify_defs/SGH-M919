@@ -13,7 +13,7 @@ sys_mnt=\/dev\/block\/mmcblk0p16
 cache_mnt=\/dev\/block\/mmcblk0p18
 boot_mnt=\/dev\/block\/mmcblk0p20
 data_mnt=\/dev\/block\/mmcblk0p29
-sdcard_mnt=???
+sdcard_mnt=\/dev\/block\/mmcblk1p1
 
 modem_mnt=\/dev\/block\/mmcblk0p2
 
