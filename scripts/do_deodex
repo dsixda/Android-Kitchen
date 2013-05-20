@@ -252,7 +252,7 @@ do
       echo
       echo "Creating backup folder $backup_folder outside working folder ..."
       mkdir ../../../$backup_folder
-      cp  * ../../../$backup_folder/
+      cp  -r * ../../../$backup_folder/
       echo "Finished backup of $f folder."
 
       cd ../..
