@@ -54,4 +54,19 @@ symlink toolbox SYSTEM:bin/uptime
 symlink toolbox SYSTEM:bin/vmstat
 symlink toolbox SYSTEM:bin/watchprops
 symlink toolbox SYSTEM:bin/wipe
+symlink toolbox SYSTEM:bin/chcon
+symlink toolbox SYSTEM:bin/setenforce
+symlink toolbox SYSTEM:bin/grep
+symlink toolbox SYSTEM:bin/runcon
+symlink toolbox SYSTEM:bin/touchinput
+symlink toolbox SYSTEM:bin/md5
+symlink toolbox SYSTEM:bin/getsebool
+symlink toolbox SYSTEM:bin/setsebool
+symlink toolbox SYSTEM:bin/restorecon
+symlink toolbox SYSTEM:bin/getenforce
+symlink toolbox SYSTEM:bin/load_policy
+symlink toolbox SYSTEM:bin/cp
+symlink toolbox SYSTEM:bin/playback
+symlink toolbox SYSTEM:bin/du
+symlink wiperiface_v02 SYSTEM:bin/wiperiface
 
