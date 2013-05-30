@@ -17,5 +17,5 @@ sdcard_mnt=\/dev\/block\/mmcblk1p1
 
 modem_mnt=\/dev\/block\/mmcblk0p2
 
-fix_boot2=yes
+fix_boot=yes
 
