@@ -1,5 +1,5 @@
 
-# AT&T Samsung Galaxy S4 SGH-I337
+# Bell/Telus/Rogers Samsung Galaxy S4 SGH-I337M
 
 change_mnt=yes
 
@@ -11,11 +11,11 @@ param2_sdcard=MTD
 
 sys_mnt=\/dev\/block\/mmcblk0p16
 cache_mnt=\/dev\/block\/mmcblk0p18
-boot_mnt=\/dev\/block\/platform\/msm_sdcc.1\/by-name\/boot
+boot_mnt=\/dev\/block\/mmcblk0p20
 data_mnt=\/dev\/block\/mmcblk0p29
 sdcard_mnt=\/dev\/block\/mmcblk1p1
 
 modem_mnt=\/dev\/block\/mmcblk0p2
 
-fix_boot=yes
+fix_boot2=yes
 
