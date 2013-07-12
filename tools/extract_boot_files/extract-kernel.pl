@@ -22,7 +22,7 @@ my($bootMagic, $kernelSize, $kernelLoadAddr, $ram1Size, $ram1LoadAddr, $ram2Size
 
 $pageSize = 2048;
 my($kernel) = substr($bootimg, $pageSize, $kernelSize);
-
+$kernel = substr($kernel, 512);
 open (KERNELFILE, ">zImage");
 binmode(KERNELFILE);
 print KERNELFILE $kernel or die;
