@@ -28,7 +28,7 @@ my($kernelSizeInPages) = int(($kernelSize + $pageSize - 1) / $pageSize);
 my($ram1Addr) = (1 + $kernelSizeInPages) * $pageSize;
 
 my($ram1) = substr($bootimg, $ram1Addr, $ram1Size);
-
+$ram1 = substr($ram1, 512);
 if (substr($ram1, 0, 2) ne "\x1F\x8B")
 {
 	die "The boot image does not appear to contain a valid gzip file";
