@@ -1,0 +1,16 @@
+# Huawei U8860
+
+change_mnt=yes
+
+sys_mnt=\/dev\/block\/mmcblk0p12
+cache_mnt=\/dev\/block\/mmcblk0p6
+boot_mnt=\/dev\/block\/mmcblk0p1
+data_mnt=\/dev\/block\/mmcblk0p13
+sdcard_mnt=\/dev\/block\/mmcblk0p14
+
+param1=ext4
+param2=EMMC
+
+param1_sdcard=vfat
+param2_sdcard=MTD
+
