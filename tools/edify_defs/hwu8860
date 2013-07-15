@@ -1,4 +1,14 @@
 # Huawei U8860
+#
+# Need modify the updater-script manually before Build ROM from working folder:
+# change:
+# assert(package_extract_file("boot.img", "/tmp/boot.img"),
+#       write_raw_image("/tmp/boot.img", "boot"),
+#       delete("/tmp/boot.img"));
+# to:
+# mount("vfat", "EMMC", "/dev/block/mmcblk0p1", "/cust");
+# package_extract_file("boot.img", "/cust/image/boot.img");
+# unmount("/cust");
 
 change_mnt=yes
 
