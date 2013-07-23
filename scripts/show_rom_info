@@ -322,7 +322,7 @@ cd WORKING_*
 
 show_csc=no
 
-if [ -e system/CSCVersion.txt ] || [ "$device_name" == "GT-I9001" ] || [ "$is_galaxies" == "1" ]
+if [ -e system/CSCVersion.txt ] || [ "$device_name" == "GT-I9001" ] || [ "$device_name" == "GT-I9070" ] || [ "$is_galaxies" == "1" ]
 then
 
   show_csc=yes
