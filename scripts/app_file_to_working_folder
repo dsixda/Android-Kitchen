@@ -53,8 +53,10 @@ then
 fi  
 
 echo
-echo "Extracting system.img and boot.img using ZeBadger's script ..."
-temp=`perl ../tools/huawei_files/split_updata.pl 2>/dev/null`
+#echo "Extracting system.img and boot.img using ZeBadger's script ..."
+#temp=`perl ../tools/huawei_files/split_updata.pl 2>/dev/null`
+echo "Extracting system.img and boot.img with huawei_files/split_updata.py ..."
+temp=`python ../tools/huawei_files/split_updata.py -u UPDATA.APP 2>/dev/null`
 
 if [ ! -e output/system.img ] 
 then
