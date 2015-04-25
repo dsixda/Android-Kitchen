@@ -13,15 +13,8 @@
 version=0.224
 
 
-if [ ! -e menu ]
-then
-  echo
-  echo "Ensure you run this file from the SAME folder as where it was"
-  echo "installed, otherwise the kitchen will have problems running the"
-  echo "scripts.  After you 'cd' to the correct folder, start the kitchen"
-  echo "with the ./menu command, NOT with any other command or method!"
-  exit 0
-fi
+# cd to the directory of this script
+cd "$(dirname "$0")
 
 dir_list=( original_update scripts tools )
 error_found=0
