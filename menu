@@ -19,8 +19,8 @@ then
   echo "installed, otherwise the kitchen will have problems running the"
   echo "scripts.  After you 'cd' to the correct folder, start the kitchen"
   echo "with the ./menu command, NOT with any other command or method!"
-  exit 0
-fi
+  echo; sleep 3
+else
 
 dir_list=( original_update scripts tools )
 error_found=0
@@ -119,3 +119,4 @@ do
   scripts/press_enter
 
 done
+fi
