@@ -104,6 +104,12 @@ then
   echo
   echo "Mounting $img_file to loopback device and then extracting files ..."
   
+  # Create a loop device just in case
+  if [ ! -f "/dev/loop8" ]
+  then
+    sudo mknod -m 0660 /dev/loop8 b 7 8
+  fi
+
   cd $img_dir
 
   user_=`whoami`
